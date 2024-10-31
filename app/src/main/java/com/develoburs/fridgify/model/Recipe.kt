@@ -1,6 +1,8 @@
 package com.develoburs.fridgify.model
 
 data class Recipe(
+    val id: String,
+
     val Name: String,
 
     val Author: String,
@@ -9,5 +11,7 @@ data class Recipe(
 
     val Comments: Int,
 
-    val Images: List<String>
+    val Images: List<String>,
+
+    val instructions: String
 )
