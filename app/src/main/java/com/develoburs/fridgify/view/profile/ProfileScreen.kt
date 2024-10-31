@@ -16,11 +16,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.develoburs.fridgify.view.home.RecipeCard
 import com.develoburs.fridgify.viewmodel.RecipeListViewModel
+import com.develoburs.fridgify.viewmodel.RecipeListViewModelFactory
 import androidx.compose.foundation.shape.CircleShape
+import androidx.navigation.NavController
 
 @Composable
-fun ProfileScreen() {
-    val viewModel: RecipeListViewModel = viewModel()
+fun ProfileScreen(navController: NavController) {
+    val viewModel: RecipeListViewModel = viewModel(factory = RecipeListViewModelFactory(navController))
     val recipes = viewModel.recipe.collectAsState().value // Get the list of recipes
 
     Column(

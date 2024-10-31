@@ -9,8 +9,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import androidx.navigation.NavController
 
-class RecipeListViewModel : ViewModel() {
+class RecipeListViewModel(private val navController: NavController) : ViewModel() {
     private val repository = FridgifyRepositoryImpl()
     private val _recipe = MutableStateFlow<List<Recipe>>(emptyList())
     val recipe: StateFlow<List<Recipe>> = _recipe
@@ -28,5 +29,9 @@ class RecipeListViewModel : ViewModel() {
                 Log.e("RecipeListViewModel", "Failed to fetch recipe list", e)
             }
         }
+    }
+
+    fun getRecipeById(recipeId: String?): Recipe? {
+        return _recipe.value.find { it.id == recipeId }
     }
 }
