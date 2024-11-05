@@ -19,6 +19,10 @@ import com.develoburs.fridgify.viewmodel.RecipeListViewModel
 import com.develoburs.fridgify.viewmodel.RecipeListViewModelFactory
 import androidx.compose.foundation.shape.CircleShape
 import androidx.navigation.NavController
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.res.painterResource
+import com.develoburs.fridgify.R
 
 @Composable
 fun ProfileScreen(navController: NavController) {
@@ -34,52 +38,98 @@ fun ProfileScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
+                .height(150.dp)
                 .background(Color.Blue, shape = RoundedCornerShape(8.dp)),
             contentAlignment = Alignment.Center
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             ) {
-                // Profile Picture
-                Box(
-                    modifier = Modifier
-                        .size(50.dp) // Adjust size as needed
-                        .background(Color.Gray, shape = CircleShape) // Placeholder for profile picture
-                )
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                // Name and Numbers
-                Column(
-                    modifier = Modifier.weight(1f), // Take remaining space
-                    verticalArrangement = Arrangement.Center
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
+                    // Profile Picture
+                    Box(
+                        modifier = Modifier
+                            .size(50.dp)
+                            .background(Color.Gray, shape = CircleShape) // Placeholder for profile picture
+                    )
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    // Name
                     Text(
                         text = "Yasin İBİŞ",
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color.White
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Row {
-                        Text(
-                            text = "14", // First number
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = Color.White
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "25", // Second number
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = Color.White
-                        )
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    // Icons and Numbers in Columns
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.SpaceEvenly,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.comment_icon),
+                                contentDescription = null,
+                                tint = Color.White
+                            )
+                            Text(
+                                text = "10",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White
+                            )
+                        }
+
+                        Column(
+                            verticalArrangement = Arrangement.SpaceEvenly,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.favorite_icon),
+                                contentDescription = null,
+                                tint = Color.White
+                            )
+                            Text(
+                                text = "10",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White
+                            )
+                        }
                     }
+                }
+
+                // Settings Button
+                IconButton(
+                    onClick = {
+                        navController.navigate("SettingsScreen")
+                        // Navigation action here, e.g., navController.navigate("settings")
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                ) {
+                    Text(
+                        text = "Settings",
+                        style = MaterialTheme.typography.bodyLarge,  // Use a larger typography style
+                        color = Color.White
+                    )
                 }
             }
         }
+
+
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -92,6 +142,7 @@ fun ProfileScreen(navController: NavController) {
                 RecipeCard(
                     recipe = recipe,
                     onClick = {
+                        navController.navigate("recipeDetails/${recipe.id}")
                         // Handle click event for the recipe card
                     }
                 )
