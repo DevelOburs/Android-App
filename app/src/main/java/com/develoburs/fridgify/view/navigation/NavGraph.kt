@@ -10,6 +10,8 @@ import com.develoburs.fridgify.view.bottombar.BottomBarScreen
 import com.develoburs.fridgify.view.fridge.FridgeScreen
 import com.develoburs.fridgify.view.home.HomeScreen
 import com.develoburs.fridgify.view.profile.ProfileScreen
+import com.develoburs.fridgify.view.profile.SettingsScreen
+import com.develoburs.fridgify.view.profile.RecipeScreen
 import com.develoburs.fridgify.view.home.RecipeDetailsScreen
 import com.develoburs.fridgify.viewmodel.RecipeListViewModel
 import com.develoburs.fridgify.viewmodel.RecipeListViewModelFactory
@@ -49,6 +51,22 @@ fun NavGraph(
                 recipe = recipe ?: return@composable,  // Handle null case
                 onBack = { navController.popBackStack() }
             )
+        }
+
+        composable("SettingsScreen") {
+            SettingsScreen(navController = navController)  // Call SettingScreen composable here
+        }
+        // Route for the Recipes screen with a dynamic parameter
+        composable(
+            "recipes/{recipeType}",
+            arguments = listOf(navArgument("recipeType") { type = androidx.navigation.NavType.StringType })
+        ) { backStackEntry ->
+            val recipeType = backStackEntry.arguments?.getString("recipeType") ?: "liked"
+
+            // Call RecipesScreen with the type of recipes (liked or saved)
+            RecipeScreen(
+                navController = navController,
+                recipeType = recipeType)
         }
     }
 }
