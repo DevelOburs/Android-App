@@ -20,9 +20,7 @@ import com.develoburs.fridgify.ui.theme.DarkBlueColor
 import com.develoburs.fridgify.ui.theme.DarkerBlueColor
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Alignment
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun FoodCard(
@@ -62,6 +60,34 @@ fun FoodCard(
             Text(
                 text = food.name,
                 modifier = Modifier.padding(top = 0.dp)
+            )
+        }
+    }
+}
+@Composable
+fun AddFoodCard(onClick: () -> Unit) {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val cardSize = screenWidth / 4
+
+    Card(
+        modifier = Modifier
+            .padding(horizontal = 4.dp)
+            .padding(bottom = 8.dp)
+            .size(cardSize)
+            .border(
+                width = 1.dp,
+                color = DarkerBlueColor,
+            )
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = DarkBlueColor),
+        shape = RectangleShape
+    )  {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                "+", fontSize = 40.sp
             )
         }
     }

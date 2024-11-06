@@ -22,8 +22,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
+
 @Composable
-fun FridgeScreen() {
+fun FridgeScreen()
+{
     val viewModel: FridgeViewModel = viewModel(factory = viewModelFactory {
         initializer {
             FridgeViewModel()
@@ -63,6 +65,9 @@ fun FridgeScreen() {
                         food = recipe,
                         onClick = {},
                     )
+                }
+                item {
+                    AddFoodCard(onClick = {})
                 }
             }
         }

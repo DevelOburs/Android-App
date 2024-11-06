@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.develoburs.fridgify.view.bottombar.BottomBarScreen
 import com.develoburs.fridgify.view.fridge.FridgeScreen
+import com.develoburs.fridgify.view.fridge.AddingScreen
 import com.develoburs.fridgify.view.home.HomeScreen
 import com.develoburs.fridgify.view.profile.ProfileScreen
 import com.develoburs.fridgify.view.profile.SettingsScreen
@@ -35,6 +36,9 @@ fun NavGraph(
         }
         composable(BottomBarScreen.Profile.route) {
             ProfileScreen(navController = navController)
+        }
+        composable("AddingScreen") {
+            AddingScreen()
         }
         composable(
             "recipeDetails/{recipeId}",
