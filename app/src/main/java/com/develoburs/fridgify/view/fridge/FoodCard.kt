@@ -25,7 +25,7 @@ fun FoodCard(
     onClick: () -> Unit = {}
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val cardSize = screenWidth / 4 // Ekran genişliğinin dörtte biri
+    val cardSize = screenWidth / 4
 
     Card(
         modifier = Modifier
