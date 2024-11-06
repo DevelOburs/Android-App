@@ -60,7 +60,7 @@ fun FridgeScreen() {
             ) {
                 items(filteredFoods) { recipe ->
                     FoodCard(
-                        recipe = recipe,
+                        food = recipe,
                         onClick = {},
                     )
                 }
