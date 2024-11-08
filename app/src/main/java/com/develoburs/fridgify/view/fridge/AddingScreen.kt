@@ -43,7 +43,7 @@ fun AddingScreen(navController: NavController) {
         TextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            placeholder = { Text("Search...") },
+            placeholder = { Text("Search") },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -102,7 +102,6 @@ fun AddingScreen(navController: NavController) {
             }
             Button(onClick = {
                 displaySelectedItems = selectedItems.joinToString(", ") { it.name }
-                //navController.popBackStack()
             }) {
                 Text("Add")
             }
