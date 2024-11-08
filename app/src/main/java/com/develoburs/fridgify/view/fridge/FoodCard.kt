@@ -15,12 +15,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.develoburs.fridgify.model.Food
-import com.develoburs.fridgify.ui.theme.DarkBlueColor
-import com.develoburs.fridgify.ui.theme.DarkerBlueColor
+
+import com.develoburs.fridgify.ui.theme.BlueColor
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
+//import androidx.compose.ui.graphics.Color
+import com.develoburs.fridgify.ui.theme.DarkBlueColor
+
+//val PurpleColor = Color(0xFF800080)
+
 
 
 @Composable
@@ -28,31 +33,33 @@ fun FoodCard(
     food: Food,
     onClick: () -> Unit = {}
 ) {
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val cardSize = screenWidth / 4
+    val screen_width_android = LocalConfiguration.current.screenWidthDp.dp
+    val cardSize = screen_width_android / 4
 
     Card(
         modifier = Modifier
-            .padding(horizontal = 4.dp)
+            .padding(horizontal = 5.dp)
             .padding(bottom = 8.dp)
             .size(cardSize)
             .border(
-                width = 1.dp,
-                color = DarkerBlueColor,
+                width = 2.dp,
+                color = BlueColor,
                 shape = RoundedCornerShape(8.dp),
             )
-            .clickable { onClick() },
+            ,
         colors = CardDefaults.cardColors(containerColor = DarkBlueColor),
         shape = RoundedCornerShape(8.dp)
     ){
         Column(
+
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
+
                 modifier = Modifier
                     .size(cardSize * 0.75f)
-                    .border(2.dp, DarkerBlueColor,shape = RoundedCornerShape(8.dp)),
+                    .border(2.dp, BlueColor,shape = RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(food.image)
@@ -61,7 +68,7 @@ fun FoodCard(
 
             Text(
                 text = food.name,
-                modifier = Modifier.padding(top = 0.dp)
+                modifier = Modifier.padding(top = 1.dp)
             )
         }
     }
@@ -78,11 +85,11 @@ fun AddFoodCard(onClick: () -> Unit) {
             .size(cardSize)
             .border(
                 width = 2.dp,
-                color = DarkerBlueColor,
+                color = BlueColor,
                 shape = RoundedCornerShape(8.dp),
             )
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = DarkBlueColor),
+        colors = CardDefaults.cardColors(containerColor = BlueColor),
         shape = RoundedCornerShape(8.dp)
     )  {
         Box(
