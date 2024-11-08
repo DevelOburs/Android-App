@@ -13,5 +13,11 @@ data class Recipe(
 
     val Images: List<String>,
 
-    val instructions: String
+    val instructions: String,
+
+    val ingredients: List<String>,
+
+    val comments: List<String>
+
+
 )
