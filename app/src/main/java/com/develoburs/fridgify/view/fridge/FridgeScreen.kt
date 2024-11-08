@@ -22,9 +22,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
+import androidx.navigation.NavController
 
 @Composable
-fun FridgeScreen()
+fun FridgeScreen(navController: NavController)
 {
     val viewModel: FridgeViewModel = viewModel(factory = viewModelFactory {
         initializer {
@@ -67,7 +68,7 @@ fun FridgeScreen()
                     )
                 }
                 item {
-                    AddFoodCard(onClick = {})
+                    AddFoodCard(onClick = {navController.navigate("addingScreen")})
                 }
             }
         }
