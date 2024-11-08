@@ -12,7 +12,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.develoburs.fridgify.model.Food
@@ -21,6 +20,8 @@ import com.develoburs.fridgify.ui.theme.DarkerBlueColor
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.shape.RoundedCornerShape
+
 
 @Composable
 fun FoodCard(
@@ -38,10 +39,11 @@ fun FoodCard(
             .border(
                 width = 1.dp,
                 color = DarkerBlueColor,
+                shape = RoundedCornerShape(8.dp),
             )
             .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = DarkBlueColor),
-        shape = RectangleShape
+        shape = RoundedCornerShape(8.dp)
     ){
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -50,7 +52,7 @@ fun FoodCard(
             Box(
                 modifier = Modifier
                     .size(cardSize * 0.75f)
-                    .border(1.dp, DarkerBlueColor),
+                    .border(2.dp, DarkerBlueColor,shape = RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(food.image)
@@ -75,12 +77,13 @@ fun AddFoodCard(onClick: () -> Unit) {
             .padding(bottom = 8.dp)
             .size(cardSize)
             .border(
-                width = 1.dp,
+                width = 2.dp,
                 color = DarkerBlueColor,
+                shape = RoundedCornerShape(8.dp),
             )
             .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = DarkBlueColor),
-        shape = RectangleShape
+        shape = RoundedCornerShape(8.dp)
     )  {
         Box(
             modifier = Modifier.fillMaxSize(),
