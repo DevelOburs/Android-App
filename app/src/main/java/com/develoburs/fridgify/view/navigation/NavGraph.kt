@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.develoburs.fridgify.view.bottombar.BottomBarScreen
 import com.develoburs.fridgify.view.fridge.FridgeScreen
+import com.develoburs.fridgify.view.fridge.AddingScreen
 import com.develoburs.fridgify.view.home.HomeScreen
 import com.develoburs.fridgify.view.profile.ProfileScreen
 import com.develoburs.fridgify.view.profile.SettingsScreen
@@ -22,19 +23,21 @@ fun NavGraph(
     navController: NavHostController,
     startDestination: String = BottomBarScreen.Home.route
 ) {
-    // Get the ViewModel instance (use hiltViewModel() if using Hilt)
     val recipeListViewModel: RecipeListViewModel = viewModel(factory = RecipeListViewModelFactory(navController))
 
 
     NavHost(navController = navController, startDestination = startDestination) {
         composable(BottomBarScreen.Fridge.route) {
-            FridgeScreen()
+            FridgeScreen(navController = navController)
         }
         composable(BottomBarScreen.Home.route) {
             HomeScreen(navController = navController)
         }
         composable(BottomBarScreen.Profile.route) {
             ProfileScreen(navController = navController)
+        }
+        composable("AddingScreen") {
+            AddingScreen(navController = navController)
         }
         composable(
             "recipeDetails/{recipeId}",
@@ -43,27 +46,23 @@ fun NavGraph(
             // Fetch the recipeId from the arguments
             val recipeId = backStackEntry.arguments?.getString("recipeId")
 
-            // Use the ViewModel to get the recipe by ID
             val recipe = recipeListViewModel.getRecipeById(recipeId)
 
-            // Call RecipeDetailsScreen with the retrieved recipe
             RecipeDetailsScreen(
-                recipe = recipe ?: return@composable,  // Handle null case
+                recipe = recipe ?: return@composable,
                 onBack = { navController.popBackStack() }
             )
         }
 
         composable("SettingsScreen") {
-            SettingsScreen(navController = navController)  // Call SettingScreen composable here
+            SettingsScreen(navController = navController)
         }
-        // Route for the Recipes screen with a dynamic parameter
         composable(
             "recipes/{recipeType}",
             arguments = listOf(navArgument("recipeType") { type = androidx.navigation.NavType.StringType })
         ) { backStackEntry ->
             val recipeType = backStackEntry.arguments?.getString("recipeType") ?: "liked"
 
-            // Call RecipesScreen with the type of recipes (liked or saved)
             RecipeScreen(
                 navController = navController,
                 recipeType = recipeType)
