@@ -37,7 +37,7 @@ fun NavGraph(
             ProfileScreen(navController = navController)
         }
         composable("AddingScreen") {
-            AddingScreen(navController = navController)
+            AddingScreen(navController = navController, onBack = { navController.popBackStack() })
         }
         composable(
             "recipeDetails/{recipeId}",
