@@ -1,4 +1,6 @@
 package com.develoburs.fridgify.view.fridge
+
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 
 
@@ -19,14 +21,28 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import com.develoburs.fridgify.R
+import com.develoburs.fridgify.ui.theme.BlackColor
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FridgeScreen(navController: NavController)
-{
+fun FridgeScreen(navController: NavController) {
     val viewModel: FridgeViewModel = viewModel(factory = viewModelFactory {
         initializer {
             FridgeViewModel()
@@ -40,37 +56,74 @@ fun FridgeScreen(navController: NavController)
     val filteredFoods = remember(searchQuery, allFoods) {
         allFoods.filter { it.name.contains(searchQuery, ignoreCase = true) }
     }
-    Column(modifier = Modifier.fillMaxSize()) {
 
-        TextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            placeholder = { Text("Search...") },
-            modifier = Modifier
-                .fillMaxWidth()
-
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(4),
-                contentPadding = PaddingValues(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(filteredFoods) { recipe ->
-                    FoodCard(
-                        food = recipe,
-                        onClick = {},
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.fridge),
+                        color = BlackColor,
+                        style = MaterialTheme.typography.labelMedium
                     )
-                }
-                item {
-                    AddFoodCard(onClick = {navController.navigate("addingScreen")})
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent
+                ),
+                modifier = Modifier.height(50.dp)
+            )
+        },
+        content = { paddingValues ->
+            Surface(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.background_image),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+
+                Column(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .padding(top = 21.dp)
+                )
+                {
+                    TextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        placeholder = { Text("Search...") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(4),
+                            contentPadding = PaddingValues(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(filteredFoods) { recipe ->
+                                FoodCard(
+                                    food = recipe,
+                                    onClick = {},
+                                )
+                            }
+                            item {
+                                AddFoodCard(onClick = { navController.navigate("addingScreen") })
+                            }
+                        }
+                    }
                 }
             }
-        }
-    }
+        },
+    )
+
+
 }

@@ -1,5 +1,6 @@
 package com.develoburs.fridgify.view.profile
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,135 +19,177 @@ import com.develoburs.fridgify.view.home.RecipeCard
 import com.develoburs.fridgify.viewmodel.RecipeListViewModel
 import com.develoburs.fridgify.viewmodel.RecipeListViewModelFactory
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.navigation.NavController
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.develoburs.fridgify.R
+import com.develoburs.fridgify.ui.theme.BlackColor
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController) {
     val viewModel: RecipeListViewModel = viewModel(factory = RecipeListViewModelFactory(navController))
     val recipes = viewModel.recipe.collectAsState().value // Get the list of recipes
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        // Upper Box with Name, Two Numbers, and Profile Picture
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp)
-                .background(Color.Blue, shape = RoundedCornerShape(8.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.profile),
+                        color = BlackColor,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent
+                ),
+                modifier = Modifier.height(50.dp)
+            )
+        },
+        content = { paddingValues ->
+            Surface(
+                modifier = Modifier.fillMaxSize()
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                Image(
+                    painter = painterResource(id = R.drawable.background_image),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+
+                Column(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .padding(top = 21.dp)
                 ) {
-                    // Profile Picture
+                    // Upper Box with Name, Two Numbers, and Profile Picture
                     Box(
                         modifier = Modifier
-                            .size(50.dp)
-                            .background(Color.Gray, shape = CircleShape) // Placeholder for profile picture
-                    )
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    // Name
-                    Text(
-                        text = "Yasin İBİŞ",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Color.White
-                    )
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    // Icons and Numbers in Columns
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                            .fillMaxWidth()
+                            .height(150.dp)
+                            .background(Color.Blue, shape = RoundedCornerShape(8.dp)),
+                        contentAlignment = Alignment.Center
                     ) {
                         Column(
-                            verticalArrangement = Arrangement.SpaceEvenly,
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
                         ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.comment_icon),
-                                contentDescription = null,
-                                tint = Color.White
-                            )
-                            Text(
-                                text = "10",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color.White
-                            )
-                        }
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                // Profile Picture
+                                Box(
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .background(Color.Gray, shape = CircleShape) // Placeholder for profile picture
+                                )
 
-                        Column(
-                            verticalArrangement = Arrangement.SpaceEvenly,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.favorite_icon),
-                                contentDescription = null,
-                                tint = Color.White
-                            )
-                            Text(
-                                text = "10",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color.White
+                                Spacer(modifier = Modifier.width(16.dp))
+
+                                // Name
+                                Text(
+                                    text = "Yasin İBİŞ",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = Color.White
+                                )
+
+                                Spacer(modifier = Modifier.width(16.dp))
+
+                                // Icons and Numbers in Columns
+                                Row(
+                                    modifier = Modifier.weight(1f),
+                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.SpaceEvenly,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.comment_icon),
+                                            contentDescription = null,
+                                            tint = Color.White
+                                        )
+                                        Text(
+                                            text = "10",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = Color.White
+                                        )
+                                    }
+
+                                    Column(
+                                        verticalArrangement = Arrangement.SpaceEvenly,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.favorite_icon),
+                                            contentDescription = null,
+                                            tint = Color.White
+                                        )
+                                        Text(
+                                            text = "10",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = Color.White
+                                        )
+                                    }
+                                }
+                            }
+
+                            // Settings Button
+                            IconButton(
+                                onClick = {
+                                    navController.navigate("SettingsScreen")
+                                    // Navigation action here, e.g., navController.navigate("settings")
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp)
+                            ) {
+                                Text(
+                                    text = "Settings",
+                                    style = MaterialTheme.typography.bodyLarge,  // Use a larger typography style
+                                    color = Color.White
+                                )
+                            }
+                        }
+                    }
+
+
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Vertical Sliding Recipe Cards
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(recipes) { recipe ->  // Use the list of recipes
+                            RecipeCard(
+                                recipe = recipe,
+                                onClick = {
+                                    navController.navigate("recipeDetails/${recipe.id}")
+                                    // Handle click event for the recipe card
+                                }
                             )
                         }
                     }
                 }
 
-                // Settings Button
-                IconButton(
-                    onClick = {
-                        navController.navigate("SettingsScreen")
-                        // Navigation action here, e.g., navController.navigate("settings")
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp)
-                ) {
-                    Text(
-                        text = "Settings",
-                        style = MaterialTheme.typography.bodyLarge,  // Use a larger typography style
-                        color = Color.White
-                    )
-                }
             }
-        }
+        },
+    )
 
 
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Vertical Sliding Recipe Cards
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(recipes) { recipe ->  // Use the list of recipes
-                RecipeCard(
-                    recipe = recipe,
-                    onClick = {
-                        navController.navigate("recipeDetails/${recipe.id}")
-                        // Handle click event for the recipe card
-                    }
-                )
-            }
-        }
-    }
 }
