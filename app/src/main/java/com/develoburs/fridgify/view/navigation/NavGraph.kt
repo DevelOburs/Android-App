@@ -13,6 +13,8 @@ import com.develoburs.fridgify.view.home.HomeScreen
 import com.develoburs.fridgify.view.profile.ProfileScreen
 import com.develoburs.fridgify.view.profile.SettingsScreen
 import com.develoburs.fridgify.view.profile.RecipeScreen
+import com.develoburs.fridgify.view.profile.EditRecipeScreen
+import com.develoburs.fridgify.view.profile.AddRecipeScreen
 import com.develoburs.fridgify.view.home.RecipeDetailsScreen
 import com.develoburs.fridgify.viewmodel.RecipeListViewModel
 import com.develoburs.fridgify.viewmodel.RecipeListViewModelFactory
@@ -53,9 +55,35 @@ fun NavGraph(
                 onBack = { navController.popBackStack() }
             )
         }
+        composable(
+            "editRecipe/{recipeId}",
+            arguments = listOf(navArgument("recipeId") { type = androidx.navigation.NavType.StringType })
+        ) { backStackEntry ->
+            val recipeId = backStackEntry.arguments?.getString("recipeId")
+            val recipe = recipeListViewModel.getRecipeById(recipeId)
 
+            EditRecipeScreen(
+                recipe = recipe ?: return@composable,
+                onSave = { updatedRecipe ->
+                    recipeListViewModel.updateRecipe(updatedRecipe)
+                    navController.popBackStack() // Navigate back after saving the recipe
+                },
+                onBack = { navController.popBackStack() }
+            )
+        }
         composable("SettingsScreen") {
             SettingsScreen(navController = navController)
+        }
+        composable(
+            "addRecipe"
+        ) {
+            AddRecipeScreen(
+                onSave = { newRecipe ->
+                    recipeListViewModel.addRecipe(newRecipe) // Add the new recipe to the list or database
+                    navController.popBackStack() // Navigate back after saving
+                },
+                onBack = { navController.popBackStack() }
+            )
         }
         composable(
             "recipes/{recipeType}",
