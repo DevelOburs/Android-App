@@ -73,6 +73,52 @@ fun FoodCard(
         }
     }
 }
+
+@Composable
+fun ClickFoodCard(
+    food: Food,
+    onClick: () -> Unit = {}
+) {
+    val screen_width_android = LocalConfiguration.current.screenWidthDp.dp
+    val cardSize = screen_width_android / 4
+
+    Card(
+        modifier = Modifier
+            .padding(horizontal = 5.dp)
+            .padding(bottom = 8.dp)
+            .size(cardSize)
+            .border(
+                width = 2.dp,
+                color = BlueColor,
+                shape = RoundedCornerShape(8.dp),
+            )
+        ,
+        colors = CardDefaults.cardColors(containerColor = DarkBlueColor),
+        shape = RoundedCornerShape(8.dp)
+    ){
+        Column(
+
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+
+                modifier = Modifier
+                    .size(cardSize * 0.75f)
+                    .border(2.dp, BlueColor,shape = RoundedCornerShape(8.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(food.image)
+            }
+
+
+            Text(
+                text = food.name,
+                modifier = Modifier.padding(top = 1.dp)
+            )
+        }
+    }
+}
 @Composable
 fun AddFoodCard(onClick: () -> Unit) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
@@ -85,11 +131,11 @@ fun AddFoodCard(onClick: () -> Unit) {
             .size(cardSize)
             .border(
                 width = 2.dp,
-                color = BlueColor,
+                color = DarkBlueColor,
                 shape = RoundedCornerShape(8.dp),
             )
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = BlueColor),
+        colors = CardDefaults.cardColors(containerColor = DarkBlueColor),
         shape = RoundedCornerShape(8.dp)
     )  {
         Box(
@@ -98,6 +144,35 @@ fun AddFoodCard(onClick: () -> Unit) {
         ) {
             Text(
                 "+", fontSize = 40.sp
+            )
+        }
+    }
+}
+@Composable
+fun DeleteFoodCard(onClick: () -> Unit) {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val cardSize = screenWidth / 4
+
+    Card(
+        modifier = Modifier
+            .padding(horizontal = 4.dp)
+            .padding(bottom = 8.dp)
+            .size(cardSize)
+            .border(
+                width = 2.dp,
+                color = DarkBlueColor,
+                shape = RoundedCornerShape(8.dp),
+            )
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = DarkBlueColor),
+        shape = RoundedCornerShape(8.dp)
+    )  {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                "-", fontSize = 40.sp
             )
         }
     }

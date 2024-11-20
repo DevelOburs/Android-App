@@ -64,11 +64,17 @@ fun FridgeScreen(navController: NavController)
                 items(filteredFoods) { recipe ->
                     FoodCard(
                         food = recipe,
-                        onClick = {},
+                        onClick = { /* Tıklama sırasında yapılacak işlemler */ }
+
+
+
                     )
                 }
                 item {
                     AddFoodCard(onClick = {navController.navigate("addingScreen")})
+                }
+                item {
+                    DeleteFoodCard(onClick = {navController.navigate("deleteScreen")})
                 }
             }
         }
