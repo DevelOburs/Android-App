@@ -16,4 +16,6 @@
     <string name="save">Save</string>
     <string name="recipe_image_description">Recipe Image</string>
     <string name="background_image_description">Background Image</string>
+    <string name="show_all">Show All</string>
+    <string name="filter_by_comments">Filter by Comments</string>
 </resources>
