@@ -93,7 +93,7 @@ fun FridgeScreen(navController: NavController) {
                     TextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
-                        placeholder = { Text("Search...") },
+                        placeholder = { Text("Search") },
                         modifier = Modifier
                             .fillMaxWidth()
 
@@ -117,6 +117,9 @@ fun FridgeScreen(navController: NavController) {
                             }
                             item {
                                 AddFoodCard(onClick = { navController.navigate("addingScreen") })
+                            }
+                            item {
+                                DeleteFoodCard(onClick = { navController.navigate("deleteScreen") })
                             }
                         }
                     }
