@@ -3,4 +3,6 @@
     <string name="home">Home</string>
     <string name="profile">Profile</string>
     <string name="fridge">Fridge</string>
+    <string name="show_all">Show All</string>
+    <string name="filter_by_comments">Filter by Comments</string>
 </resources>
