@@ -78,7 +78,11 @@ fun HomeScreen(navController: NavController) {
                             recipe = recipe,
                             onClick = {
                                 navController.navigate("recipeDetails/${recipe.id}")
-                            }
+                            },
+                            onEditClick = {
+                                navController.navigate("editRecipe/${recipe.id}") // Navigate to the edit screen
+                            },
+                            isProfileScreen = false
                         )
                     }
                 }

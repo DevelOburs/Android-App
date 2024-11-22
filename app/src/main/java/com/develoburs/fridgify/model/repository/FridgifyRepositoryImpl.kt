@@ -5,7 +5,7 @@ import com.develoburs.fridgify.model.Recipe
 
 class FridgifyRepositoryImpl : FridgifyRepository {
 
-    private val mockRecipes = listOf(
+    private val mockRecipes = mutableListOf(
         Recipe(
             id = "1",
             Name = "Low-Fat Berry Blue Frozen Dessert",
@@ -163,7 +163,10 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         Food(id = 50, name = "Broccoli", image = "Broccoli")
     )
 
-
+    fun addRecipe(recipe: Recipe) {
+        // Simulate adding the recipe to a backend or database
+        mockRecipes.add(recipe) // Add recipe to the local mutable list
+    }
     override suspend fun getFoodList(): List<Food> {
         return mockFoods
     }

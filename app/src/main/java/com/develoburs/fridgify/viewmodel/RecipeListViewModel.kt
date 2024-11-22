@@ -34,4 +34,23 @@ class RecipeListViewModel(private val navController: NavController) : ViewModel(
     fun getRecipeById(recipeId: String?): Recipe? {
         return _recipe.value.find { it.id == recipeId }
     }
+    fun addRecipe(newRecipe: Recipe) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Add recipe to the repository
+                repository.addRecipe(newRecipe)
+
+                // Update the local state flow with the new recipe list
+                _recipe.value = _recipe.value + newRecipe
+            } catch (e: Exception) {
+                Log.e("RecipeListViewModel", "Failed to add recipe", e)
+            }
+        }
+    }
+    fun updateRecipe(updatedRecipe: Recipe) {
+        // Update the recipe in your list and/or backend
+        _recipe.value = _recipe.value.map {
+            if (it.id == updatedRecipe.id) updatedRecipe else it
+        }
+    }
 }

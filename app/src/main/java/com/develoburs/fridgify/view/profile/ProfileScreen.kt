@@ -19,8 +19,11 @@ import com.develoburs.fridgify.view.home.RecipeCard
 import com.develoburs.fridgify.viewmodel.RecipeListViewModel
 import com.develoburs.fridgify.viewmodel.RecipeListViewModelFactory
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.navigation.NavController
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,7 +35,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.BlackColor
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController) {
@@ -54,6 +56,20 @@ fun ProfileScreen(navController: NavController) {
                 ),
                 modifier = Modifier.height(50.dp)
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navController.navigate("addRecipe") }, // Navigate to Add Recipe Screen
+                shape = CircleShape,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = Color.White,
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Icon(
+                    Icons.Filled.Add, // Replace with your "add" icon resource
+                    contentDescription = "Add Recipe"
+                )
+            }
         },
         content = { paddingValues ->
             Surface(
@@ -151,7 +167,6 @@ fun ProfileScreen(navController: NavController) {
                             IconButton(
                                 onClick = {
                                     navController.navigate("SettingsScreen")
-                                    // Navigation action here, e.g., navController.navigate("settings")
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -159,14 +174,12 @@ fun ProfileScreen(navController: NavController) {
                             ) {
                                 Text(
                                     text = "Settings",
-                                    style = MaterialTheme.typography.bodyLarge,  // Use a larger typography style
+                                    style = MaterialTheme.typography.bodyLarge,
                                     color = Color.White
                                 )
                             }
                         }
                     }
-
-
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -180,16 +193,16 @@ fun ProfileScreen(navController: NavController) {
                                 recipe = recipe,
                                 onClick = {
                                     navController.navigate("recipeDetails/${recipe.id}")
-                                    // Handle click event for the recipe card
-                                }
+                                },
+                                onEditClick = {
+                                    navController.navigate("editRecipe/${recipe.id}")
+                                },
+                                isProfileScreen = true
                             )
                         }
                     }
                 }
-
             }
         },
     )
-
-
 }
