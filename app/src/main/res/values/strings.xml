@@ -3,4 +3,17 @@
     <string name="home">Home</string>
     <string name="profile">Profile</string>
     <string name="fridge">Fridge</string>
+    <string name="recipe_details">Recipe details</string>
+    <string name="back">Back</string>
+    <string name="add_comment">Add a comment</string>
+    <string name="submit">Submit</string>
+    <string name="ingredients">Ingredients:</string>
+    <string name="instructions">Instructions:</string>
+    <string name="comments">Comments:</string>
+    <string name="liked">Liked</string>
+    <string name="like">Like</string>
+    <string name="saved">Saved</string>
+    <string name="save">Save</string>
+    <string name="recipe_image_description">Recipe Image</string>
+    <string name="background_image_description">Background Image</string>
 </resources>
