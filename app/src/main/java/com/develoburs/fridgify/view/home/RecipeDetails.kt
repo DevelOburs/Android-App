@@ -5,6 +5,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,51 +17,65 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import androidx.compose.material3.Text
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.Column
-import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.background
-import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.BlackColor
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeDetailsScreen(recipe: Recipe, onBack: () -> Unit) {
-    // Use a local mutable list to store comments so that changes reflect immediately in the UI
-    val comments = remember { mutableStateListOf(*recipe.comments.toTypedArray()) }
-    val newComment = remember { mutableStateOf("") }
+    // State for Like and Save buttons
+    var isLiked by remember { mutableStateOf(false) }
+    var isSaved by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(
-                        text = "Recipe details", //TODO will be changed later
-                        color = BlackColor,
-                        style = MaterialTheme.typography.labelMedium
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.recipe_details),
+                            color = BlackColor,
+                            style = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        // Like Button
+                        IconButton(onClick = { isLiked = !isLiked }) {
+                            Icon(
+                                imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                contentDescription = if (isLiked) stringResource(id = R.string.liked) else stringResource(id = R.string.like),
+                                tint = if (isLiked) Color.Red else BlackColor
+                            )
+                        }
+
+                        // Save Button
+                        IconButton(onClick = { isSaved = !isSaved }) {
+                            Icon(
+                                imageVector = if (isSaved) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
+                                contentDescription = if (isSaved) stringResource(id = R.string.saved) else stringResource(id = R.string.save),
+                                tint = if (isSaved) Color.Blue else BlackColor
+                            )
+                        }
+                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(id = R.string.back),
                             tint = BlackColor
                         )
                     }
@@ -87,7 +105,7 @@ fun RecipeDetailsScreen(recipe: Recipe, onBack: () -> Unit) {
 
                     Image(
                         painter = rememberAsyncImagePainter(recipe.Images[0]),
-                        contentDescription = "Recipe Image",
+                        contentDescription = stringResource(id = R.string.recipe_image_description),
                         modifier = Modifier
                             .size(400.dp)
                             .padding(8.dp),
@@ -96,17 +114,44 @@ fun RecipeDetailsScreen(recipe: Recipe, onBack: () -> Unit) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Text(
-                        text = recipe.Name,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    // Recipe Title with Like and Save Buttons
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        Text(
+                            text = recipe.Name,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        // Like Button
+                        IconButton(onClick = { isLiked = !isLiked }) {
+                            Icon(
+                                imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                contentDescription = if (isLiked) stringResource(id = R.string.liked) else stringResource(id = R.string.like),
+                                tint = if (isLiked) Color.Red else BlackColor
+                            )
+                        }
+
+                        // Save Button
+                        IconButton(onClick = { isSaved = !isSaved }) {
+                            Icon(
+                                imageVector = if (isSaved) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
+                                contentDescription = if (isSaved) stringResource(id = R.string.saved) else stringResource(id = R.string.save),
+                                tint = if (isSaved) Color.Blue else BlackColor
+                            )
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // Ingredients Section
                     Text(
-                        text = "Ingredients:",
+                        text = stringResource(id = R.string.ingredients),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -130,7 +175,7 @@ fun RecipeDetailsScreen(recipe: Recipe, onBack: () -> Unit) {
 
                     // Instructions Section
                     Text(
-                        text = "Instructions:",
+                        text = stringResource(id = R.string.instructions),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -143,56 +188,66 @@ fun RecipeDetailsScreen(recipe: Recipe, onBack: () -> Unit) {
 
                     // Comments Section
                     Text(
-                        text = "Comments:",
+                        text = stringResource(id = R.string.comments),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp)
-                    ) {
-                        comments.forEach { comment ->
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp)
-                                    .background(Color.LightGray)
-                                    .padding(8.dp)
-                            ) {
-                                Text(text = comment, fontSize = 16.sp)
+                    // Comments Logic
+                    var newComment by remember { mutableStateOf("") }
+                    val comments = remember { mutableStateListOf(*recipe.comments.toTypedArray()) }
+
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp) // Scrollable area for comments
+                                .padding(start = 16.dp)
+                        ) {
+                            items(comments) { comment ->
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp)
+                                        .background(Color.LightGray)
+                                        .padding(8.dp)
+                                ) {
+                                    Text(text = comment, fontSize = 16.sp)
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Add New Comment Section
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                        ) {
+                            OutlinedTextField(
+                                value = newComment,
+                                onValueChange = { newComment = it },
+                                modifier = Modifier.weight(1f),
+                                placeholder = { Text(stringResource(id = R.string.add_comment)) }
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(onClick = {
+                                if (newComment.isNotBlank()) {
+                                    comments.add(newComment)
+                                    newComment = ""
+                                }
+                            }) {
+                                Text(stringResource(id = R.string.submit))
                             }
                         }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
-
-                    // New Comment Section
-                    OutlinedTextField(
-                        value = newComment.value,
-                        onValueChange = { newComment.value = it },
-                        label = { Text("Add a comment") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Button(
-                        onClick = {
-                            if (newComment.value.isNotBlank()) {
-                                comments.add(newComment.value) // Add the new comment to the list
-                                newComment.value = "" // Clear the input field after submitting
-                            }
-                        },
-                        modifier = Modifier.align(Alignment.End)
-                    ) {
-                        Text("Submit")
-                    }
                 }
-
             }
         }
     )
