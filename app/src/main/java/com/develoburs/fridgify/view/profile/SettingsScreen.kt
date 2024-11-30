@@ -45,12 +45,22 @@ fun SettingsScreen(navController: NavController) {
             onClick = { navController.navigate("recipes/liked") }
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Button to navigate to Saved Recipes with parameter
         CustomButton(
             text = "Saved Recipes",
             onClick = { navController.navigate("recipes/saved") }
+        )
+
+        // Spacer to push Logout button to the bottom
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Button to redirect to the Login page
+        CustomButton(
+            text = "Logout",
+            onClick = { navController.navigate("login") },
+            buttonColor = Color(0xFFB00020)
         )
     }
 }
@@ -115,18 +125,21 @@ fun ExpandableSettingRow(title: String, settings: List<String>) {
 }
 
 @Composable
-fun CustomButton(text: String, onClick: () -> Unit) {
+fun CustomButton(
+    text: String,
+    onClick: () -> Unit,
+    buttonColor: Color = MaterialTheme.colorScheme.surfaceVariant // Default color
+) {
     Button(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp) // Match height with expandable row
-            .background(MaterialTheme.colorScheme.surfaceVariant, shape = MaterialTheme.shapes.medium),
+            .height(56.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            containerColor = buttonColor,
             contentColor = MaterialTheme.colorScheme.onSurface
         ),
-        elevation = ButtonDefaults.buttonElevation(0.dp) // Make it flat to match the row style
+        elevation = ButtonDefaults.buttonElevation(0.dp) // Flat style
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
