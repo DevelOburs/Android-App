@@ -1,13 +1,21 @@
 package com.develoburs.fridgify.model.repository
 
+import android.util.Log
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.model.Recipe
+import com.develoburs.fridgify.model.api.RetrofitInstance.api
 
 class FridgifyRepositoryImpl : FridgifyRepository {
+    //todo update token
+    private var token: String = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlZWVkYWFhYWFhYWFhIiwiZXhwIjoxNzMzMDc1MzAyLCJpYXQiOjE3MzMwMzkzMDJ9.11Ax3LHnRQTcGrO_cl01NFnCHg3dW5QxLyhstXS4zEY"
+
+    fun setToken(newToken: String) {
+        token = newToken
+    }
 
     private val mockRecipes = mutableListOf(
         Recipe(
-            id = "1",
+            id = 1,
             Name = "Low-Fat Berry Blue Frozen Dessert",
             Author = "Dancer",
             Likes = 158,
@@ -30,7 +38,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
             )
         ),
         Recipe(
-            id="2",
+            id = 2,
             Name = "Biryani",
             Author = "elly9812",
             Likes = 39,
@@ -55,7 +63,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
             )
         ),
         Recipe(
-            id = "3",
+            id = 3,
             Name = "Best Lemonade",
             Author = "Stephen Little",
             Likes = 18,
@@ -78,7 +86,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
             )
         ),
         Recipe(
-            id = "4",
+            id = 4,
             Name = "Carina's Tofu-Vegetable Kebabs",
             Author = "Cyclopz",
             Likes = 236,
@@ -107,7 +115,13 @@ class FridgifyRepositoryImpl : FridgifyRepository {
     )
 
     override suspend fun getRecipeList(): List<Recipe> {
-        return mockRecipes
+        try {
+            val recipes = api.getRecipes("Bearer $token")
+            Log.d("Recipe List", recipes.toString())
+            return recipes
+        } catch (e: Exception) {
+            throw Exception("Failed to get recipes", e)
+        }
     }
 
     private val mockFoods = listOf(

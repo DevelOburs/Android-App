@@ -31,7 +31,7 @@ class RecipeListViewModel(private val navController: NavController) : ViewModel(
         }
     }
 
-    fun getRecipeById(recipeId: String?): Recipe? {
+    fun getRecipeById(recipeId: Int?): Recipe? {
         return _recipe.value.find { it.id == recipeId }
     }
     fun addRecipe(newRecipe: Recipe) {
