@@ -7,24 +7,24 @@ data class Recipe(
     val id: Int,
 
     @SerializedName("name")
-    val Name: String,
+    val Name: String?,
 
     @SerializedName("userId")
     val Author: String?,
 
     @SerializedName("likeCount")
-    val Likes: Int,
+    val Likes: Int?,
 
     @SerializedName("commentCount")
-    val Comments: Int,
+    val Comments: Int?,
 
-    val Images: List<String>,
+    val Images: List<String>?,
 
-    val instructions: String,
+    val instructions: String?,
 
-    val ingredients: List<String>,
+    val ingredients: List<String>?,
 
-    val comments: List<String>
+    val comments: List<String>?
 
 
 )

@@ -100,7 +100,7 @@ fun RecipeCard(
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        text = recipe.Name,
+                        text = recipe.Name ?: "Unnamed Recipe", // Provide a default value if null
                         style = MaterialTheme.typography.labelMedium,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,

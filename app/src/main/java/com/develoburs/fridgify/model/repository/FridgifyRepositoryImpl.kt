@@ -7,7 +7,7 @@ import com.develoburs.fridgify.model.api.RetrofitInstance.api
 
 class FridgifyRepositoryImpl : FridgifyRepository {
     //todo update token
-    private var token: String = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlZWVkYWFhYWFhYWFhIiwiZXhwIjoxNzMzMDc1MzAyLCJpYXQiOjE3MzMwMzkzMDJ9.11Ax3LHnRQTcGrO_cl01NFnCHg3dW5QxLyhstXS4zEY"
+    private var token: String = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNzMzMzU2OTI1LCJpYXQiOjE3MzMzMjA5MjV9.0XNejo0l46PlNPW6Vcj-BPxhtDMgPZ7TjbP8oNtbAQ8"
 
     fun setToken(newToken: String) {
         token = newToken

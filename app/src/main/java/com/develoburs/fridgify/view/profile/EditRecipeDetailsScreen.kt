@@ -59,7 +59,8 @@ fun EditRecipeScreen(
     var name by remember { mutableStateOf(recipe.Name) }
     var ingredients by remember { mutableStateOf(recipe.ingredients) }
     var instructions by remember { mutableStateOf(recipe.instructions) }
-    var imageUri by remember { mutableStateOf(recipe.Images.firstOrNull()) } // Assuming first image is the main one
+    var imageUri by remember { mutableStateOf(recipe.Images?.firstOrNull() ?: "") } // Use safe call and provide a default value
+    // Assuming first image is the main one
 
     Scaffold(
         topBar = {
@@ -103,16 +104,16 @@ fun EditRecipeScreen(
 
                     // Recipe Name Section
                     OutlinedTextField(
-                        value = name,
-                        onValueChange = { name = it },
-                        label = { Text("Recipe Name") },
+                        value = name ?: "", // Provide a default empty string if null
+                        onValueChange = { name = if (it.isBlank()) null else it }, // Set to null if blank
+                        label = { Text(text = "Recipe Name") },
                         modifier = Modifier.fillMaxWidth()
                     )
                     // Instructions Section
                     OutlinedTextField(
-                        value = instructions,
-                        onValueChange = { instructions = it },
-                        label = { Text("Instructions") },
+                        value = instructions ?: "", // Provide a default empty string if null
+                        onValueChange = { instructions = if (it.isBlank()) null else it }, // Set to null if blank
+                        label = { Text(text = "Instructions") },
                         modifier = Modifier.fillMaxWidth()
                     )
                     // Ingredients Section with LazyVerticalGrid

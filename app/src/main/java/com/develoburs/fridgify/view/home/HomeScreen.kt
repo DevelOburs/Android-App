@@ -109,7 +109,7 @@ fun HomeScreen(navController: NavController) {
                 )
 
                 val recipesToShow = if (showFiltered) {
-                    allRecipes.value.filter { it.Comments >= 10 }
+                    allRecipes.value.filter { (it.Comments ?: 0) >= 10 }
                 } else {
                     allRecipes.value
                 }
