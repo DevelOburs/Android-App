@@ -6,6 +6,7 @@ import com.develoburs.fridgify.model.Recipe
 interface FridgifyRepository {
 
     suspend fun getRecipeList(): List<Recipe>
+
     suspend fun getFoodList(): List<Food>
 
 }

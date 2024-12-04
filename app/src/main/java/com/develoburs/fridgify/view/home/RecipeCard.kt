@@ -64,12 +64,12 @@ fun RecipeCard(
         shape = RectangleShape
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            Image(
-                painter = rememberAsyncImagePainter(recipe.Images[0]),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
+//            Image(
+//                painter = rememberAsyncImagePainter(recipe.Images[0]),
+//                contentDescription = null,
+//                modifier = Modifier.fillMaxSize(),
+//                contentScale = ContentScale.Crop
+//            )
 
             Box(
                 modifier = Modifier
@@ -106,7 +106,10 @@ fun RecipeCard(
                         overflow = TextOverflow.Ellipsis,
                     )
 
-                    Text(text = recipe.Author, style = MaterialTheme.typography.labelSmall)
+                    Text(
+                        text = recipe.Author ?: "Unknown Author",
+                        style = MaterialTheme.typography.labelSmall
+                    )
                 }
 
                 Column(

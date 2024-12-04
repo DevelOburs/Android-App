@@ -53,7 +53,7 @@ fun NavGraph(
             "recipeDetails/{recipeId}",
             arguments = listOf(navArgument("recipeId") { type = androidx.navigation.NavType.StringType })
         ) { backStackEntry ->
-            val recipeId = backStackEntry.arguments?.getString("recipeId")
+            val recipeId = backStackEntry.arguments?.getString("recipeId")?.toInt()
             val recipe = recipeListViewModel.getRecipeById(recipeId)
             RecipeDetailsScreen(
                 recipe = recipe ?: return@composable,
@@ -65,7 +65,7 @@ fun NavGraph(
             arguments = listOf(navArgument("recipeId") { type = androidx.navigation.NavType.StringType })
         ) { backStackEntry ->
             val recipeId = backStackEntry.arguments?.getString("recipeId")
-            val recipe = recipeListViewModel.getRecipeById(recipeId)
+            val recipe = recipeListViewModel.getRecipeById(recipeId?.toInt())
 
             EditRecipeScreen(
                 navController = navController,
