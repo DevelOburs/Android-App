@@ -18,4 +18,9 @@
     <string name="background_image_description">Background Image</string>
     <string name="show_all">Show All</string>
     <string name="filter_by_comments">Filter by Comments</string>
+    <string name="no_image_available">No image available</string>
+    <string name="no_instructions_available">No instructions available</string>
+    <string name="no_ingredients_available">No ingredients available</string>
+    <string name="no_comments_available">No comments yet</string>
+    <string name="unknown_recipe">Unknown recipe</string>
 </resources>
