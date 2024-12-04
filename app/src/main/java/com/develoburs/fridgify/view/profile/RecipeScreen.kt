@@ -23,13 +23,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 @Composable
 fun RecipeScreen(
     navController: NavController,
+    viewModel: RecipeListViewModel = viewModel(),
     recipeType: String  // Either "liked" or "saved"
 ) {
-    val viewModel: RecipeListViewModel = viewModel(factory = viewModelFactory {
-        initializer {
-            RecipeListViewModel(navController = navController)
-        }
-    })
 
     // Collect the appropriate list based on recipeType
     val recipes = when (recipeType) {

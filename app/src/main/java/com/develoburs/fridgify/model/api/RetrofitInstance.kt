@@ -1,5 +1,7 @@
 package com.develoburs.fridgify.model.api
 
+import com.develoburs.fridgify.model.repository.FridgifyRepositoryImpl
+import com.develoburs.fridgify.viewmodel.LoginViewModel
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -16,4 +18,10 @@ object RetrofitInstance {
     val api: RecipeApi by lazy {
         retrofit.create(RecipeApi::class.java)
     }
+
+    val authapi: AuthApi by lazy {
+        retrofit.create(AuthApi::class.java)
+    }
+
+
 }

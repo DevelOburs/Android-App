@@ -22,11 +22,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.develoburs.fridgify.view.bottombar.BottomBarScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.develoburs.fridgify.viewmodel.LoginViewModel
 
 @Composable
-fun LoginPageScreen(navController: NavController) {
+fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = viewModel()) {
     var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var loginResult by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
     Column(
@@ -77,29 +81,25 @@ fun LoginPageScreen(navController: NavController) {
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        // Login Button
         Button(
             onClick = {
-                // Navigate to Home screen on successful login
-                navController.navigate(BottomBarScreen.Home.route)
+                viewModel.login(username, email, password) { response ->
+                    loginResult = if (response.error.isNullOrEmpty()) {
+                        navController.navigate(BottomBarScreen.Home.route) {
+                            // Clear the back stack so the user can't return to the login screen
+                            popUpTo("login") { inclusive = true }
+                        }
+                        "Welcome, ${response.username} (ID: ${response.userId})"
+                    } else {
+                        "Error: ${response.error}"
+                    }
+                }
             },
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
         ) {
             Text("Login")
         }
-
-
         Spacer(modifier = Modifier.height(8.dp))
-
-        // Forgot Password
-        TextButton(
-            onClick = { navController.navigate(BottomBarScreen.Home.route) }
-        ) {
-            Text("Forgot Password?")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         // Register Button (Navigate to Register Page)
         TextButton(
@@ -112,3 +112,5 @@ fun LoginPageScreen(navController: NavController) {
         }
     }
 }
+
+

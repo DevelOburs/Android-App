@@ -36,20 +36,19 @@ import com.develoburs.fridgify.viewmodel.RecipeListViewModel
 import androidx.navigation.NavController
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.BlackColor
+import com.develoburs.fridgify.viewmodel.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController) {
-
-    val viewModel: RecipeListViewModel = viewModel(factory = viewModelFactory {
-        initializer {
-            RecipeListViewModel(navController = navController)
-        }
-    })
-
+fun HomeScreen(navController: NavController, viewModel: RecipeListViewModel = viewModel()) {
     val allRecipes = viewModel.recipe.collectAsState(initial = emptyList())
 
     var showFiltered by remember { mutableStateOf(false) }
+
+    // Check if recipes are empty and trigger fetching them
+    if (allRecipes.value.isEmpty()) {
+        viewModel.getRecipesList() // Call the method to fetch recipes
+    }
 
     Scaffold(
         topBar = {
@@ -71,7 +70,7 @@ fun HomeScreen(navController: NavController) {
                         )
                     }
 
-                    DropdownMenu( //Filter choices will be updated later
+                    DropdownMenu(
                         expanded = menuExpanded,
                         onDismissRequest = { menuExpanded = false }
                     ) {
