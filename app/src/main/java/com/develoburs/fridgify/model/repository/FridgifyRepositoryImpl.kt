@@ -11,7 +11,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
     private var token: String = ""
     //eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNzMzMzU2OTI1LCJpYXQiOjE3MzMzMjA5MjV9.0XNejo0l46PlNPW6Vcj-BPxhtDMgPZ7TjbP8oNtbAQ8""
 
-
+    private var userId: Int = 0
     fun setToken(newToken: String) {
         token = newToken
     }
@@ -19,6 +19,14 @@ class FridgifyRepositoryImpl : FridgifyRepository {
     fun getToken(): String {
         return token
     }
+    fun setUserID(UserID: Int) {
+        userId = UserID
+    }
+
+    fun getUserID(): Int {
+        return userId
+    }
+
 
     private val mockRecipes = mutableListOf(
         Recipe(

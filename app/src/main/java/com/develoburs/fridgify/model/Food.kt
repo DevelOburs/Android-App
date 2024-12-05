@@ -1,7 +1,18 @@
 package com.develoburs.fridgify.model
 
+import com.google.gson.annotations.SerializedName
+
 data class Food(
+    @SerializedName("id")
     val id: Int,
-    val name: String,
-    val image: String
-)
+
+    @SerializedName("name")
+    val Name: String,
+
+    @SerializedName("category")
+    val Category: String,
+
+    @SerializedName("ImageUrl")
+    val ImageUrl: String,
+
+    )
