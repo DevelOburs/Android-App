@@ -4,13 +4,20 @@ import android.util.Log
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.model.Recipe
 import com.develoburs.fridgify.model.api.RetrofitInstance.api
+import android.content.Context
 
 class FridgifyRepositoryImpl : FridgifyRepository {
     //todo update token
-    private var token: String = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNzMzMzU2OTI1LCJpYXQiOjE3MzMzMjA5MjV9.0XNejo0l46PlNPW6Vcj-BPxhtDMgPZ7TjbP8oNtbAQ8"
+    private var token: String = ""
+    //eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNzMzMzU2OTI1LCJpYXQiOjE3MzMzMjA5MjV9.0XNejo0l46PlNPW6Vcj-BPxhtDMgPZ7TjbP8oNtbAQ8""
+
 
     fun setToken(newToken: String) {
         token = newToken
+    }
+
+    fun getToken(): String {
+        return token
     }
 
     private val mockRecipes = mutableListOf(
@@ -116,11 +123,12 @@ class FridgifyRepositoryImpl : FridgifyRepository {
 
     override suspend fun getRecipeList(): List<Recipe> {
         try {
-            val recipes = api.getRecipes("Bearer $token")
+            // Use getToken function to retrieve the token
+            val recipes = api.getRecipes("Bearer ${getToken()}")
             Log.d("Recipe List", recipes.toString())
             return recipes
         } catch (e: Exception) {
-            throw Exception("Failed to get recipes", e)
+            throw Exception("Failed to get recipes, Bearer ${getToken()}", e)
         }
     }
 

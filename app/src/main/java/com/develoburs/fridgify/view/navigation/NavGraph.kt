@@ -1,11 +1,15 @@
 package com.develoburs.fridgify.view.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.develoburs.fridgify.model.api.AuthApi
+import com.develoburs.fridgify.model.api.RetrofitInstance
+import com.develoburs.fridgify.model.repository.FridgifyRepositoryImpl
 import com.develoburs.fridgify.view.bottombar.BottomBarScreen
 import com.develoburs.fridgify.view.fridge.FridgeScreen
 import com.develoburs.fridgify.view.fridge.AddingScreen
@@ -19,6 +23,8 @@ import com.develoburs.fridgify.view.profile.AddRecipeScreen
 import com.develoburs.fridgify.view.profile.LoginPageScreen
 import com.develoburs.fridgify.view.profile.RegisterPageScreen
 import com.develoburs.fridgify.view.home.RecipeDetailsScreen
+import com.develoburs.fridgify.viewmodel.LoginViewModel
+import com.develoburs.fridgify.viewmodel.LoginViewModelFactory
 import com.develoburs.fridgify.viewmodel.RecipeListViewModel
 import com.develoburs.fridgify.viewmodel.RecipeListViewModelFactory
 
@@ -27,21 +33,30 @@ fun NavGraph(
     navController: NavHostController,
     startDestination: String = BottomBarScreen.Home.route
 ) {
-    val recipeListViewModel: RecipeListViewModel = viewModel(factory = RecipeListViewModelFactory(navController))
+    val repository = remember { FridgifyRepositoryImpl() }
+    val recipeListViewModel: RecipeListViewModel = viewModel(factory = RecipeListViewModelFactory(navController,repository))
 
+    val authApi: AuthApi = remember { RetrofitInstance.authapi }
+
+
+    // Create an instance of LoginViewModel
+    val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(authApi, repository))
+
+
+    // Retrieve the user token
+    val userToken: String = repository.getToken() // Use the getToken function from your repository
     // Here, you can define your user token (for now, assume it's always present)
-    val userToken: String? = getUserToken() // Replace with your actual method to get the user token
 
-    NavHost(navController = navController, startDestination = if (userToken == null) "login" else startDestination) {
+    NavHost(navController = navController, startDestination = if (userToken == "") "login" else startDestination) {
         // Define composable screens with checks for user token
         composable(BottomBarScreen.Fridge.route) {
             FridgeScreen(navController = navController)
         }
         composable(BottomBarScreen.Home.route) {
-            HomeScreen(navController = navController)
+            HomeScreen(navController = navController, viewModel = recipeListViewModel)
         }
         composable(BottomBarScreen.Profile.route) {
-            ProfileScreen(navController = navController)
+            ProfileScreen(navController = navController, viewModel = recipeListViewModel)
         }
         composable("AddingScreen") {
             AddingScreen(navController = navController, onBack = { navController.popBackStack() })
@@ -98,15 +113,10 @@ fun NavGraph(
             RecipeScreen(navController = navController, recipeType = recipeType)
         }
         composable("login") {
-            LoginPageScreen(navController = navController) // No bottom bar on this screen
+            LoginPageScreen(navController = navController, viewModel = loginViewModel) // Pass the LoginViewModel here
         }
         composable("register") {
             RegisterPageScreen(navController = navController) // No bottom bar on this screen
         }
     }
-}
-
-fun getUserToken(): String? {
-    // Replace this with your logic to retrieve the user token
-    return null // Assuming no token for demonstration; change as needed
 }

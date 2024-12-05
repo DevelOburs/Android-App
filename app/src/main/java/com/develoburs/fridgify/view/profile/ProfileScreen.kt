@@ -37,8 +37,7 @@ import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.BlackColor
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavController) {
-    val viewModel: RecipeListViewModel = viewModel(factory = RecipeListViewModelFactory(navController))
+fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = viewModel()) {
     val recipes = viewModel.recipe.collectAsState().value // Get the list of recipes
 
     Scaffold(

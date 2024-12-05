@@ -11,8 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import androidx.navigation.NavController
 
-class RecipeListViewModel(private val navController: NavController) : ViewModel() {
-    private val repository = FridgifyRepositoryImpl()
+class RecipeListViewModel(private val navController: NavController, private val repository: FridgifyRepositoryImpl) : ViewModel() {
     private val _recipe = MutableStateFlow<List<Recipe>>(emptyList())
     val recipe: StateFlow<List<Recipe>> = _recipe
 
@@ -20,7 +19,7 @@ class RecipeListViewModel(private val navController: NavController) : ViewModel(
         getRecipesList()
     }
 
-    private fun getRecipesList() {
+    fun getRecipesList() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val recipeList = repository.getRecipeList()
