@@ -23,5 +23,9 @@ object RetrofitInstance {
         retrofit.create(AuthApi::class.java)
     }
 
+    val fridgeApi: FridgeApi by lazy {
+        retrofit.create(FridgeApi::class.java)
+    }
+
 
 }

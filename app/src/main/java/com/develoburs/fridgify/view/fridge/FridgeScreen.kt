@@ -1,8 +1,10 @@
 package com.develoburs.fridgify.view.fridge
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 
+import com.develoburs.fridgify.model.repository.FridgifyRepositoryImpl
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,6 +43,7 @@ import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.BlackColor
 
 @OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun FridgeScreen(navController: NavController) {
     val viewModel: FridgeViewModel = viewModel(factory = viewModelFactory {
@@ -48,10 +51,24 @@ fun FridgeScreen(navController: NavController) {
             FridgeViewModel()
         }
     })
+    val repository = FridgifyRepositoryImpl()
+    viewModel.setUserId(repository.getUserID())
 
+    // API çağrısı
 
     val allFoods by viewModel.food.collectAsState(initial = emptyList())
     var searchQuery by remember { mutableStateOf("") }
+
+    // API'den veri çekmek için
+    LaunchedEffect(Unit) {
+        val userId = repository.getUserID()
+        if (userId > 0) {
+            viewModel.setUserId(userId)
+            viewModel.fetchFoods(userId)
+        } else {
+            Log.e("FridgeScreen", "Invalid userId: $userId")
+        }
+    }
 
     val filteredFoods = remember(searchQuery, allFoods) {
         allFoods.filter { it.name.contains(searchQuery, ignoreCase = true) }

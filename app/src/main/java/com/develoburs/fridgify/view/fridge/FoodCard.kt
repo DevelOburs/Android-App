@@ -62,7 +62,7 @@ fun FoodCard(
                     .border(2.dp, BlueColor,shape = RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Text(food.image)
+                Text(food.imageUrl)
             }
 
 

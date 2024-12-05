@@ -5,13 +5,14 @@ import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.model.Recipe
 import com.develoburs.fridgify.model.api.RetrofitInstance.api
 import android.content.Context
+import com.develoburs.fridgify.model.api.RetrofitInstance
 
 class FridgifyRepositoryImpl : FridgifyRepository {
     //todo update token
     private var token: String = ""
     //eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNzMzMzU2OTI1LCJpYXQiOjE3MzMzMjA5MjV9.0XNejo0l46PlNPW6Vcj-BPxhtDMgPZ7TjbP8oNtbAQ8""
 
-    private var userId: Int = 0
+    private var userId: Int = 1
     fun setToken(newToken: String) {
         token = newToken
     }
@@ -19,6 +20,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
     fun getToken(): String {
         return token
     }
+
     fun setUserID(UserID: Int) {
         userId = UserID
     }
@@ -140,65 +142,25 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         }
     }
 
-    private val mockFoods = listOf(
-        Food(id = 1, name = "Radish", image = "Radish"),
-        Food(id = 2, name = "Blueberry", image = "Blueberry"),
-        Food(id = 3, name = "Guava", image = "Guava"),
-        Food(id = 4, name = "Mushroom", image = "Mushroom"),
-        Food(id = 5, name = "Kiwi", image = "Kiwi"),
-        Food(id = 6, name = "Raspberry", image = "Raspberry"),
-        Food(id = 7, name = "Avocado", image = "Avocado"),
-        Food(id = 8, name = "Papaya", image = "Papaya"),
-        Food(id = 9, name = "Zucchini", image = "Zucchini"),
-        Food(id = 10, name = "Cabbage", image = "Cabbage"),
-        Food(id = 11, name = "Lemon", image = "Lemon"),
-        Food(id = 12, name = "Onion", image = "Onion"),
-        Food(id = 13, name = "Garlic", image = "Garlic"),
-        Food(id = 14, name = "Carrot", image = "Carrot"),
-        Food(id = 15, name = "Potato", image = "Potato"),
-        Food(id = 16, name = "Lettuce", image = "Lettuce"),
-        Food(id = 17, name = "Corn", image = "Corn"),
-        Food(id = 18, name = "Chili Pepper", image = "Chili Pepper"),
-        Food(id = 19, name = "Jalapeno", image = "Jalapeno"),
-        Food(id = 20, name = "Bell Pepper", image = "Bell Pepper"),
-        Food(id = 21, name = "Apple", image = "Apple"),
-        Food(id = 22, name = "Pear", image = "Pear"),
-        Food(id = 23, name = "Cucumber", image = "Cucumber"),
-        Food(id = 24, name = "Fig", image = "Fig"),
-        Food(id = 25, name = "Grapes", image = "Grapes"),
-        Food(id = 26, name = "Watermelon", image = "Watermelon"),
-        Food(id = 27, name = "Passionfruit", image = "Passionfruit"),
-        Food(id = 28, name = "Celery", image = "Celery"),
-        Food(id = 29, name = "Pumpkin", image = "Pumpkin"),
-        Food(id = 30, name = "Mango", image = "Mango"),
-        Food(id = 31, name = "Lime", image = "Lime"),
-        Food(id = 32, name = "Strawberry", image = "Strawberry"),
-        Food(id = 33, name = "Orange", image = "Orange"),
-        Food(id = 34, name = "Blackberry", image = "Blackberry"),
-        Food(id = 35, name = "Grapefruit", image = "Grapefruit"),
-        Food(id = 36, name = "Coconut", image = "Coconut"),
-        Food(id = 37, name = "Honeydew", image = "Honeydew"),
-        Food(id = 38, name = "Dragonfruit", image = "Dragonfruit"),
-        Food(id = 39, name = "Tomato", image = "Tomato"),
-        Food(id = 40, name = "Peach", image = "Peach"),
-        Food(id = 41, name = "Pineapple", image = "Pineapple"),
-        Food(id = 42, name = "Pomegranate", image = "Pomegranate"),
-        Food(id = 43, name = "Cherry", image = "Cherry"),
-        Food(id = 44, name = "Spinach", image = "Spinach"),
-        Food(id = 45, name = "Cantaloupe", image = "Cantaloupe"),
-        Food(id = 46, name = "Lychee", image = "Lychee"),
-        Food(id = 47, name = "Plum", image = "Plum"),
-        Food(id = 48, name = "Apricot", image = "Apricot"),
-        Food(id = 49, name = "Banana", image = "Banana"),
-        Food(id = 50, name = "Broccoli", image = "Broccoli")
-    )
 
     fun addRecipe(recipe: Recipe) {
         // Simulate adding the recipe to a backend or database
         mockRecipes.add(recipe) // Add recipe to the local mutable list
     }
-    override suspend fun getFoodList(): List<Food> {
-        return mockFoods
+
+    override
+     suspend fun getFoodList(userId: Int): List<Food> {
+        return try {
+            val foods = RetrofitInstance.fridgeApi.getFoods(userId)
+            Log.d("FridgeApi", "Fetched foods for userId $userId: $foods")
+            foods
+        } catch (e: Exception) {
+            Log.e("FridgeApi", "Failed to fetch foods for userId $userId: ${e.message}")
+            emptyList()
+        }
     }
+
+
+
 
 }

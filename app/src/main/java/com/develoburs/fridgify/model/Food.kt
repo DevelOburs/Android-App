@@ -3,16 +3,13 @@ package com.develoburs.fridgify.model
 import com.google.gson.annotations.SerializedName
 
 data class Food(
-    @SerializedName("id")
-    val id: Int,
 
     @SerializedName("name")
-    val Name: String,
+    val name: String, // Kotlin'de değişken isimleri küçük harfle başlar.
 
     @SerializedName("category")
-    val Category: String,
+    val category: String,
 
     @SerializedName("ImageUrl")
-    val ImageUrl: String,
-
-    )
+    val imageUrl: String // Alan isimlerinde PascalCase yerine camelCase kullanımı önerilir.
+)

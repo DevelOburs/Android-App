@@ -13,20 +13,25 @@ import kotlinx.coroutines.launch
 class FridgeViewModel : ViewModel() {
     private val repository = FridgifyRepositoryImpl()
     private val _food = MutableStateFlow<List<Food>>(emptyList())
-    val food: StateFlow<List<Food>> = _food
-
-    init {
-        getFoodList()
+    val food: StateFlow<List<Food>> get() = _food
+    private var userId: Int = 0
+    fun setUserId(id: Int) {
+        userId = id
     }
 
-    private fun getFoodList() {
+    fun fetchFoods(userId: Int) {
+        if (userId <= 0) {
+            Log.e("FridgeViewModel", "Invalid userId: $userId")
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val foodList = repository.getFoodList()
+                val foodList = repository.getFoodList(userId)
                 _food.value = foodList
             } catch (e: Exception) {
-                Log.e("FridgeViewModel", "Failed to fetch food list", e)
+                Log.e("FridgeViewModel", "Error fetching foods: ${e.message}", e)
             }
         }
     }
+
 }
