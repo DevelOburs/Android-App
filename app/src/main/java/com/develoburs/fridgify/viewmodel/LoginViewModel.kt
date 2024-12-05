@@ -27,6 +27,7 @@ class LoginViewModel(
                 if (response.error.isNullOrEmpty()) {
                     // Save the token in the repository
                     repository.setToken(response.token)
+                    repository.setUserID(response.userId)
                     // You might want to log the token to verify
                     Log.d("LoginViewModel", "Token set: ${repository.getToken()}")
                 }
