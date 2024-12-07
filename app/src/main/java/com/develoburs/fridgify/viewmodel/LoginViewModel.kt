@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.develoburs.fridgify.model.api.AuthApi
 import com.develoburs.fridgify.model.api.LoginRequest
 import com.develoburs.fridgify.model.api.LoginResponse
+import com.develoburs.fridgify.model.api.RegisterRequest
+import com.develoburs.fridgify.model.api.RegisterResponse
 import com.develoburs.fridgify.model.repository.FridgifyRepositoryImpl
 import kotlinx.coroutines.launch
 
@@ -37,6 +39,35 @@ class LoginViewModel(
                         error = "Failed to login: ${e.localizedMessage}"
                     )
                 )
+            }
+        }
+    }
+
+    fun register(
+        username: String,
+        email: String,
+        password: String,
+        firstName: String,
+        lastName: String,
+        onResult: (RegisterResponse) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val response = authApi.register(
+                    registerRequest = RegisterRequest(username, email, password, firstName, lastName)
+                )
+                onResult(response)
+            } catch (e: Exception) {
+                onResult(
+                    RegisterResponse(
+                        userId = -1,
+                        username = "",
+                        email = "",
+                        firstName = "",
+                        lastName = ""
+                    ) // Handle error appropriately
+                )
+                Log.e("LoginViewModel", "Failed to register: ${e.localizedMessage}")
             }
         }
     }

@@ -18,9 +18,31 @@ data class LoginResponse(
     val error: String?
 )
 
+// Data class for the registration request
+data class RegisterRequest(
+    val username: String,
+    val email: String,
+    val password: String,
+    val firstName: String,
+    val lastName: String
+)
+
+// Data class for the registration response
+data class RegisterResponse(
+    val userId: Int,
+    val username: String,
+    val email: String,
+    val firstName: String,
+    val lastName: String
+)
 interface AuthApi {
     @POST("auth-api/login")
     suspend fun login(
-        @Body loginRequest: LoginRequest // Use the LoginRequest class defined earlier
-    ): LoginResponse // Use the LoginResponse class defined earlier
+        @Body loginRequest: LoginRequest
+    ): LoginResponse
+
+    @POST("user-api/register") // Define the endpoint for registration
+    suspend fun register(
+        @Body registerRequest: RegisterRequest // Use the RegisterRequest class
+    ): RegisterResponse // Use the RegisterResponse class
 }

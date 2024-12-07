@@ -116,7 +116,7 @@ fun NavGraph(
             LoginPageScreen(navController = navController, viewModel = loginViewModel) // Pass the LoginViewModel here
         }
         composable("register") {
-            RegisterPageScreen(navController = navController) // No bottom bar on this screen
+            RegisterPageScreen(navController = navController, viewModel = loginViewModel) // No bottom bar on this screen
         }
     }
 }
