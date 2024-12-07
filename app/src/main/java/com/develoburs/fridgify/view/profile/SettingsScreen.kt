@@ -1,5 +1,6 @@
 package com.develoburs.fridgify.view.profile
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
@@ -13,10 +14,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.outlined.Lock
 import androidx.navigation.NavController
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.develoburs.fridgify.viewmodel.LoginViewModel
 
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen(navController: NavController, viewModel: LoginViewModel = viewModel()) {
+    var showChangePasswordDialog by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -26,20 +35,38 @@ fun SettingsScreen(navController: NavController) {
         // App Settings Row
         ExpandableSettingRow(
             title = "App Settings",
-            settings = listOf("Enable Notifications", "Dark Mode")
+            settings = listOf("Enable Notifications", "Dark Mode"),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // User Settings Row
+        // User Settings Row without Change Password functionality
         ExpandableSettingRow(
             title = "User Settings",
-            settings = listOf("Privacy Mode", "Location Access")
+            settings = listOf("Privacy Mode", "Location Access"),
         )
+
+        // Change Password button placed directly in SettingsScreen
+        Button(
+            onClick = { showChangePasswordDialog = true },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        ) {
+            Text("Change Password")
+        }
+
+        // Show the dialog if needed
+        if (showChangePasswordDialog) {
+            ShowChangePasswordDialog(
+                onDismiss = { showChangePasswordDialog = false }, // Close the dialog
+                viewModel = viewModel // Pass the ViewModel to the dialog
+            )
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Button to navigate to Liked Recipes with parameter
+        // Button to navigate to Liked Recipes
         CustomButton(
             text = "Liked Recipes",
             onClick = { navController.navigate("recipes/liked") }
@@ -47,7 +74,7 @@ fun SettingsScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Button to navigate to Saved Recipes with parameter
+        // Button to navigate to Saved Recipes
         CustomButton(
             text = "Saved Recipes",
             onClick = { navController.navigate("recipes/saved") }
@@ -65,8 +92,12 @@ fun SettingsScreen(navController: NavController) {
     }
 }
 
+
 @Composable
-fun ExpandableSettingRow(title: String, settings: List<String>) {
+fun ExpandableSettingRow(
+    title: String,
+    settings: List<String>,
+) {
     var isExpanded by remember { mutableStateOf(false) }
 
     Column(
@@ -123,6 +154,90 @@ fun ExpandableSettingRow(title: String, settings: List<String>) {
         }
     }
 }
+
+@Composable
+fun ShowChangePasswordDialog(onDismiss: () -> Unit,  viewModel: LoginViewModel = viewModel()) {
+    var showDialog by remember { mutableStateOf(true) }
+    var username by remember { mutableStateOf("") }
+    var oldPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showDialog = false
+                onDismiss()
+            },
+            title = { Text("Change Password") },
+            text = {
+                Column {
+                    OutlinedTextField(
+                        value = username,
+                        onValueChange = { username = it },
+                        label = { Text("Username") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = oldPassword,
+                        onValueChange = { oldPassword = it },
+                        label = { Text("Old Password") },
+                        singleLine = true,
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                val visibilityIcon = if (passwordVisible) Icons.Default.Lock else Icons.Outlined.Lock
+                                Icon(imageVector = visibilityIcon, contentDescription = "Toggle Password Visibility")
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = newPassword,
+                        onValueChange = { newPassword = it },
+                        label = { Text("New Password") },
+                        singleLine = true,
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                val visibilityIcon = if (passwordVisible) Icons.Default.Lock else Icons.Outlined.Lock
+                                Icon(imageVector = visibilityIcon, contentDescription = "Toggle Password Visibility")
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.changePassword(username, oldPassword, newPassword) { response ->
+                            if (response.userId != -1) {
+                                Log.d("ChangePasswordDialog", "Password changed successfully for user: ${response.username}")
+                                showDialog = false
+                                onDismiss()
+                            } else {
+                                Log.e("ChangePasswordDialog", "Failed to change password")
+                            }
+                        }
+                    }
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                Button(onClick = {
+                    showDialog = false
+                    onDismiss()
+                }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+}
+
 
 @Composable
 fun CustomButton(

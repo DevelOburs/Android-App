@@ -93,7 +93,7 @@ fun NavGraph(
             )
         }
         composable("SettingsScreen") {
-            SettingsScreen(navController = navController)
+            SettingsScreen(navController = navController, viewModel = loginViewModel)
         }
         composable("addRecipe") {
             AddRecipeScreen(

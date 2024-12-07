@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.develoburs.fridgify.model.api.AuthApi
+import com.develoburs.fridgify.model.api.ChangePasswordRequest
+import com.develoburs.fridgify.model.api.ChangePasswordResponse
 import com.develoburs.fridgify.model.api.LoginRequest
 import com.develoburs.fridgify.model.api.LoginResponse
 import com.develoburs.fridgify.model.api.RegisterRequest
@@ -71,4 +73,33 @@ class LoginViewModel(
             }
         }
     }
+
+    fun changePassword(
+        username: String,
+        password: String,
+        newPassword: String,
+        onResult: (ChangePasswordResponse) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val response = authApi.changePassword(
+                    changePasswordRequest = ChangePasswordRequest(username, password, newPassword),
+                    token = "Bearer ${repository.getToken()}"
+                )
+                onResult(response) // Pass the successful response to the callback
+            } catch (e: Exception) {
+                onResult(
+                    ChangePasswordResponse(
+                        userId = -1,
+                        username = "",
+                        email = "",
+                        firstName = "",
+                        lastName = ""
+                    ) // Handle error by returning an empty response or a meaningful fallback
+                )
+                Log.e("UserViewModel", "Failed to change password: ${e.localizedMessage}")
+            }
+        }
+    }
+
 }

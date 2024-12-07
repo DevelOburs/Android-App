@@ -3,6 +3,7 @@ package com.develoburs.fridgify.model.api
 import retrofit2.http.Body
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
 
 data class LoginRequest(
     val username: String,
@@ -26,6 +27,18 @@ data class RegisterRequest(
     val firstName: String,
     val lastName: String
 )
+data class ChangePasswordResponse(
+    val userId: Int,
+    val username: String,
+    val email: String,
+    val firstName: String,
+    val lastName: String
+)
+data class ChangePasswordRequest(
+    val username: String,
+    val password: String,
+    val newPassword: String
+)
 
 // Data class for the registration response
 data class RegisterResponse(
@@ -45,4 +58,11 @@ interface AuthApi {
     suspend fun register(
         @Body registerRequest: RegisterRequest // Use the RegisterRequest class
     ): RegisterResponse // Use the RegisterResponse class
+
+    @PUT("user-api/changePassword") // Define the PUT endpoint
+    suspend fun changePassword(
+        @Header("Authorization") token: String,
+        @Body changePasswordRequest: ChangePasswordRequest
+    ): ChangePasswordResponse // Define the response type
+
 }
