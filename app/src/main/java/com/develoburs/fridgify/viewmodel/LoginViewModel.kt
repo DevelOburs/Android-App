@@ -4,8 +4,12 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.develoburs.fridgify.model.api.AuthApi
+import com.develoburs.fridgify.model.api.ChangePasswordRequest
+import com.develoburs.fridgify.model.api.ChangePasswordResponse
 import com.develoburs.fridgify.model.api.LoginRequest
 import com.develoburs.fridgify.model.api.LoginResponse
+import com.develoburs.fridgify.model.api.RegisterRequest
+import com.develoburs.fridgify.model.api.RegisterResponse
 import com.develoburs.fridgify.model.repository.FridgifyRepositoryImpl
 import kotlinx.coroutines.launch
 
@@ -40,4 +44,62 @@ class LoginViewModel(
             }
         }
     }
+
+    fun register(
+        username: String,
+        email: String,
+        password: String,
+        firstName: String,
+        lastName: String,
+        onResult: (RegisterResponse) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val response = authApi.register(
+                    registerRequest = RegisterRequest(username, email, password, firstName, lastName)
+                )
+                onResult(response)
+            } catch (e: Exception) {
+                onResult(
+                    RegisterResponse(
+                        userId = -1,
+                        username = "",
+                        email = "",
+                        firstName = "",
+                        lastName = ""
+                    ) // Handle error appropriately
+                )
+                Log.e("LoginViewModel", "Failed to register: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    fun changePassword(
+        username: String,
+        password: String,
+        newPassword: String,
+        onResult: (ChangePasswordResponse) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val response = authApi.changePassword(
+                    changePasswordRequest = ChangePasswordRequest(username, password, newPassword),
+                    token = "Bearer ${repository.getToken()}"
+                )
+                onResult(response) // Pass the successful response to the callback
+            } catch (e: Exception) {
+                onResult(
+                    ChangePasswordResponse(
+                        userId = -1,
+                        username = "",
+                        email = "",
+                        firstName = "",
+                        lastName = ""
+                    ) // Handle error by returning an empty response or a meaningful fallback
+                )
+                Log.e("UserViewModel", "Failed to change password: ${e.localizedMessage}")
+            }
+        }
+    }
+
 }

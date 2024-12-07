@@ -18,16 +18,19 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.Icons
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.develoburs.fridgify.view.bottombar.BottomBarScreen
+import com.develoburs.fridgify.viewmodel.LoginViewModel
 
 @Composable
-fun RegisterPageScreen(navController: NavController) {
+fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel = viewModel()) {
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
+    var registerResult by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
     Column(
@@ -117,7 +120,17 @@ fun RegisterPageScreen(navController: NavController) {
         // Register Button
         Button(
             onClick = {
-                navController.navigate(BottomBarScreen.Home.route)
+                viewModel.register(username, email, password, firstName, lastName) { response ->
+                    registerResult = if (response.userId != -1) {
+                        navController.navigate("login") {
+                            // Clear the back stack so the user can't return to the login screen
+                            popUpTo("register") { inclusive = true }
+                        }
+                        "Welcome, ${response.username} (ID: ${response.userId})"
+                    } else {
+                        "Error: Registration failed. Please try again."
+                    }
+                }
             },
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
         ) {
