@@ -23,6 +23,8 @@ import com.develoburs.fridgify.view.profile.AddRecipeScreen
 import com.develoburs.fridgify.view.profile.LoginPageScreen
 import com.develoburs.fridgify.view.profile.RegisterPageScreen
 import com.develoburs.fridgify.view.home.RecipeDetailsScreen
+import com.develoburs.fridgify.viewmodel.FridgeViewModel
+import com.develoburs.fridgify.viewmodel.FridgeViewModelFactory
 import com.develoburs.fridgify.viewmodel.LoginViewModel
 import com.develoburs.fridgify.viewmodel.LoginViewModelFactory
 import com.develoburs.fridgify.viewmodel.RecipeListViewModel
@@ -38,10 +40,10 @@ fun NavGraph(
 
     val authApi: AuthApi = remember { RetrofitInstance.authapi }
 
-
     // Create an instance of LoginViewModel
     val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(authApi, repository))
 
+    val fridgeViewModel: FridgeViewModel = viewModel(factory = FridgeViewModelFactory(repository))
 
     // Retrieve the user token
     val userToken: String = repository.getToken() // Use the getToken function from your repository
@@ -50,7 +52,7 @@ fun NavGraph(
     NavHost(navController = navController, startDestination = if (userToken == "") "login" else startDestination) {
         // Define composable screens with checks for user token
         composable(BottomBarScreen.Fridge.route) {
-            FridgeScreen(navController = navController)
+            FridgeScreen(navController = navController, viewModel = fridgeViewModel)
         }
         composable(BottomBarScreen.Home.route) {
             HomeScreen(navController = navController, viewModel = recipeListViewModel)
@@ -59,10 +61,10 @@ fun NavGraph(
             ProfileScreen(navController = navController, viewModel = recipeListViewModel)
         }
         composable("AddingScreen") {
-            AddingScreen(navController = navController, onBack = { navController.popBackStack() })
+            AddingScreen(navController = navController, viewModel = fridgeViewModel, onBack = { navController.popBackStack() })
         }
         composable("DeleteScreen") {
-            DeleteScreen(navController = navController, onBack = { navController.popBackStack() })
+            DeleteScreen(navController = navController, viewModel = fridgeViewModel, onBack = { navController.popBackStack() })
         }
         composable(
             "recipeDetails/{recipeId}",
@@ -98,6 +100,8 @@ fun NavGraph(
         composable("addRecipe") {
             AddRecipeScreen(
                 navController = navController,
+                viewModel = recipeListViewModel,
+                fviewModel = fridgeViewModel,
                 onSave = { newRecipe ->
                     recipeListViewModel.addRecipe(newRecipe) // Add the new recipe to your ViewModel
                     navController.popBackStack() // Navigate back after saving

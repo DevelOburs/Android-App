@@ -10,8 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class FridgeViewModel : ViewModel() {
-    private val repository = FridgifyRepositoryImpl()
+class FridgeViewModel(private val repository: FridgifyRepositoryImpl) : ViewModel() {
     private val _food = MutableStateFlow<List<Food>>(emptyList())
     val food: StateFlow<List<Food>> = _food
 
@@ -19,7 +18,7 @@ class FridgeViewModel : ViewModel() {
         getFoodList()
     }
 
-    private fun getFoodList() {
+    fun getFoodList() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val foodList = repository.getFoodList()

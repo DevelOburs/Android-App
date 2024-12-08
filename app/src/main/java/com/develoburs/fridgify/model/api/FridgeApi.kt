@@ -9,7 +9,8 @@ import retrofit2.http.Query
 interface FridgeApi {
     @GET("fridge-api/{userId}/inFridge")
     suspend fun getFood(
-        @Path("userId") userId: Long,  // Path parameter
+        @Header("Authorization") token: String,
+        @Path("userId") userId: Int,  // Path parameter
         @Query("nameFilter") nameFilter: String? = null, // Query parameter (optional)
         @Query("categoryFilters") categoryFilters: List<String>? = null // Query parameter (optional)
     ): List<Food>
