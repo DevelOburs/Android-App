@@ -39,12 +39,7 @@ import com.develoburs.fridgify.ui.theme.BlackColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddingScreen(navController: NavController, onBack: () -> Unit) {
-    val viewModel: FridgeViewModel = viewModel(factory = viewModelFactory {
-        initializer {
-            FridgeViewModel()
-        }
-    })
+fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = viewModel() ,onBack: () -> Unit) {
 
     val allFoods by viewModel.food.collectAsState(initial = emptyList())
     var searchQuery by remember { mutableStateOf("") }
@@ -52,7 +47,7 @@ fun AddingScreen(navController: NavController, onBack: () -> Unit) {
     var displaySelectedItems by remember { mutableStateOf("") }
 
     val filteredFoods = remember(searchQuery, allFoods) {
-        allFoods.filter { it.name.contains(searchQuery, ignoreCase = true) }
+        allFoods.filter { it.Name.contains(searchQuery, ignoreCase = true) }
     }
 
     Scaffold(
@@ -154,7 +149,7 @@ fun AddingScreen(navController: NavController, onBack: () -> Unit) {
                             Text("Exit")
                         }
                         Button(onClick = {
-                            displaySelectedItems = selectedItems.joinToString(", ") { it.name }
+                            displaySelectedItems = selectedItems.joinToString(", ") { it.Name }
                         }) {
                             Text("Add")
                         }

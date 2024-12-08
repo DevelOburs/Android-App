@@ -44,10 +44,15 @@ import com.develoburs.fridgify.view.fridge.AddFoodCard
 import com.develoburs.fridgify.view.fridge.DeleteFoodCard
 import com.develoburs.fridgify.view.fridge.FoodCard
 import com.develoburs.fridgify.viewmodel.FridgeViewModel
+import com.develoburs.fridgify.viewmodel.FridgeViewModelFactory
+import com.develoburs.fridgify.viewmodel.RecipeListViewModel
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddRecipeScreen(
     navController: NavController,
+    viewModel: RecipeListViewModel = viewModel(),
+    fviewModel: FridgeViewModel = viewModel(),
     onSave: (Recipe) -> Unit,
     onBack: () -> Unit
 ) {
@@ -59,15 +64,10 @@ fun AddRecipeScreen(
     val likes by remember { mutableStateOf(0) }
     val comments by remember { mutableStateOf(listOf<String>()) }
 
-    val viewModel: FridgeViewModel = viewModel(factory = viewModelFactory {
-        initializer {
-            FridgeViewModel()
-        }
-    })
-    val allFoods by viewModel.food.collectAsState(initial = emptyList())
+    val allFoods by fviewModel.food.collectAsState(initial = emptyList())
 
-    val filteredFoods = remember("L", allFoods) { // TEST FILTER
-        allFoods.filter { it.name.contains("L", ignoreCase = true) }
+    val filteredFoods = remember("", allFoods) { // TEST FILTER
+        allFoods.filter { it.Name.contains("", ignoreCase = true) }
     }
 
     Scaffold(
