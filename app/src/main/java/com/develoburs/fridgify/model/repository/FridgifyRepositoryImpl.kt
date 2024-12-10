@@ -122,13 +122,13 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         ),
     )
 
-    override suspend fun getRecipeList(): List<Recipe> {
+    override suspend fun getRecipeList(limit: Int, pageNumber: Int): List<Recipe> {
         try {
             // Use getToken function to retrieve the token
             val recipes = api.getRecipes(
                 token = "Bearer ${getToken()}",
-                limit = 10, //todo get with pagination
-                pageNumber = 1
+                limit = limit,
+                pageNumber = pageNumber
             )
             Log.d("Recipe List", recipes.toString())
             return recipes

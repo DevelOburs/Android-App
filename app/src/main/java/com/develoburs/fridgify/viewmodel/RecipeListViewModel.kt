@@ -16,17 +16,37 @@ class RecipeListViewModel(private val navController: NavController, private val 
     val recipe: StateFlow<List<Recipe>> = _recipe
     private val _recipeDetail = MutableStateFlow<Recipe?>(null)
     val recipeDetail: StateFlow<Recipe?> = _recipeDetail
+
+    private var currentPage = 0
+    private val pageSize = 10
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+    private var isLastPage = false
+
+    private val tag = "RecipeListViewModel"
+
     init {
         getRecipesList()
     }
 
     fun getRecipesList() {
+        if (_isLoading.value || isLastPage) return
+        _isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val recipeList = repository.getRecipeList()
-                _recipe.value = recipeList
+                Log.d(tag, "Getting recipes for page:$currentPage and limit:$pageSize")
+                val recipeList = repository.getRecipeList(pageSize, currentPage)
+
+                if (recipeList.isEmpty()) {
+                    isLastPage = true
+                } else {
+                    _recipe.value = _recipe.value + recipeList
+                    currentPage++
+                }
             } catch (e: Exception) {
-                Log.e("RecipeListViewModel", "Failed to fetch recipe list", e)
+                Log.e(tag, "Failed to fetch recipe list", e)
+            } finally {
+                _isLoading.value = false
             }
         }
     }
