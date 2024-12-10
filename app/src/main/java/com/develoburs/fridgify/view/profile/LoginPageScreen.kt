@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.develoburs.fridgify.view.bottombar.BottomBarScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.develoburs.fridgify.R
 import com.develoburs.fridgify.viewmodel.LoginViewModel
 
 @Composable
@@ -42,19 +44,18 @@ fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = v
     ) {
         // App Title
         Text(
-            text = "Fridgify",
-            fontSize = 36.sp,
-            fontWeight = FontWeight.Bold,
+            text = stringResource(id = R.string.app_name),
             color = Color(0xFF6200EA), // Customize the color
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 24.dp)
+            modifier = Modifier.padding(bottom = 24.dp),
+            style = MaterialTheme.typography.labelLarge
         )
 
         // Username Input
         OutlinedTextField(
             value = username,
             onValueChange = { username = it },
-            label = { Text("Username") },
+            label = { Text(text = "Username", style = MaterialTheme.typography.titleMedium) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -65,7 +66,7 @@ fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = v
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text(text = "Password", style = MaterialTheme.typography.titleMedium) },
             singleLine = true,
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
@@ -95,9 +96,11 @@ fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = v
                     }
                 }
             },
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
         ) {
-            Text("Login")
+            Text(text = "Login", style = MaterialTheme.typography.titleMedium)
         }
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -108,7 +111,7 @@ fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = v
                 navController.navigate("register")
             }
         ) {
-            Text("Not registered? Create an account")
+            Text(text = "Not registered? Create an account", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

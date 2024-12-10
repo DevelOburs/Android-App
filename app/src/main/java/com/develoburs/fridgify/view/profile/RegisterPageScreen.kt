@@ -2,7 +2,9 @@ package com.develoburs.fridgify.view.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -36,13 +38,15 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         // Title Text
         Text(
             text = "Register",
+            style = MaterialTheme.typography.labelMedium,
             color = Color(0xFF6200EA),
             modifier = Modifier.padding(bottom = 32.dp)
         )
@@ -50,6 +54,7 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
         // User Information Section
         Text(
             text = "User Information",
+            style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(vertical = 16.dp)
         )
 
@@ -57,7 +62,7 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
         OutlinedTextField(
             value = firstName,
             onValueChange = { firstName = it },
-            label = { Text("First Name") },
+            label = { Text(text = "First Name", style = MaterialTheme.typography.bodySmall) },
             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
         )
 
@@ -65,7 +70,7 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
         OutlinedTextField(
             value = lastName,
             onValueChange = { lastName = it },
-            label = { Text("Last Name") },
+            label = { Text(text = "Last Name", style = MaterialTheme.typography.bodySmall) },
             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
         )
 
@@ -73,7 +78,7 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text(text = "Email", style = MaterialTheme.typography.bodySmall) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
         )
@@ -82,7 +87,7 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
         OutlinedTextField(
             value = phoneNumber,
             onValueChange = { phoneNumber = it },
-            label = { Text("Phone Number") },
+            label = { Text(text = "Phone Number", style = MaterialTheme.typography.bodySmall) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
         )
@@ -90,6 +95,7 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
         // Account Information Section
         Text(
             text = "Account Information",
+            style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(vertical = 16.dp)
         )
 
@@ -97,7 +103,7 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
         OutlinedTextField(
             value = username,
             onValueChange = { username = it },
-            label = { Text("Username") },
+            label = { Text(text = "Username", style = MaterialTheme.typography.bodySmall) },
             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
         )
 
@@ -105,7 +111,7 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text(text = "Password", style = MaterialTheme.typography.bodySmall) },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 val icon = if (passwordVisible) Icons.Default.Lock else Icons.Outlined.Lock
@@ -134,14 +140,14 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
             },
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
         ) {
-            Text(text = "Register", fontSize = 16.sp)
+            Text(text = "Register", style = MaterialTheme.typography.bodyMedium)
         }
 
         // Back to Login Button
         TextButton(
             onClick = { navController.navigate("login") }
         ) {
-            Text("Already have an account? Login")
+            Text(text = "Already have an account? Login", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

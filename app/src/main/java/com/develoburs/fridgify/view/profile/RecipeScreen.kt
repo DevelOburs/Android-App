@@ -19,6 +19,7 @@ import com.develoburs.fridgify.viewmodel.RecipeListViewModel
 import com.develoburs.fridgify.view.home.RecipeCard
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.MaterialTheme
 
 @Composable
 fun RecipeScreen(
@@ -51,7 +52,7 @@ fun RecipeScreen(
                     .weight(1f),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "No recipes found for $recipeType.")
+                Text(text = "No recipes found for $recipeType.", style = MaterialTheme.typography.labelMedium)
             }
         } else {
             // Display the list of recipes

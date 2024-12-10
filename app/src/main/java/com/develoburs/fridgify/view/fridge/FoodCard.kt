@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 //import androidx.compose.ui.graphics.Color
 import com.develoburs.fridgify.ui.theme.DarkBlueColor
 
@@ -60,7 +61,7 @@ fun FoodCard(
                 contentAlignment = Alignment.Center
             ) {
                 val imageUrl = food.ImageUrl ?: "No Image"
-                Text(text = imageUrl, fontSize = 12.sp)
+                Text(text = imageUrl,  style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp))
                 // Alternatively, use a placeholder image:
                 // Image(
                 //     painter = painterResource(id = R.drawable.placeholder_image),
@@ -73,7 +74,7 @@ fun FoodCard(
             Text(
                 text = food.Name ?: "Unknown",
                 modifier = Modifier.padding(top = 2.dp),
-                fontSize = 14.sp
+                style = MaterialTheme.typography.bodySmall
             )
         }
     }
@@ -103,7 +104,7 @@ fun AddFoodCard(onClick: () -> Unit) {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                "+", fontSize = 40.sp
+                "+", style = MaterialTheme.typography.bodySmall.copy(fontSize = 40.sp)
             )
         }
     }
@@ -132,7 +133,7 @@ fun DeleteFoodCard(onClick: () -> Unit) {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                "-", fontSize = 40.sp
+                "-", style = MaterialTheme.typography.bodySmall.copy(fontSize = 40.sp)
             )
         }
     }

@@ -79,14 +79,14 @@ fun HomeScreen(navController: NavController, viewModel: RecipeListViewModel = vi
                                 menuExpanded = false
                                 showFiltered = false
                             },
-                            text = { Text(stringResource(id = R.string.show_all)) }
+                            text = { Text(stringResource(id = R.string.show_all), style = MaterialTheme.typography.titleMedium) }
                         )
                         DropdownMenuItem(
                             onClick = {
                                 menuExpanded = false
                                 showFiltered = true
                             },
-                            text = { Text(stringResource(id = R.string.filter_by_comments)) }
+                            text = { Text(stringResource(id = R.string.filter_by_comments), style = MaterialTheme.typography.titleMedium) }
                         )
                     }
                 },

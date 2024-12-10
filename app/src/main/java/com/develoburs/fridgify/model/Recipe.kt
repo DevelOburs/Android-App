@@ -18,7 +18,8 @@ data class Recipe(
     @SerializedName("commentCount")
     val Comments: Int?,
 
-    val Images: List<String>?,
+    @SerializedName("imageUrl")
+    val Image: String?,
 
     val instructions: String?,
 
