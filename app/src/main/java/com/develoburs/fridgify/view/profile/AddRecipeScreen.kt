@@ -157,7 +157,7 @@ fun AddRecipeScreen(
                 Button(
                     onClick = {
                         val newRecipe = Recipe(
-                            id = System.currentTimeMillis().toInt(),
+                            id = System.currentTimeMillis().toString(),
                             Name = name,
                             ingredients = ingredients,
                             instructions = instructions,
