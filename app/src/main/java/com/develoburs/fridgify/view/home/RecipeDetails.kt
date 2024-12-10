@@ -29,14 +29,40 @@ import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.BlackColor
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.develoburs.fridgify.viewmodel.RecipeListViewModel
+import com.develoburs.fridgify.viewmodel.RecipeListViewModelFactory
+import androidx.navigation.NavController
+import com.develoburs.fridgify.model.repository.FridgifyRepositoryImpl
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeDetailsScreen(
-    recipe: Recipe,
+    recipeId: String, // Accept recipeId as a String
     onBack: () -> Unit,
-    loggedInUsername: String = "Guest" // Pass the logged-in user's username here
+    navController: NavController,
+    repository: FridgifyRepositoryImpl,
+    loggedInUsername: String = "Guest",
+    onLoadingFinished: () -> Unit
 ) {
+    // Initialize the ViewModel
+    val viewModel: RecipeListViewModel = viewModel(factory = RecipeListViewModelFactory(
+        navController = navController,
+        repository = repository
+    ))
+
+    // Fetch the recipe details when the screen is loaded
+    LaunchedEffect(recipeId) {
+        viewModel.getRecipeById(recipeId)
+    }
+
+    // Collect the recipe details state
+    val recipe by viewModel.recipeDetail.collectAsState()
+    if (recipe != null) {
+        onLoadingFinished() // Notify the parent that loading is complete
+    }
+    
+    // State for like, save, and new comment
     var isLiked by remember { mutableStateOf<Boolean?>(null) }
     var isSaved by remember { mutableStateOf<Boolean?>(null) }
     var newComment by remember { mutableStateOf("") }
@@ -49,7 +75,7 @@ fun RecipeDetailsScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = recipe.Name ?: stringResource(id = R.string.unknown_recipe),
+                        text = recipe?.Name ?: stringResource(id = R.string.unknown_recipe),
                         color = BlackColor,
                         style = MaterialTheme.typography.labelMedium
                     )
@@ -97,13 +123,13 @@ fun RecipeDetailsScreen(
                             .verticalScroll(rememberScrollState())
                     ) {
                         // Recipe Image
-                        recipe.Image?.firstOrNull()?.let { imageUrl ->
+                        recipe?.Image?.let { imageUrl ->
                             Image(
                                 painter = rememberAsyncImagePainter(imageUrl),
                                 contentDescription = stringResource(id = R.string.recipe_image_description),
                                 modifier = Modifier
-                                    .size(300.dp)
-                                    .padding(8.dp),
+                                    .size(320.dp)
+                                    .padding(6.dp),
                                 contentScale = ContentScale.Crop
                             )
                         } ?: Text(
@@ -123,7 +149,7 @@ fun RecipeDetailsScreen(
                             )
                         )
                         Spacer(modifier = Modifier.height(4.dp))
-                        recipe.ingredients?.let { ingredients ->
+                        recipe?.ingredients?.let { ingredients ->
                             ingredients.forEach { ingredient ->
                                 Text(text = "• $ingredient", style = MaterialTheme.typography.bodySmall)
                             }
@@ -144,8 +170,8 @@ fun RecipeDetailsScreen(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = recipe.instructions ?: stringResource(id = R.string.no_instructions_available),
-                            color = if (recipe.instructions == null) Color.Gray else Color.Unspecified,
+                            text = recipe?.instructions ?: stringResource(id = R.string.no_instructions_available),
+                            color = if (recipe?.instructions == null) Color.Gray else Color.Unspecified,
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -165,7 +191,7 @@ fun RecipeDetailsScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp) // Static height for the comment section
+                            .height(100.dp) // Static height for the comment section
                             .background(Color.LightGray, shape = MaterialTheme.shapes.medium)
                             .padding(8.dp)
                     ) {
@@ -216,7 +242,7 @@ fun RecipeDetailsScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
+                            .padding(horizontal = 12.dp)
                     ) {
                         OutlinedTextField(
                             value = newComment,

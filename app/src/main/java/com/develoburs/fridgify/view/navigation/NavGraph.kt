@@ -29,6 +29,17 @@ import com.develoburs.fridgify.viewmodel.LoginViewModel
 import com.develoburs.fridgify.viewmodel.LoginViewModelFactory
 import com.develoburs.fridgify.viewmodel.RecipeListViewModel
 import com.develoburs.fridgify.viewmodel.RecipeListViewModelFactory
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.runtime.mutableStateOf
+
+
 
 @Composable
 fun NavGraph(
@@ -67,33 +78,71 @@ fun NavGraph(
             DeleteScreen(navController = navController, viewModel = fridgeViewModel, onBack = { navController.popBackStack() })
         }
         composable(
-            "recipeDetails/{recipeId}",
-            arguments = listOf(navArgument("recipeId") { type = androidx.navigation.NavType.StringType })
+            route = "recipeDetails/{recipeId}"
         ) { backStackEntry ->
-            val recipeId = backStackEntry.arguments?.getString("recipeId")?.toInt()
-            val recipe = recipeListViewModel.getRecipeById(recipeId)
-            RecipeDetailsScreen(
-                recipe = recipe ?: return@composable,
-                onBack = { navController.popBackStack() }
-            )
+            // Retrieve the recipeId as a String
+            val recipeId = backStackEntry.arguments?.getString("recipeId") ?: return@composable
+
+            // Use remember to hold the loading state
+            val isLoading = remember { mutableStateOf(true) }
+
+            // Pass recipeId to the RecipeDetailsScreen and observe loading status
+            Box(modifier = Modifier.fillMaxSize()) {
+                RecipeDetailsScreen(
+                    recipeId = recipeId,
+                    onBack = { navController.popBackStack() },
+                    navController = navController,
+                    repository = repository,
+                    onLoadingFinished = { isLoading.value = false } // Callback to update loading state
+                )
+
+                // Display a loading indicator while data is loading
+                if (isLoading.value) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                    )
+                }
+            }
         }
+
+
         composable(
             "editRecipe/{recipeId}",
             arguments = listOf(navArgument("recipeId") { type = androidx.navigation.NavType.StringType })
         ) { backStackEntry ->
-            val recipeId = backStackEntry.arguments?.getString("recipeId")
-            val recipe = recipeListViewModel.getRecipeById(recipeId?.toInt())
+            val recipeId = backStackEntry.arguments?.getString("recipeId") ?: return@composable
 
-            EditRecipeScreen(
-                navController = navController,
-                recipe = recipe ?: return@composable,
-                onSave = { updatedRecipe ->
-                    recipeListViewModel.updateRecipe(updatedRecipe)
-                    navController.popBackStack()
-                },
-                onBack = { navController.popBackStack() }
-            )
+            // Observe the recipe state from the ViewModel
+            val recipe by recipeListViewModel.recipeDetail.collectAsState()
+
+            // Trigger the recipe fetch when entering the composable
+            LaunchedEffect(recipeId) {
+                recipeListViewModel.getRecipeById(recipeId)
+            }
+
+            if (recipe != null) {
+                EditRecipeScreen(
+                    navController = navController,
+                    recipe = recipe!!, // Pass the fetched recipe
+                    onSave = { updatedRecipe ->
+                        recipeListViewModel.updateRecipe(updatedRecipe)
+                        navController.popBackStack()
+                    },
+                    onBack = { navController.popBackStack() }
+                )
+            } else {
+                // Show a loading indicator while waiting for the recipe
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
         }
+
+
         composable("SettingsScreen") {
             SettingsScreen(navController = navController, viewModel = loginViewModel)
         }

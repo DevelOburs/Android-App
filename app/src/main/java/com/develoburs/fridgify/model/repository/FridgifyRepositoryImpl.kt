@@ -10,7 +10,7 @@ import android.content.Context
 
 class FridgifyRepositoryImpl : FridgifyRepository {
     //todo update token
-    private var token: String = ""
+    private var token: String = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNzMzODgwMjkyLCJpYXQiOjE3MzM4NDQyOTJ9.Kby3fRb1zwm0RKlj9TWrU50jGsxbuntV_mwsN6VvhtE"
     //eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNzMzMzU2OTI1LCJpYXQiOjE3MzMzMjA5MjV9.0XNejo0l46PlNPW6Vcj-BPxhtDMgPZ7TjbP8oNtbAQ8""
 
     private var userId: Int = 0
@@ -32,7 +32,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
 
     private val mockRecipes = mutableListOf(
         Recipe(
-            id = 1,
+            id = "1",
             Name = "Low-Fat Berry Blue Frozen Dessert",
             Author = "Dancer",
             Likes = 158,
@@ -53,7 +53,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
             )
         ),
         Recipe(
-            id = 2,
+            id = "2",
             Name = "Biryani",
             Author = "elly9812",
             Likes = 39,
@@ -76,7 +76,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
             )
         ),
         Recipe(
-            id = 3,
+            id = "3",
             Name = "Best Lemonade",
             Author = "Stephen Little",
             Likes = 18,
@@ -97,7 +97,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
             )
         ),
         Recipe(
-            id = 4,
+            id = "4",
             Name = "Carina's Tofu-Vegetable Kebabs",
             Author = "Cyclopz",
             Likes = 236,
@@ -136,21 +136,35 @@ class FridgifyRepositoryImpl : FridgifyRepository {
             throw Exception("Failed to get recipes, Bearer ${getToken()}", e)
         }
     }
-/*
-    private val mockFoods = listOf(
-        Food(
-            id = 1, Name = "Radish", ImageUrl = "Radish", Category =
-        ),
-        Food(id = 2, Name = "Blueberry", ImageUrl = "Blueberry"),
-        Food(id = 3, Name = "Guava", ImageUrl = "Guava"),
-        Food(id = 4, Name = "Mushroom", ImageUrl = "Mushroom"),
-        Food(id = 5, Name = "Kiwi", ImageUrl = "Kiwi"),
-        Food(id = 6, Name = "Raspberry", ImageUrl = "Raspberry"),
-        Food(id = 7, Name = "Avocado", ImageUrl = "Avocado"),
-        Food(id = 8, Name = "Papaya", ImageUrl = "Papaya"),
-        Food(id = 9, Name = "Zucchini", ImageUrl = "Zucchini"),
 
-    )*/
+    override suspend fun getRecipeById(id: String): Recipe {
+        return try {
+            val token = "Bearer ${getToken()}" // Dynamically fetch the token
+            val recipe = api.getRecipeById(id, token) // Pass the token in the API call
+            Log.d("Recipe", "Fetched recipe: $recipe")
+            recipe
+        } catch (e: Exception) {
+            Log.e("FridgifyRepositoryImpl", "Failed to get recipe detail for ID: $id", e)
+            throw Exception("Failed to get recipe detail")
+        }
+    }
+
+
+    /*
+        private val mockFoods = listOf(
+            Food(
+                id = 1, Name = "Radish", ImageUrl = "Radish", Category =
+            ),
+            Food(id = 2, Name = "Blueberry", ImageUrl = "Blueberry"),
+            Food(id = 3, Name = "Guava", ImageUrl = "Guava"),
+            Food(id = 4, Name = "Mushroom", ImageUrl = "Mushroom"),
+            Food(id = 5, Name = "Kiwi", ImageUrl = "Kiwi"),
+            Food(id = 6, Name = "Raspberry", ImageUrl = "Raspberry"),
+            Food(id = 7, Name = "Avocado", ImageUrl = "Avocado"),
+            Food(id = 8, Name = "Papaya", ImageUrl = "Papaya"),
+            Food(id = 9, Name = "Zucchini", ImageUrl = "Zucchini"),
+
+        )*/
 
     fun addRecipe(recipe: Recipe) {
         // Simulate adding the recipe to a backend or database

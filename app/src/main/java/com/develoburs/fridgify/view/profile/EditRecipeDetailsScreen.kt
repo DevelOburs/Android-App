@@ -60,7 +60,7 @@ fun EditRecipeScreen(
     var name by remember { mutableStateOf(recipe.Name) }
     var ingredients by remember { mutableStateOf(recipe.ingredients) }
     var instructions by remember { mutableStateOf(recipe.instructions) }
-    var imageUri by remember { mutableStateOf(recipe.Image?.firstOrNull() ?: "") } // Use safe call and provide a default value
+    var imageUri by remember { mutableStateOf(recipe.Image ?: "") } // Use safe call and provide a default value
     // Assuming first image is the main one
 
     Scaffold(
