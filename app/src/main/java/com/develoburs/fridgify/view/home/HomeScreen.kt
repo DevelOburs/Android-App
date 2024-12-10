@@ -1,12 +1,15 @@
 package com.develoburs.fridgify.view.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -42,6 +46,7 @@ import com.develoburs.fridgify.viewmodel.LoginViewModel
 @Composable
 fun HomeScreen(navController: NavController, viewModel: RecipeListViewModel = viewModel()) {
     val allRecipes = viewModel.recipe.collectAsState(initial = emptyList())
+    val isLoading by viewModel.isLoading.collectAsState()
 
     var showFiltered by remember { mutableStateOf(false) }
 
@@ -129,7 +134,32 @@ fun HomeScreen(navController: NavController, viewModel: RecipeListViewModel = vi
                             },
                             isProfileScreen = false
                         )
+
+                        if (index == viewModel.recipe.collectAsState().value.lastIndex) {
+                            viewModel.getRecipesList()
+                        }
                     }
+
+                    if (isLoading) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .height(36.dp)
+                                        .fillMaxWidth(0.1f),
+                                    strokeWidth = 5.dp
+                                )
+                            }
+
+                        }
+                    }
+
                 }
             }
         },

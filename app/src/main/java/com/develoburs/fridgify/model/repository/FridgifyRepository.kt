@@ -5,7 +5,7 @@ import com.develoburs.fridgify.model.Recipe
 
 interface FridgifyRepository {
 
-    suspend fun getRecipeList(): List<Recipe>
+    suspend fun getRecipeList(limit: Int, pageNumber: Int): List<Recipe>
 
     suspend fun getRecipeById(id: String): Recipe
 
