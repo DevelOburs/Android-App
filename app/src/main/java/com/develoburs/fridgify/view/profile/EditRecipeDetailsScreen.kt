@@ -24,6 +24,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -59,13 +60,13 @@ fun EditRecipeScreen(
     var name by remember { mutableStateOf(recipe.Name) }
     var ingredients by remember { mutableStateOf(recipe.ingredients) }
     var instructions by remember { mutableStateOf(recipe.instructions) }
-    var imageUri by remember { mutableStateOf(recipe.Images?.firstOrNull() ?: "") } // Use safe call and provide a default value
+    var imageUri by remember { mutableStateOf(recipe.Image?.firstOrNull() ?: "") } // Use safe call and provide a default value
     // Assuming first image is the main one
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Edit Recipe") },
+                title = { Text(text = "Edit Recipe", style = MaterialTheme.typography.labelMedium) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -106,14 +107,14 @@ fun EditRecipeScreen(
                     OutlinedTextField(
                         value = name ?: "", // Provide a default empty string if null
                         onValueChange = { name = if (it.isBlank()) null else it }, // Set to null if blank
-                        label = { Text(text = "Recipe Name") },
+                        label = { Text(text = "Recipe Name", style = MaterialTheme.typography.titleMedium) },
                         modifier = Modifier.fillMaxWidth()
                     )
                     // Instructions Section
                     OutlinedTextField(
                         value = instructions ?: "", // Provide a default empty string if null
                         onValueChange = { instructions = if (it.isBlank()) null else it }, // Set to null if blank
-                        label = { Text(text = "Instructions") },
+                        label = { Text(text = "Instructions", style = MaterialTheme.typography.titleMedium) },
                         modifier = Modifier.fillMaxWidth()
                     )
                     // Ingredients Section with LazyVerticalGrid
@@ -148,7 +149,7 @@ fun EditRecipeScreen(
                             Name = name,
                             ingredients = ingredients,
                             instructions = instructions,
-                            Images = listOfNotNull(imageUri) // Update images list if a new image is set
+                            Image = listOfNotNull(imageUri).toString() // Update images list if a new image is set
                         )
                         onSave(updatedRecipe)
                     },
@@ -156,7 +157,7 @@ fun EditRecipeScreen(
                         .align(Alignment.BottomCenter)// Aligns the button to the bottom center
                         .padding(16.dp) // Add padding for aesthetics
                 ) {
-                    Text("Save Changes")
+                    Text(text = "Save Changes", style = MaterialTheme.typography.titleMedium)
                 }
             }
         }

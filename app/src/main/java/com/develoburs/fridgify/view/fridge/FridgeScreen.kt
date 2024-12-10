@@ -91,7 +91,7 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
                     TextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
-                        placeholder = { Text("Search") },
+                        placeholder = { Text(text = "Search", style = MaterialTheme.typography.titleMedium) },
                         modifier = Modifier
                             .fillMaxWidth()
 

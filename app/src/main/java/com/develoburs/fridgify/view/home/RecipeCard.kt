@@ -64,17 +64,17 @@ fun RecipeCard(
         shape = RectangleShape
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-//            Image(
-//                painter = rememberAsyncImagePainter(recipe.Images[0]),
-//                contentDescription = null,
-//                modifier = Modifier.fillMaxSize(),
-//                contentScale = ContentScale.Crop
-//            )
+            Image(
+                painter = rememberAsyncImagePainter(recipe.Image ?: R.drawable.menu_book),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
 
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(cardSize / 6)
+                    .height(cardSize / 5)
                     .align(Alignment.BottomCenter)
                     .background(
                         Brush.verticalGradient(
@@ -88,7 +88,7 @@ fun RecipeCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(cardSize / 6)
+                    .height(cardSize / 5)
                     .align(Alignment.BottomCenter)
             )
             {

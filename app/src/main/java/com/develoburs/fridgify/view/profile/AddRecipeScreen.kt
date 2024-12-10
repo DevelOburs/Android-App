@@ -20,6 +20,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -73,7 +74,7 @@ fun AddRecipeScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Add Recipe") },
+                title = { Text(text = "Add Recipe", style = MaterialTheme.typography.labelMedium) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -110,7 +111,7 @@ fun AddRecipeScreen(
                     OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },
-                        label = { Text("Recipe Name") },
+                        label = { Text(text = "Recipe Name", style = MaterialTheme.typography.titleMedium) },
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -118,7 +119,7 @@ fun AddRecipeScreen(
                     OutlinedTextField(
                         value = instructions,
                         onValueChange = { instructions = it },
-                        label = { Text("Instructions") },
+                        label = { Text(text = "Instructions", style = MaterialTheme.typography.titleMedium) },
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -160,7 +161,7 @@ fun AddRecipeScreen(
                             Name = name,
                             ingredients = ingredients,
                             instructions = instructions,
-                            Images = listOfNotNull(imageUri),
+                            Image = listOfNotNull(imageUri).toString(),
                             Author = author,
                             Likes = likes,
                             Comments = comments.size,
@@ -172,7 +173,7 @@ fun AddRecipeScreen(
                         .align(Alignment.BottomCenter) // Aligns the button to the bottom center
                         .padding(16.dp) // Add padding for aesthetics
                 ) {
-                    Text("Save Recipe")
+                    Text(text = "Save Recipe", style = MaterialTheme.typography.bodyLarge)
                 }
             }
         }

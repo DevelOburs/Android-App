@@ -92,7 +92,7 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
                     TextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
-                        placeholder = { Text("Search") },
+                        placeholder = { Text(text = "Search", style = MaterialTheme.typography.titleMedium) },
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -146,12 +146,12 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         Button(onClick = { navController.popBackStack() }) {
-                            Text("Exit")
+                            Text(text = "Exit", style = MaterialTheme.typography.labelLarge)
                         }
                         Button(onClick = {
                             displaySelectedItems = selectedItems.joinToString(", ") { it.Name }
                         }) {
-                            Text("Add")
+                            Text(text = "Add", style = MaterialTheme.typography.labelLarge)
                         }
                     }
                     if (displaySelectedItems.isNotEmpty()) {
@@ -160,7 +160,8 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp),
-                            color = Color.Black
+                            color = Color.Black,
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 }

@@ -97,7 +97,7 @@ fun RecipeDetailsScreen(
                             .verticalScroll(rememberScrollState())
                     ) {
                         // Recipe Image
-                        recipe.Images?.firstOrNull()?.let { imageUrl ->
+                        recipe.Image?.firstOrNull()?.let { imageUrl ->
                             Image(
                                 painter = rememberAsyncImagePainter(imageUrl),
                                 contentDescription = stringResource(id = R.string.recipe_image_description),
@@ -109,7 +109,8 @@ fun RecipeDetailsScreen(
                         } ?: Text(
                             text = stringResource(id = R.string.no_image_available),
                             color = Color.Gray,
-                            modifier = Modifier.padding(8.dp)
+                            modifier = Modifier.padding(8.dp),
+                            style = MaterialTheme.typography.bodySmall
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -117,16 +118,19 @@ fun RecipeDetailsScreen(
                         // Ingredients
                         Text(
                             text = stringResource(id = R.string.ingredients),
-                            fontWeight = FontWeight.Bold
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.Bold
+                            )
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         recipe.ingredients?.let { ingredients ->
                             ingredients.forEach { ingredient ->
-                                Text(text = "• $ingredient")
+                                Text(text = "• $ingredient", style = MaterialTheme.typography.bodySmall)
                             }
                         } ?: Text(
                             text = stringResource(id = R.string.no_ingredients_available),
-                            color = Color.Gray
+                            color = Color.Gray,
+                            style = MaterialTheme.typography.bodySmall
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -134,12 +138,15 @@ fun RecipeDetailsScreen(
                         // Instructions
                         Text(
                             text = stringResource(id = R.string.instructions),
-                            fontWeight = FontWeight.Bold
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.Bold
+                            )
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = recipe.instructions ?: stringResource(id = R.string.no_instructions_available),
-                            color = if (recipe.instructions == null) Color.Gray else Color.Unspecified
+                            color = if (recipe.instructions == null) Color.Gray else Color.Unspecified,
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
 
@@ -148,9 +155,10 @@ fun RecipeDetailsScreen(
                     // Static Comment Section
                     Text(
                         text = stringResource(id = R.string.comments),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontSize = 18.sp
+                        )
                     )
 
                     // Comment Box
@@ -165,9 +173,9 @@ fun RecipeDetailsScreen(
                             // Show "No comments yet" placeholder
                             Text(
                                 text = stringResource(id = R.string.no_comments_available),
-                                fontSize = 16.sp,
                                 color = Color.Gray,
-                                modifier = Modifier.align(Alignment.Center)
+                                modifier = Modifier.align(Alignment.Center),
+                                style = MaterialTheme.typography.titleMedium
                             )
                         } else {
                             // Display comments in a scrollable list (most recent first)
@@ -182,15 +190,18 @@ fun RecipeDetailsScreen(
                                     ) {
                                         Text(
                                             text = username,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 14.sp,
-                                            color = Color.Black
+                                            color = Color.Black,
+                                            style = MaterialTheme.typography.bodySmall.copy(
+                                                fontWeight = FontWeight.Bold,
+                                            )
                                         )
                                         Spacer(modifier = Modifier.height(4.dp))
                                         Text(
                                             text = comment,
-                                            fontSize = 16.sp,
-                                            color = Color.DarkGray
+                                            color = Color.DarkGray,
+                                            style = MaterialTheme.typography.bodySmall.copy(
+                                                fontSize = 16.sp,
+                                            )
                                         )
                                     }
                                 }
@@ -211,7 +222,7 @@ fun RecipeDetailsScreen(
                             value = newComment,
                             onValueChange = { newComment = it },
                             modifier = Modifier.weight(1f),
-                            placeholder = { Text(stringResource(id = R.string.add_comment)) },
+                            placeholder = { Text(text = stringResource(id = R.string.add_comment), style = MaterialTheme.typography.bodyMedium) },
                             singleLine = true
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -221,7 +232,7 @@ fun RecipeDetailsScreen(
                                 newComment = "" // Clear input
                             }
                         }) {
-                            Text(stringResource(id = R.string.submit))
+                            Text(text = stringResource(id = R.string.submit), style = MaterialTheme.typography.titleMedium)
                         }
                     }
                 }

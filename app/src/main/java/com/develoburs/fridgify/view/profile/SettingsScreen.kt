@@ -53,7 +53,7 @@ fun SettingsScreen(navController: NavController, viewModel: LoginViewModel = vie
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
         ) {
-            Text("Change Password")
+            Text(text = "Change Password", style = MaterialTheme.typography.labelMedium)
         }
 
         // Show the dialog if needed
@@ -169,20 +169,20 @@ fun ShowChangePasswordDialog(onDismiss: () -> Unit,  viewModel: LoginViewModel =
                 showDialog = false
                 onDismiss()
             },
-            title = { Text("Change Password") },
+            title = { Text(text = "Change Password", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)) },
             text = {
                 Column {
                     OutlinedTextField(
                         value = username,
                         onValueChange = { username = it },
-                        label = { Text("Username") },
+                        label = { Text(text = "Username", style = MaterialTheme.typography.bodyLarge) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
                     OutlinedTextField(
                         value = oldPassword,
                         onValueChange = { oldPassword = it },
-                        label = { Text("Old Password") },
+                        label = { Text(text = "Old Password", style = MaterialTheme.typography.bodyLarge) },
                         singleLine = true,
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         trailingIcon = {
@@ -196,7 +196,7 @@ fun ShowChangePasswordDialog(onDismiss: () -> Unit,  viewModel: LoginViewModel =
                     OutlinedTextField(
                         value = newPassword,
                         onValueChange = { newPassword = it },
-                        label = { Text("New Password") },
+                        label = { Text(text = "New Password" , style = MaterialTheme.typography.bodyLarge) },
                         singleLine = true,
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         trailingIcon = {
@@ -223,7 +223,7 @@ fun ShowChangePasswordDialog(onDismiss: () -> Unit,  viewModel: LoginViewModel =
                         }
                     }
                 ) {
-                    Text("OK")
+                    Text(text = "OK", style = MaterialTheme.typography.bodyLarge)
                 }
             },
             dismissButton = {
@@ -231,7 +231,7 @@ fun ShowChangePasswordDialog(onDismiss: () -> Unit,  viewModel: LoginViewModel =
                     showDialog = false
                     onDismiss()
                 }) {
-                    Text("Cancel")
+                    Text(text = "Cancel", style = MaterialTheme.typography.bodyLarge)
                 }
             }
         )
