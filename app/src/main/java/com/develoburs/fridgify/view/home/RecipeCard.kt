@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
@@ -26,6 +27,7 @@ import com.develoburs.fridgify.model.Recipe
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
@@ -40,7 +42,6 @@ import com.develoburs.fridgify.ui.theme.DarkerBlueColor
 import com.develoburs.fridgify.ui.theme.PaleWhiteColor
 import com.develoburs.fridgify.ui.theme.WhiteColor
 
-
 @Composable
 fun RecipeCard(
     recipe: Recipe,
@@ -49,25 +50,25 @@ fun RecipeCard(
     isProfileScreen: Boolean = false
 ) {
     val cardSize = LocalConfiguration.current.screenWidthDp.dp
+    val cornerRadius = 16.dp
 
     Card(
         modifier = Modifier
             .padding(horizontal = 10.dp)
             .padding(bottom = 10.dp)
             .size(cardSize)
-            .border(
-                width = 1.dp,
-                color = DarkerBlueColor,
-            )
             .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = DarkBlueColor),
-        shape = RectangleShape
+        shape = RoundedCornerShape(cornerRadius),
+        elevation = CardDefaults.cardElevation(defaultElevation = 20.dp)
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .clip(RoundedCornerShape(cornerRadius))) {
             Image(
                 painter = rememberAsyncImagePainter(recipe.Image ?: R.drawable.menu_book),
                 contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(cornerRadius)),
                 contentScale = ContentScale.Crop
             )
 
@@ -83,10 +84,12 @@ fun RecipeCard(
                             endY = 0f
                         )
                     )
+                    .clip(RoundedCornerShape(cornerRadius))
             )
 
             Row(
                 modifier = Modifier
+                    .padding(horizontal = 8.dp)
                     .fillMaxWidth()
                     .height(cardSize / 5)
                     .align(Alignment.BottomCenter)
@@ -107,7 +110,7 @@ fun RecipeCard(
                     )
 
                     Text(
-                        text = recipe.Author ?: "Unknown Author",
+                        text = "${recipe.AuthorFirstName ?: ""} ${recipe.AuthorLastName ?: ""}",
                         style = MaterialTheme.typography.labelSmall
                     )
                 }

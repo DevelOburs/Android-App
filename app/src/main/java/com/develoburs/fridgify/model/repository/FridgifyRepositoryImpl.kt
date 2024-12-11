@@ -9,9 +9,8 @@ import com.develoburs.fridgify.model.api.RetrofitInstance.fridgeapi
 import android.content.Context
 
 class FridgifyRepositoryImpl : FridgifyRepository {
-    //todo update token
-    private var token: String = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNzMzODgwMjkyLCJpYXQiOjE3MzM4NDQyOTJ9.Kby3fRb1zwm0RKlj9TWrU50jGsxbuntV_mwsN6VvhtE"
-    //eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNzMzMzU2OTI1LCJpYXQiOjE3MzMzMjA5MjV9.0XNejo0l46PlNPW6Vcj-BPxhtDMgPZ7TjbP8oNtbAQ8""
+
+    private var token: String = ""
 
     private var userId: Int = 0
     fun setToken(newToken: String) {
@@ -35,6 +34,8 @@ class FridgifyRepositoryImpl : FridgifyRepository {
             id = "1",
             Name = "Low-Fat Berry Blue Frozen Dessert",
             Author = "Dancer",
+            AuthorFirstName = "",
+            AuthorLastName = "",
             Likes = 158,
             Comments = 12,
             Image =
@@ -56,6 +57,8 @@ class FridgifyRepositoryImpl : FridgifyRepository {
             id = "2",
             Name = "Biryani",
             Author = "elly9812",
+            AuthorFirstName = "",
+            AuthorLastName = "",
             Likes = 39,
             Comments = 3,
             Image =
@@ -79,6 +82,8 @@ class FridgifyRepositoryImpl : FridgifyRepository {
             id = "3",
             Name = "Best Lemonade",
             Author = "Stephen Little",
+            AuthorFirstName = "",
+            AuthorLastName = "",
             Likes = 18,
             Comments = 2,
             Image =
@@ -100,6 +105,8 @@ class FridgifyRepositoryImpl : FridgifyRepository {
             id = "4",
             Name = "Carina's Tofu-Vegetable Kebabs",
             Author = "Cyclopz",
+            AuthorFirstName = "",
+            AuthorLastName = "",
             Likes = 236,
             Comments = 90,
             Image = "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/41/picmbLig8.jpg",
@@ -130,7 +137,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
                 limit = limit,
                 pageNumber = pageNumber
             )
-            Log.d("Recipe List", recipes.toString())
+//            Log.d("Recipe List", recipes.toString())
             return recipes
         } catch (e: Exception) {
             throw Exception("Failed to get recipes, Bearer ${getToken()}", e)
