@@ -12,6 +12,12 @@ data class Recipe(
     @SerializedName("userId")
     val Author: String?,
 
+    @SerializedName("userFirstName")
+    val AuthorFirstName: String? = "",
+
+    @SerializedName("userLastName")
+    val AuthorLastName: String? = "",
+
     @SerializedName("likeCount")
     val Likes: Int?,
 
