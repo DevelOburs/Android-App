@@ -7,6 +7,8 @@ interface FridgifyRepository {
 
     suspend fun getRecipeList(limit: Int, pageNumber: Int): List<Recipe>
 
+    suspend fun getUserRecipeList(): List<Recipe>
+
     suspend fun getRecipeById(id: String): Recipe
 
     suspend fun getFoodList(): List<Food>

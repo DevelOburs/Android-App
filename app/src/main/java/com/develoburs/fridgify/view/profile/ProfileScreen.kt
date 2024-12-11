@@ -38,8 +38,12 @@ import com.develoburs.fridgify.ui.theme.BlackColor
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = viewModel()) {
-    val recipes = viewModel.recipe.collectAsState().value // Get the list of recipes
-
+    val allRecipes = viewModel.userrecipe.collectAsState(initial = emptyList())
+    // Check if recipes are empty and trigger fetching them
+    if (allRecipes.value.isEmpty()) {
+        viewModel.getUserRecipesList() // Call the method to fetch recipes
+    }
+    val recipes = allRecipes.value
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -87,11 +91,21 @@ fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = 
                         .padding(top = 21.dp)
                 ) {
                     // Upper Box with Name, Two Numbers, and Profile Picture
+                    // Updated Upper Box
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(150.dp)
-                            .background(Color.Blue, shape = RoundedCornerShape(8.dp)),
+                            .background(
+                                brush = androidx.compose.ui.graphics.Brush.horizontalGradient(
+                                    colors = listOf(
+                                        Color(0xFF8E44AD), // Deep Purple
+                                        Color(0xFF9B59B6)  // Light Purple
+                                    )
+                                ),
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .padding(8.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Column(
@@ -105,15 +119,6 @@ fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = 
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                // Profile Picture
-                                Box(
-                                    modifier = Modifier
-                                        .size(50.dp)
-                                        .background(Color.Gray, shape = CircleShape) // Placeholder for profile picture
-                                )
-
-                                Spacer(modifier = Modifier.width(16.dp))
-
                                 // Name
                                 Text(
                                     text = "Yasin İBİŞ",
@@ -179,6 +184,7 @@ fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = 
                             }
                         }
                     }
+
 
                     Spacer(modifier = Modifier.height(16.dp))
 

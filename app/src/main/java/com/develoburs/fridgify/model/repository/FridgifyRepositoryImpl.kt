@@ -144,6 +144,20 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         }
     }
 
+    override suspend fun getUserRecipeList(): List<Recipe> {
+        try {
+            // Use getToken function to retrieve the token
+            val recipes = api.getRecipesByUserId(
+                userId = getUserID(),
+                token = "Bearer ${getToken()}"
+            )
+//            Log.d("Recipe List", recipes.toString())
+            return recipes
+        } catch (e: Exception) {
+            throw Exception("Failed to get recipes, Bearer ${getToken()}", e)
+        }
+    }
+
     override suspend fun getRecipeById(id: String): Recipe {
         return try {
             val token = "Bearer ${getToken()}" // Dynamically fetch the token
