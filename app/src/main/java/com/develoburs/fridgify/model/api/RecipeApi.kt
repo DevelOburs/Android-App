@@ -14,6 +14,12 @@ interface RecipeApi {
         @Query("pageNumber") pageNumber: Int
     ): List<Recipe>
 
+    @GET("recipe-api/getRecipes/{userId}")
+    suspend fun getRecipesByUserId(
+        @Path("userId") userId: Int,
+        @Header("Authorization") token: String
+    ): List<Recipe>
+
     @GET("recipe-api/{id}")
     suspend fun getRecipeById(
         @Path("id") id: String,

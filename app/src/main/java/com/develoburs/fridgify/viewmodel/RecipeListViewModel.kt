@@ -14,6 +14,8 @@ import androidx.navigation.NavController
 class RecipeListViewModel(private val navController: NavController, private val repository: FridgifyRepositoryImpl) : ViewModel() {
     private val _recipe = MutableStateFlow<List<Recipe>>(emptyList())
     val recipe: StateFlow<List<Recipe>> = _recipe
+    private val _userrecipe = MutableStateFlow<List<Recipe>>(emptyList())
+    val userrecipe: StateFlow<List<Recipe>> = _userrecipe
     private val _recipeDetail = MutableStateFlow<Recipe?>(null)
     val recipeDetail: StateFlow<Recipe?> = _recipeDetail
 
@@ -27,6 +29,7 @@ class RecipeListViewModel(private val navController: NavController, private val 
 
     init {
         getRecipesList()
+        getUserRecipesList()
     }
 
     fun getRecipesList() {
@@ -43,6 +46,21 @@ class RecipeListViewModel(private val navController: NavController, private val 
                     _recipe.value = _recipe.value + recipeList
                     currentPage++
                 }
+            } catch (e: Exception) {
+                Log.e(tag, "Failed to fetch recipe list", e)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun getUserRecipesList() {
+        if (_isLoading.value) return
+        _isLoading.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val recipeList = repository.getUserRecipeList()
+                _userrecipe.value = _userrecipe.value + recipeList
             } catch (e: Exception) {
                 Log.e(tag, "Failed to fetch recipe list", e)
             } finally {
