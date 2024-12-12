@@ -1,5 +1,6 @@
 package com.develoburs.fridgify.view.fridge
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -27,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.graphics.RectangleShape
@@ -37,19 +39,25 @@ import com.develoburs.fridgify.R
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.ui.theme.BlackColor
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = viewModel() ,onBack: () -> Unit) {
 
-    val allFoods by viewModel.food.collectAsState(initial = emptyList())
+    val allFoods by viewModel.notInFridgeFood.collectAsState(initial = emptyList())
+
     var searchQuery by remember { mutableStateOf("") }
     val selectedItems = remember { mutableStateListOf<Food>() }
     var displaySelectedItems by remember { mutableStateOf("") }
+    if (allFoods.isEmpty()) {
+        viewModel.getNotInFridgeFood() // Call the method to fetch recipes
+        Log.d("NotInFridgeFoodList", allFoods.toString())
+    }
 
     val filteredFoods = remember(searchQuery, allFoods) {
         allFoods.filter { it.Name.contains(searchQuery, ignoreCase = true) }
     }
-
+    var showSnackbar by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -149,21 +157,27 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
                             Text(text = "Exit", style = MaterialTheme.typography.labelLarge)
                         }
                         Button(onClick = {
+                            val ingredientIds = selectedItems.mapNotNull { it.id }
+
+                            Log.d("AddingScreen", "Ingredient IDs: $ingredientIds")
+
+                            viewModel.addFood(ingredientIds)
+                            viewModel.getNotInFridgeFood()
+
                             displaySelectedItems = selectedItems.joinToString(", ") { it.Name }
+                            selectedItems.clear()
+
+                            Log.d("AddingScreen", "Sent ingredient IDs: $ingredientIds")
+
+                            navController.popBackStack()
                         }) {
                             Text(text = "Add", style = MaterialTheme.typography.labelLarge)
                         }
+
+
                     }
-                    if (displaySelectedItems.isNotEmpty()) {
-                        Text(
-                            text = "Selected Items: $displaySelectedItems",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            color = Color.Black,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+
+
                 }
             }
         }

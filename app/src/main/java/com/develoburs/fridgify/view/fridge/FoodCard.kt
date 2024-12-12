@@ -1,6 +1,8 @@
 package com.develoburs.fridgify.view.fridge
 
 
+import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -22,8 +24,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.rememberAsyncImagePainter
+import com.develoburs.fridgify.R
 //import androidx.compose.ui.graphics.Color
 import com.develoburs.fridgify.ui.theme.DarkBlueColor
+import coil.compose.rememberAsyncImagePainter
+
 
 //val PurpleColor = Color(0xFF800080)
 
@@ -60,15 +68,15 @@ fun FoodCard(
                     .border(2.dp, BlueColor, shape = RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                val imageUrl = food.ImageUrl ?: "No Image"
-                Text(text = imageUrl,  style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp))
+                Log.d("FoodCard", "Image URL: ${food.ImageUrl}")
                 // Alternatively, use a placeholder image:
-                // Image(
-                //     painter = painterResource(id = R.drawable.placeholder_image),
-                //     contentDescription = null,
-                //     modifier = Modifier.fillMaxSize(),
-                //     contentScale = ContentScale.Crop
-                // )
+                Image(
+                    painter = rememberAsyncImagePainter(food.ImageUrl ?: R.drawable.menu_book),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+
             }
 
             Text(
