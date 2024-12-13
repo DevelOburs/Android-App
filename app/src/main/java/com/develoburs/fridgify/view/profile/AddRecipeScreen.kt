@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,6 +41,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.develoburs.fridgify.R
+import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.model.Recipe
 import com.develoburs.fridgify.view.fridge.AddFoodCard
 import com.develoburs.fridgify.view.fridge.DeleteFoodCard
@@ -65,11 +67,7 @@ fun AddRecipeScreen(
     val likes by remember { mutableStateOf(0) }
     val comments by remember { mutableStateOf(listOf<String>()) }
 
-    val allFoods by fviewModel.food.collectAsState(initial = emptyList())
-
-    val filteredFoods = remember("", allFoods) { // TEST FILTER
-        allFoods.filter { it.Name.contains("", ignoreCase = true) }
-    }
+    val selectedItems = fviewModel.selectedFoods
 
     Scaffold(
         topBar = {
@@ -134,7 +132,7 @@ fun AddRecipeScreen(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            items(filteredFoods) { recipe ->
+                            items(selectedItems) { recipe ->
                                 FoodCard(
                                     food = recipe,
                                     onClick = {},
@@ -142,12 +140,7 @@ fun AddRecipeScreen(
                             }
                             // Add Food Card
                             item {
-                                AddFoodCard(onClick = { navController.navigate("addingScreen") })
-                            }
-
-                            // Delete Food Card
-                            item {
-                                DeleteFoodCard(onClick = { navController.navigate("deleteScreen") })
+                                AddFoodCard(onClick = { navController.navigate("AddEditFoodScreen") })
                             }
                         }
                     }
@@ -168,6 +161,7 @@ fun AddRecipeScreen(
                             comments = comments
                         )
                         onSave(newRecipe)
+                        selectedItems.clear()
                     },
                     modifier = Modifier
                         .align(Alignment.BottomCenter) // Aligns the button to the bottom center

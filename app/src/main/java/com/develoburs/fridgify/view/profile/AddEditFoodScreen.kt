@@ -1,4 +1,6 @@
-package com.develoburs.fridgify.view.fridge
+package com.develoburs.fridgify.view.profile
+
+import com.develoburs.fridgify.view.fridge.FoodCard
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -42,26 +44,25 @@ import com.develoburs.fridgify.ui.theme.BlackColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddingScreen(
-    navController: NavController,
-    viewModel: FridgeViewModel = viewModel(),
-    onBack: () -> Unit
-) {
+fun AddEditFoodScreen(navController: NavController, viewModel: FridgeViewModel = viewModel() ,onBack: () -> Unit) {
 
-    val allFoods by viewModel.notInFridgeFood.collectAsState(initial = emptyList())
+    val allFoods by viewModel.food.collectAsState(initial = emptyList())
 
     var searchQuery by remember { mutableStateOf("") }
-    val selectedItems = remember { mutableStateListOf<Food>() }
-    var displaySelectedItems by remember { mutableStateOf("") }
+
+
     if (allFoods.isEmpty()) {
-        viewModel.getNotInFridgeFood() // Call the method to fetch recipes
-        Log.d("NotInFridgeFoodList", allFoods.toString())
+        viewModel.getFoodList() // Call the method to fetch recipes
     }
 
-    val filteredFoods = remember(searchQuery, allFoods) {
-        allFoods.filter { it.Name.contains(searchQuery, ignoreCase = true) }
+    val filteredFoods = remember("", allFoods) { // TEST FILTER
+        allFoods.filter { it.Name.contains("", ignoreCase = true) }
     }
+
+    val selectedItems = viewModel.selectedFoods
+
     var showSnackbar by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -104,12 +105,7 @@ fun AddingScreen(
                     TextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
-                        placeholder = {
-                            Text(
-                                text = "Search",
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                        },
+                        placeholder = { Text(text = "Search", style = MaterialTheme.typography.titleMedium) },
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -166,7 +162,6 @@ fun AddingScreen(
                             Text(text = "Exit", style = MaterialTheme.typography.labelLarge)
                         }
                         Button(onClick = {
-
                             navController.popBackStack()
                         }) {
                             Text(text = "Add", style = MaterialTheme.typography.labelLarge)

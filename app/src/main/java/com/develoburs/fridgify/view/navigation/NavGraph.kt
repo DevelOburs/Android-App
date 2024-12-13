@@ -20,6 +20,7 @@ import com.develoburs.fridgify.view.profile.SettingsScreen
 import com.develoburs.fridgify.view.profile.RecipeScreen
 import com.develoburs.fridgify.view.profile.EditRecipeScreen
 import com.develoburs.fridgify.view.profile.AddRecipeScreen
+import com.develoburs.fridgify.view.profile.AddEditFoodScreen
 import com.develoburs.fridgify.view.profile.LoginPageScreen
 import com.develoburs.fridgify.view.profile.RegisterPageScreen
 import com.develoburs.fridgify.view.home.RecipeDetailsScreen
@@ -35,10 +36,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.runtime.mutableStateOf
-
+import com.develoburs.fridgify.model.Food
 
 
 @Composable
@@ -56,6 +58,7 @@ fun NavGraph(
 
     val fridgeViewModel: FridgeViewModel = viewModel(factory = FridgeViewModelFactory(repository))
 
+    val selectedItems = fridgeViewModel.selectedFoods
     // Retrieve the user token
     val userToken: String = repository.getToken() // Use the getToken function from your repository
     // Here, you can define your user token (for now, assume it's always present)
@@ -73,6 +76,9 @@ fun NavGraph(
         }
         composable("AddingScreen") {
             AddingScreen(navController = navController, viewModel = fridgeViewModel, onBack = { navController.popBackStack() })
+        }
+        composable("AddEditFoodScreen") {
+            AddEditFoodScreen(navController = navController, viewModel = fridgeViewModel, onBack = { navController.popBackStack() })
         }
         composable("DeleteScreen") {
             DeleteScreen(navController = navController, viewModel = fridgeViewModel, onBack = { navController.popBackStack() })
@@ -106,7 +112,6 @@ fun NavGraph(
             }
         }
 
-
         composable(
             "editRecipe/{recipeId}",
             arguments = listOf(navArgument("recipeId") { type = androidx.navigation.NavType.StringType })
@@ -125,11 +130,16 @@ fun NavGraph(
                 EditRecipeScreen(
                     navController = navController,
                     recipe = recipe!!, // Pass the fetched recipe
+                    viewModel =  recipeListViewModel,
+                    fviewModel = fridgeViewModel,
                     onSave = { updatedRecipe ->
+                        //updatedRecipe ->
                         recipeListViewModel.updateRecipe(updatedRecipe)
                         navController.popBackStack()
                     },
-                    onBack = { navController.popBackStack() }
+                    onBack = {
+                        selectedItems.clear()
+                        navController.popBackStack() }
                 )
             } else {
                 // Show a loading indicator while waiting for the recipe
@@ -155,9 +165,12 @@ fun NavGraph(
                     recipeListViewModel.addRecipe(newRecipe) // Add the new recipe to your ViewModel
                     navController.popBackStack() // Navigate back after saving
                 },
-                onBack = { navController.popBackStack() } // Handle back navigation
+                onBack = {
+                    selectedItems.clear()
+                    navController.popBackStack() } // Handle back navigation
             )
         }
+
         composable(
             "recipes/{recipeType}",
             arguments = listOf(navArgument("recipeType") { type = androidx.navigation.NavType.StringType })

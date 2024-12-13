@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Alignment.Horizontal
@@ -29,6 +30,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,19 +51,30 @@ import com.develoburs.fridgify.view.fridge.AddFoodCard
 import com.develoburs.fridgify.view.fridge.DeleteFoodCard
 import com.develoburs.fridgify.view.fridge.FoodCard
 import com.develoburs.fridgify.viewmodel.FridgeViewModel
+import com.develoburs.fridgify.viewmodel.RecipeListViewModel
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditRecipeScreen(
     navController: NavController,
+    viewModel: RecipeListViewModel = viewModel(),
+    fviewModel: FridgeViewModel = viewModel(),
     recipe: Recipe,
     onSave: (Recipe) -> Unit,
     onBack: () -> Unit
 ) {
     var name by remember { mutableStateOf(recipe.Name) }
-    var ingredients by remember { mutableStateOf(recipe.ingredients) }
     var instructions by remember { mutableStateOf(recipe.instructions) }
     var imageUri by remember { mutableStateOf(recipe.Image ?: "") } // Use safe call and provide a default value
     // Assuming first image is the main one
+    // Fetch the recipe details when the screen is loaded
+    LaunchedEffect(recipe.id) {
+        viewModel.getRecipeIngredients(recipe.id)
+    }
+    // Collect the recipe details state
+    val foods by viewModel.food.collectAsState()
+
+    val selectedItems = fviewModel.selectedFoods
 
     Scaffold(
         topBar = {
@@ -115,7 +128,11 @@ fun EditRecipeScreen(
                         value = instructions ?: "", // Provide a default empty string if null
                         onValueChange = { instructions = if (it.isBlank()) null else it }, // Set to null if blank
                         label = { Text(text = "Instructions", style = MaterialTheme.typography.titleMedium) },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 72.dp), // Set a max height based on the number of lines
+                        maxLines = 4, // Limit to two lines
+                        singleLine = false, // Allow multiple lines
                     )
                     // Ingredients Section with LazyVerticalGrid
                     Box(
@@ -129,14 +146,15 @@ fun EditRecipeScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
 
+                            items(foods + selectedItems) { recipe ->
+                                FoodCard(
+                                    food = recipe,
+                                    onClick = {},
+                                )
+                            }
                             // Add Food Card
                             item {
-                                AddFoodCard(onClick = { navController.navigate("addingScreen") })
-                            }
-
-                            // Delete Food Card
-                            item {
-                                DeleteFoodCard(onClick = { navController.navigate("deleteScreen") })
+                                AddFoodCard(onClick = { navController.navigate("AddEditFoodScreen") })
                             }
                         }
                     }
@@ -145,13 +163,12 @@ fun EditRecipeScreen(
                 // Save Button positioned at the bottom
                 Button(
                     onClick = {
-                        val updatedRecipe = recipe.copy(
-                            Name = name,
-                            ingredients = ingredients,
-                            instructions = instructions,
-                            Image = listOfNotNull(imageUri).toString() // Update images list if a new image is set
-                        )
-                        onSave(updatedRecipe)
+                        // Update Recipe
+
+                        selectedItems.clear()
+                        onBack()
+
+
                     },
                     modifier = Modifier
                         .align(Alignment.BottomCenter)// Aligns the button to the bottom center

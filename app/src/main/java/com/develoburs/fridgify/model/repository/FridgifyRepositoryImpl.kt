@@ -193,6 +193,17 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         mockRecipes.add(recipe) // Add recipe to the local mutable list
     }
 
+    override suspend fun getRecipeIngredients(id: String): List<Food> {
+        try {
+            // Use getToken function to retrieve the token
+            val foods = api.getRecipeIngredients(id, token)
+            Log.d("Food List", foods.toString())
+            return foods
+        } catch (e: Exception) {
+            throw Exception("Failed to get foods, Bearer ${getToken()}", e)
+        }
+    }
+
     override suspend fun getFoodList(): List<Food> {
         try {
             // Use getToken function to retrieve the token

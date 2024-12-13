@@ -1,6 +1,8 @@
 package com.develoburs.fridgify.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.develoburs.fridgify.model.Food
@@ -20,10 +22,13 @@ class FridgeViewModel(private val repository: FridgifyRepositoryImpl) : ViewMode
     private val _categories = MutableStateFlow<List<String>>(emptyList())
     val categories: StateFlow<List<String>> = _categories
 
+    val selectedFoods = mutableStateListOf<Food>()
+
     init {
         getFoodList()
         getCategories()
     }
+
 
     fun getFoodList() {
         viewModelScope.launch(Dispatchers.IO) {
