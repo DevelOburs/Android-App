@@ -1,4 +1,6 @@
-package com.develoburs.fridgify.view.fridge
+package com.develoburs.fridgify.view.profile
+
+import com.develoburs.fridgify.view.fridge.FoodCard
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -42,32 +44,31 @@ import com.develoburs.fridgify.ui.theme.BlackColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = viewModel() ,onBack: () -> Unit) {
+fun AddEditFoodScreen(navController: NavController, viewModel: FridgeViewModel = viewModel() ,onBack: () -> Unit) {
 
+    val allFoods by viewModel.food.collectAsState(initial = emptyList())
 
-    val selectedItems = remember { mutableStateListOf<Food>() }
-    var displaySelectedItems by remember { mutableStateOf("") }
-   val allFoods by viewModel.food.collectAsState(initial = emptyList())
     var searchQuery by remember { mutableStateOf("") }
 
-    // Check if recipes are empty and trigger fetching them
+
     if (allFoods.isEmpty()) {
         viewModel.getFoodList() // Call the method to fetch recipes
-
-
     }
 
-
-    val filteredFoods = remember(searchQuery, allFoods) {
-        allFoods.filter { it.Name.contains(searchQuery, ignoreCase = true) }
+    val filteredFoods = remember("", allFoods) { // TEST FILTER
+        allFoods.filter { it.Name.contains("", ignoreCase = true) }
     }
+
+    val selectedItems = viewModel.selectedFoods
+
     var showSnackbar by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Delete screen", //TODO will be changed later
+                        text = "Adding screen", //TODO will be changed later
                         color = BlackColor,
                         style = MaterialTheme.typography.labelMedium
                     )
@@ -161,21 +162,9 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                             Text(text = "Exit", style = MaterialTheme.typography.labelLarge)
                         }
                         Button(onClick = {
-                            val ingredientIds = selectedItems.mapNotNull { it.id }
-
-                            Log.d("DeleteScreen", "Ingredient IDs: $ingredientIds")
-
-                            viewModel.removeFood(ingredientIds)
-                            viewModel.getNotInFridgeFood()
-
-                            displaySelectedItems = selectedItems.joinToString(", ") { it.Name }
-                            selectedItems.clear()
-
-                            Log.d("DeleteScreen", "Sent ingredient IDs: $ingredientIds")
-
                             navController.popBackStack()
                         }) {
-                            Text(text = "Delete", style = MaterialTheme.typography.labelLarge)
+                            Text(text = "Add", style = MaterialTheme.typography.labelLarge)
                         }
 
 
