@@ -24,6 +24,7 @@ val PaleWhiteColor = Color(0x80FFFFFF)
 
 val LightRedColor = Color(0xFFFF4500)
 val OrangeColor = Color(0xFFFF8C00)
+val LightOrangeColor = Color(0xFFFFB45F)
 val YellowColor = Color(0xFFFFC107)
 val BurgundyColor = Color(0xFF8B0000)
 val DarkOrangeColor = Color(0xFFD2691E)

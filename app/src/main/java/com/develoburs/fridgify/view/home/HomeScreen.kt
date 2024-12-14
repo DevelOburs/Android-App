@@ -1,6 +1,7 @@
 package com.develoburs.fridgify.view.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,6 +41,8 @@ import com.develoburs.fridgify.viewmodel.RecipeListViewModel
 import androidx.navigation.NavController
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.BlackColor
+import com.develoburs.fridgify.ui.theme.CreamColor
+import com.develoburs.fridgify.ui.theme.CreamColor2
 import com.develoburs.fridgify.viewmodel.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -105,11 +108,10 @@ fun HomeScreen(navController: NavController, viewModel: RecipeListViewModel = vi
             Surface(
                 modifier = Modifier.fillMaxSize()
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.background_image),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = CreamColor2) // Replace Color.Blue with your desired color
                 )
 
                 val recipesToShow = if (showFiltered) {

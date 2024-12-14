@@ -23,7 +23,10 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.develoburs.fridgify.ui.theme.BlackColor
+import com.develoburs.fridgify.ui.theme.CreamColor
 import com.develoburs.fridgify.ui.theme.DarkBlueColor
+import com.develoburs.fridgify.ui.theme.DarkOrangeColor
+import com.develoburs.fridgify.ui.theme.OrangeColor
 import com.develoburs.fridgify.ui.theme.PaleBlackColor
 import com.develoburs.fridgify.ui.theme.PaleWhiteColor
 import com.develoburs.fridgify.ui.theme.WhiteColor
@@ -41,7 +44,7 @@ fun BottomBar(navController: NavHostController) {
 
     Box() {
         NavigationBar(
-            containerColor = DarkBlueColor,
+            containerColor = OrangeColor,
             modifier = Modifier
                 .fillMaxWidth()
         ) {
@@ -92,6 +95,7 @@ fun RowScope.AddItem(
         },
         colors = NavigationBarItemDefaults.colors(
             selectedIconColor = WhiteColor,
+            indicatorColor  = DarkOrangeColor,
             unselectedIconColor = PaleWhiteColor,
             selectedTextColor = BlackColor,
             unselectedTextColor = PaleBlackColor

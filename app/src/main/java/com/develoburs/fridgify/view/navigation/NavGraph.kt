@@ -20,8 +20,14 @@ import com.develoburs.fridgify.view.profile.SettingsScreen
 import com.develoburs.fridgify.view.profile.RecipeScreen
 import com.develoburs.fridgify.view.profile.EditRecipeScreen
 import com.develoburs.fridgify.view.profile.AddRecipeScreen
+<<<<<<< Updated upstream
 import com.develoburs.fridgify.view.profile.LoginPageScreen
 import com.develoburs.fridgify.view.profile.RegisterPageScreen
+=======
+import com.develoburs.fridgify.view.profile.AddEditFoodScreen
+import com.develoburs.fridgify.view.login.LoginPageScreen
+import com.develoburs.fridgify.view.login.RegisterPageScreen
+>>>>>>> Stashed changes
 import com.develoburs.fridgify.view.home.RecipeDetailsScreen
 import com.develoburs.fridgify.viewmodel.FridgeViewModel
 import com.develoburs.fridgify.viewmodel.FridgeViewModelFactory
@@ -38,7 +44,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.runtime.mutableStateOf
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 
 
 @Composable

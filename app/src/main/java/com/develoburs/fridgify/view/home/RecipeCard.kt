@@ -39,6 +39,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.DarkBlueColor
 import com.develoburs.fridgify.ui.theme.DarkerBlueColor
+import com.develoburs.fridgify.ui.theme.LightOrangeColor
 import com.develoburs.fridgify.ui.theme.PaleWhiteColor
 import com.develoburs.fridgify.ui.theme.WhiteColor
 
@@ -58,7 +59,7 @@ fun RecipeCard(
             .padding(bottom = 10.dp)
             .size(cardSize)
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = DarkBlueColor),
+        colors = CardDefaults.cardColors(containerColor = LightOrangeColor),
         shape = RoundedCornerShape(cornerRadius),
         elevation = CardDefaults.cardElevation(defaultElevation = 20.dp)
     ) {
@@ -79,13 +80,17 @@ fun RecipeCard(
                     .align(Alignment.BottomCenter)
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(WhiteColor, PaleWhiteColor),
+                            colors = listOf(
+                                WhiteColor.copy(alpha = 0.8f), // Adjust alpha for transparency
+                                PaleWhiteColor.copy(alpha = 0.5f)
+                            ),
                             startY = Float.POSITIVE_INFINITY,
                             endY = 0f
                         )
                     )
                     .clip(RoundedCornerShape(cornerRadius))
             )
+
 
             Row(
                 modifier = Modifier

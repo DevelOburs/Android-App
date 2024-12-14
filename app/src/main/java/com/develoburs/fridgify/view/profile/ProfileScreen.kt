@@ -30,11 +30,19 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.BlackColor
+import com.develoburs.fridgify.ui.theme.CharcoalColor
+import com.develoburs.fridgify.ui.theme.CreamColor2
+import com.develoburs.fridgify.ui.theme.DarkOrangeColor
+import com.develoburs.fridgify.ui.theme.LightOrangeColor
+import com.develoburs.fridgify.ui.theme.MintColor
+import com.develoburs.fridgify.ui.theme.OrangeColor
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = viewModel()) {
@@ -64,7 +72,7 @@ fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = 
             FloatingActionButton(
                 onClick = { navController.navigate("addRecipe") }, // Navigate to Add Recipe Screen
                 shape = CircleShape,
-                containerColor = MaterialTheme.colorScheme.primary,
+                containerColor = DarkOrangeColor,
                 contentColor = Color.White,
                 modifier = Modifier.padding(16.dp)
             ) {
@@ -78,11 +86,10 @@ fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = 
             Surface(
                 modifier = Modifier.fillMaxSize()
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.background_image),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = CreamColor2) // Replace Color.Blue with your desired color
                 )
 
                 Column(
@@ -96,11 +103,12 @@ fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = 
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(150.dp)
+                            .padding(horizontal = 10.dp)
                             .background(
                                 brush = androidx.compose.ui.graphics.Brush.horizontalGradient(
                                     colors = listOf(
-                                        Color(0xFF8E44AD), // Deep Purple
-                                        Color(0xFF9B59B6)  // Light Purple
+                                        LightOrangeColor, // Deep
+                                        LightOrangeColor  // Light
                                     )
                                 ),
                                 shape = RoundedCornerShape(16.dp)
@@ -123,7 +131,7 @@ fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = 
                                 Text(
                                     text = "Yasin İBİŞ",
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = Color.White
+                                    color = Color.Black
                                 )
 
                                 Spacer(modifier = Modifier.width(16.dp))

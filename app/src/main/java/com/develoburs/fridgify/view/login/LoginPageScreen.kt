@@ -1,7 +1,6 @@
-package com.develoburs.fridgify.view.profile
+package com.develoburs.fridgify.view.login
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -13,18 +12,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.develoburs.fridgify.view.bottombar.BottomBarScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.develoburs.fridgify.R
+import com.develoburs.fridgify.ui.theme.OrangeColor
 import com.develoburs.fridgify.viewmodel.LoginViewModel
 
 @Composable
@@ -45,7 +42,7 @@ fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = v
         // App Title
         Text(
             text = stringResource(id = R.string.app_name),
-            color = Color(0xFF6200EA), // Customize the color
+            color = OrangeColor, // Customize the color
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 24.dp),
             style = MaterialTheme.typography.labelLarge
@@ -83,6 +80,11 @@ fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = v
 
         Spacer(modifier = Modifier.height(16.dp))
         Button(
+            colors = ButtonColors(
+                containerColor = OrangeColor, contentColor = OrangeColor,
+                disabledContainerColor = OrangeColor,
+                disabledContentColor = OrangeColor,
+            ),
             onClick = {
                 viewModel.login(username, email, password) { response ->
                     loginResult = if (response.error.isNullOrEmpty()) {
@@ -100,7 +102,7 @@ fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = v
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
         ) {
-            Text(text = "Login", style = MaterialTheme.typography.titleMedium)
+            Text(text = "Login", style = MaterialTheme.typography.titleMedium, color = Color.White)
         }
         Spacer(modifier = Modifier.height(8.dp))
 

@@ -24,6 +24,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 //import androidx.compose.ui.graphics.Color
 import com.develoburs.fridgify.ui.theme.DarkBlueColor
+<<<<<<< Updated upstream
+=======
+import coil.compose.rememberAsyncImagePainter
+import com.develoburs.fridgify.ui.theme.YellowColor
+
+>>>>>>> Stashed changes
 
 //val PurpleColor = Color(0xFF800080)
 
@@ -48,6 +54,7 @@ fun FoodCard(
                 shape = RoundedCornerShape(8.dp),
             ),
         colors = CardDefaults.cardColors(containerColor = DarkBlueColor),
+        colors = CardDefaults.cardColors(containerColor = YellowColor),
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(

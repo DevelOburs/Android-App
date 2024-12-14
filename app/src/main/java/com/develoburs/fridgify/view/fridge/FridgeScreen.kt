@@ -1,6 +1,7 @@
 package com.develoburs.fridgify.view.fridge
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 
 
@@ -36,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.BlackColor
+import com.develoburs.fridgify.ui.theme.CreamColor2
 import com.develoburs.fridgify.viewmodel.FridgeViewModel
 import com.develoburs.fridgify.viewmodel.LoginViewModel
 
@@ -75,11 +77,10 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
             Surface(
                 modifier = Modifier.fillMaxSize()
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.background_image),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = CreamColor2) // Replace Color.Blue with your desired color
                 )
 
                 Column(
