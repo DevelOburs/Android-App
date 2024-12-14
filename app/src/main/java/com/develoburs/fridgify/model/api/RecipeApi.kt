@@ -1,5 +1,5 @@
 package com.develoburs.fridgify.model.api
-
+import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.model.Recipe
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -25,4 +25,10 @@ interface RecipeApi {
         @Path("id") id: String,
         @Header("Authorization") token: String
     ): Recipe
+
+    @GET("recipe-api/ingredient/{id}")
+    suspend fun getRecipeIngredients(
+        @Path("id") id: String,
+        @Header("Authorization") token: String
+    ): List<Food>
 }

@@ -1,5 +1,6 @@
 package com.develoburs.fridgify.view.fridge
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -51,6 +52,8 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
     // Check if recipes are empty and trigger fetching them
     if (allFoods.isEmpty()) {
         viewModel.getFoodList() // Call the method to fetch recipes
+
+
     }
 
     val filteredFoods = remember(searchQuery, allFoods) {

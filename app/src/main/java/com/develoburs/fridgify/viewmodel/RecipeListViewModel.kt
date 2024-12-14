@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import androidx.navigation.NavController
+import com.develoburs.fridgify.model.Food
 
 class RecipeListViewModel(private val navController: NavController, private val repository: FridgifyRepositoryImpl) : ViewModel() {
     private val _recipe = MutableStateFlow<List<Recipe>>(emptyList())
@@ -18,6 +19,9 @@ class RecipeListViewModel(private val navController: NavController, private val 
     val userrecipe: StateFlow<List<Recipe>> = _userrecipe
     private val _recipeDetail = MutableStateFlow<Recipe?>(null)
     val recipeDetail: StateFlow<Recipe?> = _recipeDetail
+
+    private val _food = MutableStateFlow<List<Food>>(emptyList())
+    val food: StateFlow<List<Food>> = _food
 
     private var currentPage = 0
     private val pageSize = 10
@@ -98,6 +102,18 @@ class RecipeListViewModel(private val navController: NavController, private val 
         // Update the recipe in your list and/or backend
         _recipe.value = _recipe.value.map {
             if (it.id == updatedRecipe.id) updatedRecipe else it
+        }
+    }
+
+    fun getRecipeIngredients(id: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val foodList = repository.getRecipeIngredients(id)
+                _food.value = foodList
+                Log.d("ViewModel", "Recipe set to state: $recipe")
+            } catch (e: Exception) {
+                Log.e("RecipeListViewModel", "Failed to fetch recipe detail", e)
+            }
         }
     }
 }
