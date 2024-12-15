@@ -8,15 +8,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,6 +49,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.model.Recipe
+import com.develoburs.fridgify.model.createRecipe
+import com.develoburs.fridgify.model.repository.FridgifyRepositoryImpl
 import com.develoburs.fridgify.view.fridge.AddFoodCard
 import com.develoburs.fridgify.view.fridge.DeleteFoodCard
 import com.develoburs.fridgify.view.fridge.FoodCard
@@ -56,16 +64,29 @@ fun AddRecipeScreen(
     navController: NavController,
     viewModel: RecipeListViewModel = viewModel(),
     fviewModel: FridgeViewModel = viewModel(),
-    onSave: (Recipe) -> Unit,
+    repository: FridgifyRepositoryImpl,
+    onSave: (createRecipe) -> Unit,
     onBack: () -> Unit
 ) {
     var name by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
     var ingredients by remember { mutableStateOf(listOf<String>()) }
-    var instructions by remember { mutableStateOf("") }
-    var imageUri by remember { mutableStateOf<String?>(null) }
-    val author by remember { mutableStateOf("Unknown Author") }
-    val likes by remember { mutableStateOf(0) }
-    val comments by remember { mutableStateOf(listOf<String>()) }
+    var calories by remember { mutableStateOf(0) }
+    var cookingTime by remember { mutableStateOf(0) }
+    var imageUrl by remember { mutableStateOf<String?>(null) }
+    var category by remember { mutableStateOf("APPETIZERS_AND_SNACKS") }
+
+    val categoryMap = mapOf(
+        "ALL" to "All",
+        "APPETIZERS_AND_SNACKS" to "Appetizers and Snacks",
+        "MAIN_DISHES" to "Main Dishes",
+        "SIDE_DISHES" to "Side Dishes",
+        "SOUPS_AND_STEWS" to "Soups and Stews",
+        "BREADS_AND_BAKING" to "Breads and Baking",
+        "DESSERTS_AND_SWEETS" to "Desserts and Sweets",
+        "BEVERAGES" to "Beverages",
+        "SPECIAL_DIETS" to "Special Diets"
+    )
 
     val selectedItems = fviewModel.selectedFoods
 
@@ -87,55 +108,120 @@ fun AddRecipeScreen(
                     .padding(top = 21.dp)
                     .fillMaxSize()
             ) {
-                Column(
+                LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 72.dp) // Add padding to make space for the button
+                        .padding(bottom = 72.dp),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(imageUri ?: R.drawable.background_image),
-                        contentDescription = "Recipe Image",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .size(200.dp)
-                            .padding(8.dp)
-                            .clickable {
-                                // Simulate image selection
-                                imageUri = "newImageUri"
-                            },
-                        contentScale = ContentScale.Crop
-                    )
+                    // Recipe Image Section
+                    item {
+                        Image(
+                            painter = rememberAsyncImagePainter(imageUrl ?: R.drawable.background_image),
+                            contentDescription = "Recipe Image",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .size(200.dp)
+                                .padding(8.dp)
+                                .clickable {
+                                    // Simulate image selection
+                                    imageUrl = "newImageUri"
+                                },
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+
                     // Recipe Name Section
-                    OutlinedTextField(
-                        value = name,
-                        onValueChange = { name = it },
-                        label = { Text(text = "Recipe Name", style = MaterialTheme.typography.titleMedium) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    item {
+                        OutlinedTextField(
+                            value = name,
+                            onValueChange = { name = it },
+                            label = { Text(text = "Recipe Name", style = MaterialTheme.typography.titleMedium) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
 
-                    // Instructions Section
-                    OutlinedTextField(
-                        value = instructions,
-                        onValueChange = { instructions = it },
-                        label = { Text(text = "Instructions", style = MaterialTheme.typography.titleMedium) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    // Description Section
+                    item {
+                        OutlinedTextField(
+                            value = description,
+                            onValueChange = { description = it },
+                            label = { Text(text = "Description", style = MaterialTheme.typography.titleMedium) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
 
-                    // Ingredients Section with LazyVerticalGrid
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(4),
+                    // Cooking Time Section
+                    item {
+                        OutlinedTextField(
+                            value = cookingTime.toString(),
+                            onValueChange = { cookingTime = it.toIntOrNull() ?: 0 },
+                            label = { Text(text = "Cooking Time (mins)", style = MaterialTheme.typography.titleMedium) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    // Calories Section
+                    item {
+                        OutlinedTextField(
+                            value = calories.toString(),
+                            onValueChange = { calories = it.toIntOrNull() ?: 0 },
+                            label = { Text(text = "Calories", style = MaterialTheme.typography.titleMedium) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    // Category Dropdown Section
+                    item {
+                        var expanded by remember { mutableStateOf(false) }
+
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            OutlinedTextField(
+                                value = categoryMap[category] ?: "",
+                                onValueChange = {},
+                                label = { Text(text = "Category") },
+                                modifier = Modifier.fillMaxWidth(),
+                                readOnly = true,
+                                trailingIcon = {
+                                    Icon(
+                                        imageVector = Icons.Default.ArrowDropDown,
+                                        contentDescription = null,
+                                        modifier = Modifier.clickable { expanded = true }
+                                    )
+                                }
+                            )
+                            DropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                categoryMap.forEach { (key, value) ->
+                                    DropdownMenuItem(
+                                        text = { Text(value) },
+                                        onClick = {
+                                            category = key
+                                            expanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // Ingredients Section with LazyHorizontalGrid
+                    item {
+                        LazyHorizontalGrid(
+                            rows = GridCells.Fixed(2),
                             contentPadding = PaddingValues(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.height(200.dp)
                         ) {
-                            items(selectedItems) { recipe ->
+                            items(selectedItems) { food ->
                                 FoodCard(
-                                    food = recipe,
-                                    onClick = {},
+                                    food = food,
+                                    onClick = {}
                                 )
                             }
                             // Add Food Card
@@ -149,23 +235,30 @@ fun AddRecipeScreen(
                 // Save Button positioned at the bottom
                 Button(
                     onClick = {
-                        val newRecipe = Recipe(
-                            id = System.currentTimeMillis().toString(),
-                            Name = name,
-                            ingredients = ingredients,
-                            instructions = instructions,
-                            Image = listOfNotNull(imageUri).toString(),
-                            Author = author,
-                            Likes = likes,
-                            Comments = comments.size,
-                            comments = comments
+                        val newRecipe = createRecipe(
+                            id = "165565", // Replace with actual ID logic
+                            name = name,
+                            description = description,
+                            createdAt = System.currentTimeMillis().toString(),
+                            userId = repository.getUserID().toString(), // Replace with actual user ID
+                            userUsername = repository.getUserName(),
+                            userFirstName = repository.getUserName(),
+                            userLastName = repository.getUserName(),
+                            likeCount = 0,
+                            commentCount = 0,
+                            saveCount = 0,
+                            ingredients = selectedItems.map { it.Name },
+                            imageUrl = imageUrl ?: "",
+                            category = category,
+                            calories = calories,
+                            cookingTime = cookingTime
                         )
                         onSave(newRecipe)
                         selectedItems.clear()
                     },
                     modifier = Modifier
-                        .align(Alignment.BottomCenter) // Aligns the button to the bottom center
-                        .padding(16.dp) // Add padding for aesthetics
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp)
                 ) {
                     Text(text = "Save Recipe", style = MaterialTheme.typography.bodyLarge)
                 }

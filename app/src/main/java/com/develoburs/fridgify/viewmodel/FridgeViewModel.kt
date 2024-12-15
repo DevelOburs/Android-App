@@ -16,6 +16,9 @@ class FridgeViewModel(private val repository: FridgifyRepositoryImpl) : ViewMode
     private val _food = MutableStateFlow<List<Food>>(emptyList())
     val food: StateFlow<List<Food>> = _food
 
+    private val _allfood = MutableStateFlow<List<Food>>(emptyList())
+    val allfood: StateFlow<List<Food>> = _allfood
+
     private val _notInFridgeFood = MutableStateFlow<List<Food>>(emptyList())
     val notInFridgeFood: StateFlow<List<Food>> = _notInFridgeFood
 
@@ -26,8 +29,19 @@ class FridgeViewModel(private val repository: FridgifyRepositoryImpl) : ViewMode
 
     init {
         getFoodList()
+        getAllFoodList()
     }
 
+    fun getAllFoodList(category: String? = null) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val foodList = repository.getFoodList(category)
+                _allfood.value = foodList
+            } catch (e: Exception) {
+                Log.e("FridgeViewModel", "Failed to fetch food list", e)
+            }
+        }
+    }
 
     fun getFoodList(category: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
