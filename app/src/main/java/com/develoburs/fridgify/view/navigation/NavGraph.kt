@@ -174,7 +174,7 @@ fun NavGraph(
             arguments = listOf(navArgument("recipeType") { type = androidx.navigation.NavType.StringType })
         ) { backStackEntry ->
             val recipeType = backStackEntry.arguments?.getString("recipeType") ?: "liked"
-            RecipeScreen(navController = navController, recipeType = recipeType)
+            RecipeScreen(navController = navController,viewModel = recipeListViewModel, recipeType = recipeType)
         }
         composable("login") {
             LoginPageScreen(navController = navController, viewModel = loginViewModel) // Pass the LoginViewModel here

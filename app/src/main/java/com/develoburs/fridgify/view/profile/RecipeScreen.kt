@@ -19,7 +19,11 @@ import com.develoburs.fridgify.viewmodel.RecipeListViewModel
 import com.develoburs.fridgify.view.home.RecipeCard
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.unit.dp
+import com.develoburs.fridgify.ui.theme.CharcoalColor
 
 @Composable
 fun RecipeScreen(
@@ -27,12 +31,19 @@ fun RecipeScreen(
     viewModel: RecipeListViewModel = viewModel(),
     recipeType: String  // Either "liked" or "saved"
 ) {
-
-    // Collect the appropriate list based on recipeType
+    val isLoading by viewModel.isLoading.collectAsState()
     val recipes = when (recipeType) {
-        "liked" -> viewModel.recipe.collectAsState(initial = emptyList())
-        "saved" -> viewModel.recipe.collectAsState(initial = emptyList())
-        else -> viewModel.recipe.collectAsState(initial = emptyList())
+        "liked" -> viewModel.userlikedrecipe.collectAsState(initial = emptyList()).value
+        "saved" -> viewModel.usersavedrecipe.collectAsState(initial = emptyList()).value
+        else -> viewModel.userlikedrecipe.collectAsState(initial = emptyList()).value
+    }
+
+    if (recipes.isEmpty()) {
+        when (recipeType) {
+            "liked" -> viewModel.getUserLikedRecipesList()
+            "saved" -> viewModel.getUserSavedRecipesList()
+            else -> viewModel.getUserLikedRecipesList()
+        }
     }
 
     Column {
@@ -45,7 +56,7 @@ fun RecipeScreen(
         }
 
         // Show a message if the list is empty
-        if (recipes.value.isEmpty()) {
+        if (recipes.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -56,14 +67,41 @@ fun RecipeScreen(
             }
         } else {
             // Display the list of recipes
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                itemsIndexed(recipes.value) { index, recipe ->
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                itemsIndexed(recipes) { index, recipe ->  // Use the list of recipes
                     RecipeCard(
                         recipe = recipe,
                         onClick = {
                             navController.navigate("recipeDetails/${recipe.id}")
-                        }
+                        },
+                        onEditClick = {
+                            navController.navigate("editRecipe/${recipe.id}")
+                        },
+                        isProfileScreen = false
                     )
+                }
+                if (isLoading) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .height(36.dp)
+                                    .fillMaxWidth(0.1f),
+                                strokeWidth = 5.dp,
+                                color = CharcoalColor
+                            )
+                        }
+
+                    }
                 }
             }
         }

@@ -44,8 +44,6 @@ data class Recipe(
 
 
 data class createRecipe(
-    @SerializedName("id")
-    val id: String, // Changed to Long to match integer($int64)
 
     @SerializedName("name")
     val name: String?, // Updated to lowercase for consistency
@@ -53,9 +51,6 @@ data class createRecipe(
     @SerializedName("description")
     val description: String?, // Added to match schema
 
-
-    @SerializedName("createdAt")
-    val createdAt: String?, // Added to match schema
 
     @SerializedName("userId")
     val userId: String?, // Changed to Long to match integer($int64)

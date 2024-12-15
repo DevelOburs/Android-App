@@ -18,6 +18,10 @@ class RecipeListViewModel(private val navController: NavController, private val 
     val recipe: StateFlow<List<Recipe>> = _recipe
     private val _userrecipe = MutableStateFlow<List<Recipe>>(emptyList())
     val userrecipe: StateFlow<List<Recipe>> = _userrecipe
+    private val _userlikedrecipe = MutableStateFlow<List<Recipe>>(emptyList())
+    val userlikedrecipe: StateFlow<List<Recipe>> = _userlikedrecipe
+    private val _usersavedrecipe = MutableStateFlow<List<Recipe>>(emptyList())
+    val usersavedrecipe: StateFlow<List<Recipe>> = _usersavedrecipe
     private val _recipeDetail = MutableStateFlow<Recipe?>(null)
     val recipeDetail: StateFlow<Recipe?> = _recipeDetail
 
@@ -54,6 +58,36 @@ class RecipeListViewModel(private val navController: NavController, private val 
                     _recipe.value = _recipe.value + recipeList
                     currentPage++
                 }
+            } catch (e: Exception) {
+                Log.e(tag, "Failed to fetch recipe list", e)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun getUserLikedRecipesList() {
+        if (_isLoading.value) return
+        _isLoading.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val recipeList = repository.getUserLikedList()
+                _userlikedrecipe.value = recipeList
+            } catch (e: Exception) {
+                Log.e(tag, "Failed to fetch recipe list", e)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun getUserSavedRecipesList() {
+        if (_isLoading.value) return
+        _isLoading.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val recipeList = repository.getUserSavedList()
+                _usersavedrecipe.value = recipeList
             } catch (e: Exception) {
                 Log.e(tag, "Failed to fetch recipe list", e)
             } finally {

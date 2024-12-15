@@ -20,6 +20,14 @@ interface RecipeApi {
         @Query("pageNumber") pageNumber: Int
     ): List<Recipe>
 
+    suspend fun getUserLikedRecipes(
+        @Header("Authorization") token: String,
+    ): List<Recipe>
+
+    suspend fun UserSavedRecipes(
+        @Header("Authorization") token: String,
+    ): List<Recipe>
+
     @GET("recipe-api/getRecipes/{userId}")
     suspend fun getRecipesByUserId(
         @Path("userId") userId: Int,

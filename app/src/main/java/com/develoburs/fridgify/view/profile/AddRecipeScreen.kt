@@ -53,8 +53,6 @@ import com.develoburs.fridgify.model.Recipe
 import com.develoburs.fridgify.model.createRecipe
 import com.develoburs.fridgify.model.repository.FridgifyRepositoryImpl
 
-import com.develoburs.fridgify.model.createRecipe
-import com.develoburs.fridgify.model.repository.FridgifyRepositoryImpl
 
 import com.develoburs.fridgify.view.fridge.AddFoodCard
 import com.develoburs.fridgify.view.fridge.FoodCard
@@ -75,10 +73,6 @@ fun AddRecipeScreen(
     var name by rememberSaveable { mutableStateOf("") }
     var description by rememberSaveable { mutableStateOf("") }
     var ingredients by rememberSaveable { mutableStateOf(listOf<String>()) }
-    var calories by rememberSaveable { mutableStateOf(0) }
-    var cookingTime by rememberSaveable { mutableStateOf(0) }
-    var imageUrl by rememberSaveable { mutableStateOf<String?>(null) }
-    var category by rememberSaveable { mutableStateOf("APPETIZERS_AND_SNACKS") }
 
     var calories by remember { mutableStateOf(0) }
     var cookingTime by remember { mutableStateOf(0) }
@@ -249,7 +243,6 @@ fun AddRecipeScreen(
                         val newRecipe = createRecipe(
                             name = name,
                             description = description,
-                            createdAt = System.currentTimeMillis().toString(),
                             userId = repository.getUserID().toString(), // Replace with actual user ID
                             userUsername = repository.getUserName(),
                             userFirstName = repository.getUserName(),

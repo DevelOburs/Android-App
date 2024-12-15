@@ -70,6 +70,34 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         }
     }
 
+    suspend fun getUserLikedList(): List<Recipe> {
+        try {
+            // Use getToken function to retrieve the token
+            val recipes = api.getUserLikedRecipes(
+                token = "Bearer ${getToken()}"
+            )
+//            Log.d("Recipe List", recipes.toString())
+            return recipes
+        } catch (e: Exception) {
+            throw Exception("Failed to get recipes, Bearer ${getToken()}", e)
+        }
+    }
+
+    suspend fun getUserSavedList(): List<Recipe> {
+        try {
+            // Use getToken function to retrieve the token
+            val recipes = api.getUserLikedRecipes(
+                token = "Bearer ${getToken()}"
+            )
+//            Log.d("Recipe List", recipes.toString())
+            return recipes
+        } catch (e: Exception) {
+            throw Exception("Failed to get recipes, Bearer ${getToken()}", e)
+        }
+    }
+
+
+
     override suspend fun getRecipeById(id: String): Recipe {
         return try {
             val token = "Bearer ${getToken()}" // Dynamically fetch the token
@@ -99,7 +127,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
 
         )*/
 
-    suspend fun addRecipe(id: String, recipe: createRecipe) {
+    suspend fun addRecipe(recipe: createRecipe) {
         try {
             // Use getToken function to retrieve the token
             api.addRecipe(recipe = recipe, token = "Bearer ${getToken()}")
