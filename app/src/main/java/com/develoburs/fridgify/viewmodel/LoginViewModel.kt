@@ -30,6 +30,7 @@ class LoginViewModel(
                     repository.setUserID(response.userId)
                     // You might want to log the token to verify
                     Log.d("LoginViewModel", "Token set: ${repository.getToken()}")
+                    Log.d("LoginViewModel","Welcome, ${response.username} (ID: ${response.userId})")
                 }
                 onResult(response)
             } catch (e: Exception) {

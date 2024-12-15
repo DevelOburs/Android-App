@@ -31,7 +31,7 @@ fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = v
     var password by remember { mutableStateOf("") }
     var loginResult by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-
+    var isLoading by remember { mutableStateOf(false) } // Loading state
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -79,30 +79,37 @@ fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = v
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            colors = ButtonColors(
-                containerColor = OrangeColor, contentColor = OrangeColor,
-                disabledContainerColor = OrangeColor,
-                disabledContentColor = OrangeColor,
-            ),
-            onClick = {
-                viewModel.login(username, email, password) { response ->
-                    loginResult = if (response.error.isNullOrEmpty()) {
-                        navController.navigate(BottomBarScreen.Home.route) {
-                            // Clear the back stack so the user can't return to the login screen
-                            popUpTo("login") { inclusive = true }
+        // Show Loading Indicator or Login Button
+        if (isLoading) {
+            CircularProgressIndicator(color = OrangeColor)
+        } else {
+            Button(
+                colors = ButtonColors(
+                    containerColor = OrangeColor,
+                    contentColor = Color.White,
+                    disabledContainerColor = Color.White,
+                    disabledContentColor = Color.White
+                ),
+                onClick = {
+                    isLoading = true // Show loading indicator
+                    viewModel.login(username, email, password) { response ->
+                        isLoading = false // Hide loading indicator
+                        loginResult = if (response.error.isNullOrEmpty()) {
+                            navController.navigate(BottomBarScreen.Home.route) {
+                                popUpTo("login") { inclusive = true }
+                            }
+                            "Welcome, ${response.username} (ID: ${response.userId})"
+                        } else {
+                            "Error: ${response.error}"
                         }
-                        "Welcome, ${response.username} (ID: ${response.userId})"
-                    } else {
-                        "Error: ${response.error}"
                     }
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            Text(text = "Login", style = MaterialTheme.typography.titleMedium, color = Color.White)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Text(text = "Login", style = MaterialTheme.typography.titleMedium, color = Color.White)
+            }
         }
         Spacer(modifier = Modifier.height(8.dp))
 

@@ -1,5 +1,6 @@
 package com.develoburs.fridgify.view.profile
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,14 +15,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.ui.Alignment.Horizontal
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,6 +53,8 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.model.Recipe
+import com.develoburs.fridgify.model.createRecipe
+import com.develoburs.fridgify.model.repository.FridgifyRepositoryImpl
 import com.develoburs.fridgify.view.fridge.AddFoodCard
 import com.develoburs.fridgify.view.fridge.DeleteFoodCard
 import com.develoburs.fridgify.view.fridge.FoodCard
@@ -60,19 +68,28 @@ fun EditRecipeScreen(
     viewModel: RecipeListViewModel = viewModel(),
     fviewModel: FridgeViewModel = viewModel(),
     recipe: Recipe,
-    onSave: (Recipe) -> Unit,
+    repository: FridgifyRepositoryImpl,
+    onSave: (createRecipe) -> Unit,
     onBack: () -> Unit
 ) {
     var name by remember { mutableStateOf(recipe.Name) }
-    var instructions by remember { mutableStateOf(recipe.instructions) }
-    var imageUri by remember { mutableStateOf(recipe.Image ?: "") } // Use safe call and provide a default value
-    // Assuming first image is the main one
-    // Fetch the recipe details when the screen is loaded
-    LaunchedEffect(recipe.id) {
-        viewModel.getRecipeIngredients(recipe.id)
-    }
-    // Collect the recipe details state
-    val foods by viewModel.food.collectAsState()
+    var description by remember { mutableStateOf(recipe.instructions) }
+    var calories by remember { mutableStateOf(recipe.calories) }
+    var cookingTime by remember { mutableStateOf(recipe.cookingTime) }
+    var imageUrl by remember { mutableStateOf(recipe.Image ?: "") }
+    var category by remember { mutableStateOf("APPETIZERS_AND_SNACKS") }
+
+    val categoryMap = mapOf(
+        "ALL" to "All",
+        "APPETIZERS_AND_SNACKS" to "Appetizers and Snacks",
+        "MAIN_DISHES" to "Main Dishes",
+        "SIDE_DISHES" to "Side Dishes",
+        "SOUPS_AND_STEWS" to "Soups and Stews",
+        "BREADS_AND_BAKING" to "Breads and Baking",
+        "DESSERTS_AND_SWEETS" to "Desserts and Sweets",
+        "BEVERAGES" to "Beverages",
+        "SPECIAL_DIETS" to "Special Diets"
+    )
 
     val selectedItems = fviewModel.selectedFoods
 
@@ -94,62 +111,124 @@ fun EditRecipeScreen(
                     .padding(top = 21.dp)
                     .fillMaxSize()
             ) {
-                Column(
+                LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 72.dp)
+                        .padding(bottom = 72.dp),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Image Section: Make the image clickable
-                    imageUri?.let {
+                    // Recipe Image Section
+                    item {
                         Image(
-                            painter = rememberAsyncImagePainter(it),
+                            painter = rememberAsyncImagePainter(imageUrl),
                             contentDescription = "Recipe Image",
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .size(200.dp)
                                 .padding(8.dp)
                                 .clickable {
-                                    // Replace with actual image picker logic, this is a placeholder action
-                                    imageUri = "newImageUri" // Simulating image change on click
+                                    // Simulate image selection
+                                    imageUrl = "newImageUri" // Simulating image change
                                 },
                             contentScale = ContentScale.Crop
                         )
                     }
 
                     // Recipe Name Section
-                    OutlinedTextField(
-                        value = name ?: "", // Provide a default empty string if null
-                        onValueChange = { name = if (it.isBlank()) null else it }, // Set to null if blank
-                        label = { Text(text = "Recipe Name", style = MaterialTheme.typography.titleMedium) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    // Instructions Section
-                    OutlinedTextField(
-                        value = instructions ?: "", // Provide a default empty string if null
-                        onValueChange = { instructions = if (it.isBlank()) null else it }, // Set to null if blank
-                        label = { Text(text = "Instructions", style = MaterialTheme.typography.titleMedium) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(max = 72.dp), // Set a max height based on the number of lines
-                        maxLines = 4, // Limit to two lines
-                        singleLine = false, // Allow multiple lines
-                    )
-                    // Ingredients Section with LazyVerticalGrid
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(4),
-                            contentPadding = PaddingValues(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
+                    item {
+                        name?.let {
+                            OutlinedTextField(
+                                value = it,
+                                onValueChange = { name = it },
+                                label = { Text(text = "Recipe Name", style = MaterialTheme.typography.titleMedium) },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
 
-                            items(foods + selectedItems) { recipe ->
+                    // Description Section
+                    item {
+                        description?.let {
+                            OutlinedTextField(
+                                value = it,
+                                onValueChange = { description = it },
+                                label = { Text(text = "Description", style = MaterialTheme.typography.titleMedium) },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+
+                    // Cooking Time Section
+                    item {
+                        OutlinedTextField(
+                            value = cookingTime.toString(),
+                            onValueChange = { cookingTime = it.toIntOrNull() ?: 0 },
+                            label = { Text(text = "Cooking Time (mins)", style = MaterialTheme.typography.titleMedium) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    // Calories Section
+                    item {
+                        OutlinedTextField(
+                            value = calories.toString(),
+                            onValueChange = { calories = it.toIntOrNull() ?: 0 },
+                            label = { Text(text = "Calories", style = MaterialTheme.typography.titleMedium) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    // Category Dropdown Section
+                    item {
+                        var expanded by remember { mutableStateOf(false) }
+
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            OutlinedTextField(
+                                value = categoryMap[category] ?: "",
+                                onValueChange = {},
+                                label = { Text(text = "Category") },
+                                modifier = Modifier.fillMaxWidth(),
+                                readOnly = true,
+                                trailingIcon = {
+                                    Icon(
+                                        imageVector = Icons.Default.ArrowDropDown,
+                                        contentDescription = null,
+                                        modifier = Modifier.clickable { expanded = true }
+                                    )
+                                }
+                            )
+                            DropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                categoryMap.forEach { (key, value) ->
+                                    DropdownMenuItem(
+                                        text = { Text(value) },
+                                        onClick = {
+                                            category = key
+                                            expanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // Ingredients Section with LazyHorizontalGrid
+                    item {
+                        LazyHorizontalGrid(
+                            rows = GridCells.Fixed(2),
+                            contentPadding = PaddingValues(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.height(200.dp)
+                        ) {
+                            items(selectedItems) { food ->
                                 FoodCard(
-                                    food = recipe,
-                                    onClick = {},
+                                    food = food,
+                                    onClick = {}
                                 )
                             }
                             // Add Food Card
@@ -158,23 +237,37 @@ fun EditRecipeScreen(
                             }
                         }
                     }
-
                 }
+
                 // Save Button positioned at the bottom
                 Button(
                     onClick = {
-                        // Update Recipe
-
+                        val updatedRecipe = createRecipe(
+                            name = name,
+                            description = description,
+                            userId = repository.getUserID().toString(), // Replace with actual user ID
+                            userUsername = repository.getUserName(),
+                            userFirstName = repository.getUserName(),
+                            userLastName = repository.getUserName(),
+                            likeCount = recipe.Likes,
+                            commentCount = recipe.Comments,
+                            saveCount = recipe.saveCount,
+                            ingredients = selectedItems.map { it.Name },
+                            imageUrl = imageUrl ?: "deneme",
+                            category = category,
+                            calories = calories,
+                            cookingTime = cookingTime
+                        )
+                        // Debug log
+                        Log.d("RecipeUpdate", "Updated recipe: $updatedRecipe")
+                        onSave(updatedRecipe)
                         selectedItems.clear()
-                        onBack()
-
-
                     },
                     modifier = Modifier
-                        .align(Alignment.BottomCenter)// Aligns the button to the bottom center
-                        .padding(16.dp) // Add padding for aesthetics
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp)
                 ) {
-                    Text(text = "Save Changes", style = MaterialTheme.typography.titleMedium)
+                    Text(text = "Save Changes", style = MaterialTheme.typography.bodyLarge)
                 }
             }
         }

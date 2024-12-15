@@ -89,8 +89,13 @@ class RecipeListViewModel(private val navController: NavController, private val 
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 // Add recipe to the repository
+<<<<<<< Updated upstream
                 repository.addRecipe(newRecipe)
 
+=======
+                repository.addRecipe(id, newRecipe)
+                getUserRecipesList()
+>>>>>>> Stashed changes
                 // Update the local state flow with the new recipe list
                 _recipe.value = _recipe.value + newRecipe
             } catch (e: Exception) {
@@ -98,11 +103,10 @@ class RecipeListViewModel(private val navController: NavController, private val 
             }
         }
     }
-    fun updateRecipe(updatedRecipe: Recipe) {
+    fun updateRecipe(updatedRecipe: createRecipe) {
         // Update the recipe in your list and/or backend
-        _recipe.value = _recipe.value.map {
-            if (it.id == updatedRecipe.id) updatedRecipe else it
-        }
+        return
+
     }
 
     fun getRecipeIngredients(id: String) {

@@ -132,6 +132,9 @@ fun NavGraph(
                 EditRecipeScreen(
                     navController = navController,
                     recipe = recipe!!, // Pass the fetched recipe
+                    viewModel = recipeListViewModel,
+                    fviewModel = fridgeViewModel,
+                    repository = repository,
                     onSave = { updatedRecipe ->
                         recipeListViewModel.updateRecipe(updatedRecipe)
                         navController.popBackStack()

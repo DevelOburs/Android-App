@@ -30,106 +30,6 @@ class FridgifyRepositoryImpl : FridgifyRepository {
     }
 
 
-    private val mockRecipes = mutableListOf(
-        Recipe(
-            id = "1",
-            Name = "Low-Fat Berry Blue Frozen Dessert",
-            Author = "Dancer",
-            AuthorFirstName = "",
-            AuthorLastName = "",
-            Likes = 158,
-            Comments = 12,
-            Image =
-            "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/38/YUeirxMLQaeE1h3v3qnM_229%20berry%20blue%20frzn%20dess.jpg",
-            instructions = "Mix all ingredients and freeze for 2 hours.",
-            ingredients = listOf(
-                "1 cup frozen blueberries",
-                "1/2 cup low-fat yogurt",
-                "1 tablespoon honey",
-                "1/2 teaspoon vanilla extract"
-            ),
-            comments = listOf(
-                "Delicious and easy to make! My family loved it.",
-                "Perfect summer dessert, very refreshing!",
-                "I added a bit of lemon zest, and it was amazing."
-            )
-        ),
-        Recipe(
-            id = "2",
-            Name = "Biryani",
-            Author = "elly9812",
-            AuthorFirstName = "",
-            AuthorLastName = "",
-            Likes = 39,
-            Comments = 3,
-            Image =
-            "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/39/picM9Mhnw.jpg",
-            instructions = "Cook the rice and mix with spices and meat.",
-            ingredients = listOf(
-                "2 cups basmati rice",
-                "1 lb chicken or beef",
-                "1 cup yogurt",
-                "1 tablespoon biryani spice mix",
-                "1 large onion, sliced",
-                "1/4 cup cilantro, chopped"
-            ),
-            comments = listOf(
-                "The flavors are incredible! Will make again.",
-                "Took some time, but worth the effort.",
-                "Added extra spice, and it was perfect for our taste."
-            )
-        ),
-        Recipe(
-            id = "3",
-            Name = "Best Lemonade",
-            Author = "Stephen Little",
-            AuthorFirstName = "",
-            AuthorLastName = "",
-            Likes = 18,
-            Comments = 2,
-            Image =
-            "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/40/picJ4Sz3N.jpg",
-            instructions = "Mix lemon juice with water and sugar. Serve cold.",
-            ingredients = listOf(
-                "4 cups water",
-                "1 cup fresh lemon juice",
-                "1/2 cup sugar",
-                "Ice cubes",
-                "Lemon slices for garnish"
-            ),
-            comments = listOf(
-                "Super refreshing and easy to make.",
-                "Perfect for a hot day, loved it!"
-            )
-        ),
-        Recipe(
-            id = "4",
-            Name = "Carina's Tofu-Vegetable Kebabs",
-            Author = "Cyclopz",
-            AuthorFirstName = "",
-            AuthorLastName = "",
-            Likes = 236,
-            Comments = 90,
-            Image = "https://img.sndimg.com/food/image/upload/w_555,h_416,c_fit,fl_progressive,q_95/v1/img/recipes/41/picmbLig8.jpg",
-            instructions = "Marinate tofu and vegetables, skewer them, and grill until cooked.",
-            ingredients = listOf(
-                "1 cup firm tofu, cubed",
-                "1 bell pepper, chopped",
-                "1 zucchini, sliced",
-                "1/2 cup mushrooms, halved",
-                "2 tablespoons olive oil",
-                "1 tablespoon soy sauce",
-                "1 teaspoon garlic powder",
-                "Salt and pepper to taste"
-            ),
-            comments = listOf(
-                "These were a hit at our BBQ!",
-                "I used tempeh instead of tofu, and it turned out great.",
-                "The marinade was delicious; will make again."
-            )
-        ),
-    )
-
     override suspend fun getRecipeList(limit: Int, pageNumber: Int): List<Recipe> {
         try {
             // Use getToken function to retrieve the token
@@ -188,9 +88,20 @@ class FridgifyRepositoryImpl : FridgifyRepository {
 
         )*/
 
+<<<<<<< Updated upstream
     fun addRecipe(recipe: Recipe) {
         // Simulate adding the recipe to a backend or database
         mockRecipes.add(recipe) // Add recipe to the local mutable list
+=======
+    suspend fun addRecipe(id: String, recipe: createRecipe) {
+        try {
+            // Use getToken function to retrieve the token
+            api.addRecipe(recipe = recipe, token = "Bearer ${getToken()}")
+            Log.d("Food List", recipe.toString())
+        } catch (e: Exception) {
+            throw Exception("Failed to get recipes, Bearer ${getToken()}", e)
+        }
+>>>>>>> Stashed changes
     }
 
     override suspend fun getRecipeIngredients(id: String): List<Food> {
