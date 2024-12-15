@@ -14,7 +14,13 @@ class FridgifyRepositoryImpl : FridgifyRepository {
 
     private var token: String = ""
     private var userName: String = ""
+    private var firstName: String = ""
     private var userId: Int = 0
+    private var lastName: String = ""
+    private var email: String = ""
+    private var userLikeCount: List<Int> = mutableListOf()
+    private var userRecipeCount: List<Int> = mutableListOf()
+
     fun setToken(newToken: String) {
         token = newToken
     }
@@ -38,6 +44,57 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         return userName
     }
 
+    fun setUserFirstName(FirstName: String) {
+        firstName = FirstName
+    }
+
+    fun getUserFirstName(): String {
+        return firstName
+    }
+
+    fun setUserLastName(LastName: String) {
+        lastName = LastName
+    }
+
+    fun getUserLastName(): String {
+        return lastName
+    }
+
+    fun setUserEmail(Email:String) {
+        email = Email
+    }
+
+    fun getUserEmail(): String {
+        return email
+    }
+
+    suspend fun getUserLikeCount(): List<Int> {
+        try {
+            // Use getToken function to retrieve the token
+            val count = api.getUserTotalLike(
+                userId = getUserID(),
+                token = "Bearer ${getToken()}"
+            )
+//            Log.d("Recipe List", recipes.toString())
+            return count
+        } catch (e: Exception) {
+            throw Exception("Failed", e)
+        }
+    }
+
+    suspend fun getUserRecipeCount(): List<Int> {
+        try {
+            // Use getToken function to retrieve the token
+            val count = api.getUserRecipeCount(
+                userId = getUserID(),
+                token = "Bearer ${getToken()}"
+            )
+//            Log.d("Recipe List", recipes.toString())
+            return count
+        } catch (e: Exception) {
+            throw Exception("Failed", e)
+        }
+    }
 
     override suspend fun getRecipeList(limit: Int, pageNumber: Int): List<Recipe> {
         try {
@@ -74,25 +131,27 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         try {
             // Use getToken function to retrieve the token
             val recipes = api.getUserLikedRecipes(
+                userId = getUserID(),
                 token = "Bearer ${getToken()}"
             )
 //            Log.d("Recipe List", recipes.toString())
             return recipes
         } catch (e: Exception) {
-            throw Exception("Failed to get recipes, Bearer ${getToken()}", e)
+            throw Exception("Failed to get liked recipes, Bearer ${getToken()}", e)
         }
     }
 
     suspend fun getUserSavedList(): List<Recipe> {
         try {
             // Use getToken function to retrieve the token
-            val recipes = api.getUserLikedRecipes(
+            val recipes = api.getUserSavedRecipes(
+                userId = getUserID(),
                 token = "Bearer ${getToken()}"
             )
 //            Log.d("Recipe List", recipes.toString())
             return recipes
         } catch (e: Exception) {
-            throw Exception("Failed to get recipes, Bearer ${getToken()}", e)
+            throw Exception("Failed to get saved recipes, Bearer ${getToken()}", e)
         }
     }
 

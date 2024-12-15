@@ -67,7 +67,10 @@ fun RecipeCard(
             .fillMaxSize()
             .clip(RoundedCornerShape(cornerRadius))) {
             Image(
-                painter = rememberAsyncImagePainter(recipe.Image ?: R.drawable.menu_book),
+                painter = rememberAsyncImagePainter(
+                    model = recipe.Image ?: R.drawable.menu_book,
+                    error = painterResource(R.drawable.menu_book)
+                ),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(cornerRadius)),
                 contentScale = ContentScale.Crop

@@ -29,6 +29,8 @@ class LoginViewModel(
                     repository.setToken(response.token)
                     repository.setUserID(response.userId)
                     repository.setUserName(response.username)
+                    repository.setUserFirstName(response.firstName)
+                    repository.setUserLastName(response.lastName)
                     // You might want to log the token to verify
                     Log.d("LoginViewModel", "Token set: ${repository.getToken()}")
                     Log.d("LoginViewModel","Welcome, ${response.username} (ID: ${response.userId})")
@@ -40,6 +42,8 @@ class LoginViewModel(
                         token = "",
                         userId = -1,
                         username = "",
+                        firstName = "",
+                        lastName = "",
                         email = "",
                         error = "Failed to login: ${e.localizedMessage}"
                     )

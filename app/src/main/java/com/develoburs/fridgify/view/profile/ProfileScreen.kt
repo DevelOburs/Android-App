@@ -38,6 +38,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.develoburs.fridgify.R
+import com.develoburs.fridgify.model.repository.FridgifyRepositoryImpl
 import com.develoburs.fridgify.ui.theme.BlackColor
 import com.develoburs.fridgify.ui.theme.CharcoalColor
 import com.develoburs.fridgify.ui.theme.CreamColor2
@@ -48,7 +49,7 @@ import com.develoburs.fridgify.ui.theme.OrangeColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = viewModel()) {
+fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = viewModel(),repository: FridgifyRepositoryImpl) {
     val allRecipes = viewModel.userrecipe.collectAsState(initial = emptyList())
     // Check if recipes are empty and trigger fetching them
     val isLoading by viewModel.isLoading.collectAsState()
@@ -62,7 +63,7 @@ fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = 
                 title = {
                     Text(
                         text = stringResource(id = R.string.profile),
-                        color = BlackColor,
+                        color = Color.White,
                         style = MaterialTheme.typography.labelMedium
                     )
                 },
@@ -133,9 +134,9 @@ fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = 
                             ) {
                                 // Name
                                 Text(
-                                    text = "Yasin İBİŞ",
+                                    text = repository.getUserFirstName() +" " + repository.getUserLastName(),
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = Color.Black
+                                    color = Color.White
                                 )
 
                                 Spacer(modifier = Modifier.width(16.dp))

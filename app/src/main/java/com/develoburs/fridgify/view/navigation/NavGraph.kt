@@ -73,7 +73,7 @@ fun NavGraph(
             HomeScreen(navController = navController, viewModel = recipeListViewModel)
         }
         composable(BottomBarScreen.Profile.route) {
-            ProfileScreen(navController = navController, viewModel = recipeListViewModel)
+            ProfileScreen(navController = navController, viewModel = recipeListViewModel,repository = repository)
         }
         composable("AddingScreen") {
             AddingScreen(navController = navController, viewModel = fridgeViewModel, onBack = { navController.popBackStack() })

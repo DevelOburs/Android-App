@@ -15,6 +15,8 @@ data class LoginResponse(
     val token: String,
     val userId: Int,
     val username: String,
+    val firstName: String,
+    val lastName: String,
     val email: String,
     val error: String?
 )
