@@ -204,19 +204,20 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         }
     }
 
-    override suspend fun getFoodList(): List<Food> {
+    override suspend fun getFoodList(category: String?): List<Food> {
         try {
-            // Use getToken function to retrieve the token
             val foods = fridgeapi.getFood(
-                "Bearer ${getToken()}",
+                token = "Bearer ${getToken()}",
                 userId = getUserID(),
+                category = category?.let { listOf(it) } // Pass category as a list if not null
             )
             Log.d("Food List", foods.toString())
             return foods
         } catch (e: Exception) {
-            throw Exception("Failed to get recipes, Bearer ${getToken()}", e)
+            throw Exception("Failed to fetch food list", e)
         }
     }
+
     override suspend fun getNotInFridge(nameFilter: String?, categoryFilters: List<String>?): List<Food> {
         try {
             val foods = fridgeapi.getNotInFridge(
@@ -264,31 +265,8 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         }
     }
 
-    override suspend fun getCategories(): List<String> {
-        try {
-            val categories = fridgeapi.getCategories("Bearer ${getToken()}")
-            Log.d("FridgifyRepositoryImpl", "Categories fetched: $categories")
-            return categories
-        } catch (e: Exception) {
-            Log.e("FridgifyRepositoryImpl", "Failed to get categories", e)
-            throw Exception("Failed to get categories", e)
-        }
-    }
 
-    override suspend fun getFoodByCategory(ingredientCategory: String): List<Food> {
-        try {
-            val foods = fridgeapi.getFoodByCategory(
-                "Bearer ${getToken()}",
-                userId = getUserID(),
-                ingredientCategory = ingredientCategory
-            )
-            Log.d("FridgifyRepositoryImpl", "Foods in category $ingredientCategory: $foods")
-            return foods
-        } catch (e: Exception) {
-            Log.e("FridgifyRepositoryImpl", "Failed to get foods by category", e)
-            throw Exception("Failed to get foods by category", e)
-        }
-    }
+
 
 
 

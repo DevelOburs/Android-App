@@ -34,6 +34,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.model.Food
@@ -162,14 +163,24 @@ fun AddingScreen(
                             .padding(16.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Button(onClick = { navController.popBackStack() }) {
-                            Text(text = "Exit", style = MaterialTheme.typography.labelLarge)
+                        Button(onClick = { navController.popBackStack() },
+                            modifier = Modifier
+                                .width(120.dp) // Adjust width
+                                .height(40.dp) // Adjust height
+
+                            ) {
+                            Text(text = "Exit",     style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp) )
                         }
                         Button(onClick = {
 
                             navController.popBackStack()
-                        }) {
-                            Text(text = "Add", style = MaterialTheme.typography.labelLarge)
+                        },
+                            modifier = Modifier
+                                .width(120.dp) // Adjust width
+                                .height(40.dp) // Adjust height
+                        ) {
+                            Text(text = "Add",     style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp)
+                            )
                         }
 
 

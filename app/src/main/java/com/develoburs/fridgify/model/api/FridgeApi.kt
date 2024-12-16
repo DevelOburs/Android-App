@@ -24,7 +24,7 @@ interface FridgeApi {
         @Header("Authorization") token: String,
         @Path("userId") userId: Int,
         @Query("nameFilter") nameFilter: String? = null,
-        @Query("categoryFilters") categoryFilters: List<String>? = null
+        @Query("category") category: List<String>? = null
     ): List<Food>
 
     @PUT("fridge-api/{userId}/add")
@@ -51,17 +51,7 @@ interface FridgeApi {
 
 
 
-    @GET("fridge-api/categories")
-    suspend fun getCategories(
-        @Header("Authorization") token: String
-    ): List<String>
 
-    @GET("fridge-api/{userId}/inFridge/{ingredientCategory}")
-    suspend fun getFoodByCategory(
-        @Header("Authorization") token: String,
-        @Path("userId") userId: Int,
-        @Path("ingredientCategory") ingredientCategory: String
-    ): List<Food>
 }
 
 

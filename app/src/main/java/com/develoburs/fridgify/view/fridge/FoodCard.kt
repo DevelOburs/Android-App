@@ -1,6 +1,7 @@
 package com.develoburs.fridgify.view.fridge
 
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -22,14 +23,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 //import androidx.compose.ui.graphics.Color
 import com.develoburs.fridgify.ui.theme.DarkBlueColor
 import coil.compose.rememberAsyncImagePainter
+import com.develoburs.fridgify.ui.theme.LightOrangeColor
+import com.develoburs.fridgify.ui.theme.OrangeColor
 import com.develoburs.fridgify.ui.theme.YellowColor
 
 
 //val PurpleColor = Color(0xFF800080)
-
 
 
 @Composable
@@ -39,6 +45,7 @@ fun FoodCard(
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val cardSize = screenWidth / 4
+    val LightYellowColor = Color(0xFFFFF9C4)
 
     Card(
         modifier = Modifier
@@ -47,38 +54,45 @@ fun FoodCard(
             .clickable { onClick() }
             .border(
                 width = 2.dp,
-                color = BlueColor,
+                color = OrangeColor,
                 shape = RoundedCornerShape(8.dp),
             ),
-        colors = CardDefaults.cardColors(containerColor = YellowColor),
+        colors = CardDefaults.cardColors(containerColor = LightYellowColor),
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween // Added to center align content
         ) {
+            // Image Section
             Box(
                 modifier = Modifier
-                    .size(cardSize * 0.75f)
-                    .border(2.dp, BlueColor, shape = RoundedCornerShape(8.dp)),
+                    .size(cardSize * 0.75f),
                 contentAlignment = Alignment.Center
             ) {
-                val imageUrl = food.ImageUrl ?: "No Image"
-                Text(text = imageUrl,  style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp))
-                // Alternatively, use a placeholder image:
-                // Image(
-                //     painter = painterResource(id = R.drawable.placeholder_image),
-                //     contentDescription = null,
-                //     modifier = Modifier.fillMaxSize(),
-                //     contentScale = ContentScale.Crop
-                // )
+                Image(
+                    painter = rememberAsyncImagePainter(food.ImageUrl ?: com.develoburs.fridgify.R.drawable.menu_book),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop
+                )
             }
 
-            Text(
-                text = food.Name ?: "Unknown",
-                modifier = Modifier.padding(top = 2.dp),
-                style = MaterialTheme.typography.bodySmall
-            )
+            // Center-aligned Food Name
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth() // Adjusted to use width instead of size
+                    .padding(bottom = 8.dp), // Optional padding
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = food.Name ?: "Unknown",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(start = 8.dp,end = 8.dp)
+                )
+            }
         }
     }
 }
@@ -95,11 +109,11 @@ fun AddFoodCard(onClick: () -> Unit) {
             .size(cardSize)
             .border(
                 width = 2.dp,
-                color = BlueColor,
+                color = OrangeColor,
                 shape = RoundedCornerShape(8.dp),
             )
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = BlueColor),
+        colors = CardDefaults.cardColors(containerColor = LightOrangeColor),
         shape = RoundedCornerShape(8.dp)
     )  {
         Box(
@@ -107,7 +121,9 @@ fun AddFoodCard(onClick: () -> Unit) {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                "+", style = MaterialTheme.typography.bodySmall.copy(fontSize = 40.sp)
+
+                "+", style = MaterialTheme.typography.bodySmall.copy(fontSize = 40.sp),
+
             )
         }
     }
@@ -124,11 +140,11 @@ fun DeleteFoodCard(onClick: () -> Unit) {
             .size(cardSize)
             .border(
                 width = 2.dp,
-                color = BlueColor,
+                color = OrangeColor,
                 shape = RoundedCornerShape(8.dp),
             )
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = BlueColor),
+        colors = CardDefaults.cardColors(containerColor = LightOrangeColor),
         shape = RoundedCornerShape(8.dp)
     )  {
         Box(
