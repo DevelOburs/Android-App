@@ -13,7 +13,7 @@ interface FridgifyRepository {
 
     suspend fun getRecipeIngredients(id: String): List<Food>
 
-    suspend fun getFoodList(): List<Food>
+    suspend fun getFoodList(category: String? = null): List<Food>
     suspend fun getNotInFridge(
         nameFilter: String? = null,
         categoryFilters: List<String>? = null
@@ -21,10 +21,6 @@ interface FridgifyRepository {
 
     suspend fun addFood(ingredientIds: List<Int>)
     suspend fun removeFood(ingredientIds:List<Int>)
-
-    suspend fun getCategories(): List<String>
-
-    suspend fun getFoodByCategory(ingredientCategory: String): List<Food>
 
 
 }

@@ -52,27 +52,31 @@ import com.develoburs.fridgify.viewmodel.LoginViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = viewModel()) {
-
     val allFoods by viewModel.food.collectAsState(initial = emptyList())
     var searchQuery by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf<String?>(null) }
+    fun formatCategoryForApi(category: String): String {
+        return category.uppercase().replace(" ", "_")
+    }
     val categories = listOf(
-        "Produce",
-        "Dairy And Eggs",
-        "Meats And Proteins",
-        "Baking And Pantry",
-        "Canned And Preserved Foods",
-        "Beverages And Sweeteners",
-        "Nuts Seeds And Legumes",
-        "Grains And Cereals"
+        "PRODUCE",
+        "DAIRY AND EGGS",
+        "MEAT AND PROTEINS",
+        "BAKING AND PANTRY",
+        "CANNED AND PRESERVED FOODS",
+        "BEVERAGES AND SWEETENERS",
+        "NUTS SEEDS AND LEGUMES",
+        "GRAINS AND CEREALS"
     )
 
-    // Check if recipes are empty and trigger fetching them
-    if (allFoods.isEmpty()) {
-        viewModel.getFoodList() // Call the method to fetch recipes
+
+    // Trigger fetching all foods on initial load
+    LaunchedEffect(Unit) {
+        viewModel.getFoodList() // Fetch all foods on screen load
     }
 
     val filteredFoods = remember(searchQuery, allFoods) {
-        allFoods.filter { it.Name?.contains(searchQuery, ignoreCase = true) == true }
+        allFoods.filter { it.Name.contains(searchQuery, ignoreCase = true) }
     }
 
     Scaffold(
@@ -92,15 +96,7 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
             )
         },
         content = { paddingValues ->
-            Surface(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(color = CreamColor2)
-                )
-
+            Surface(modifier = Modifier.fillMaxSize()) {
                 Column(
                     modifier = Modifier
                         .padding(paddingValues)
@@ -110,22 +106,18 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         placeholder = { Text(text = "Search", style = MaterialTheme.typography.titleMedium) },
-                        modifier = Modifier
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         colors = TextFieldDefaults.textFieldColors(
                             containerColor = Color(0xFFFFE4B5) // Light orange color
-
                         )
-
                     )
 
-                    // Add clickable labels below the search bar
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp)
-                            .horizontalScroll(rememberScrollState()), // Enable horizontal scrolling
-                        horizontalArrangement = Arrangement.spacedBy(8.dp) // Add spacing between labels
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         categories.forEach { category ->
                             Box(
@@ -134,22 +126,20 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
                                     .height(40.dp)
                                     .background(color = OrangeColor, shape = MaterialTheme.shapes.medium)
                                     .clickable {
-                                        viewModel.getFoodByCategory(category) // Fetch food for this category
+                                        val formattedCategory = formatCategoryForApi(category)
+                                        viewModel.getFoodList(formattedCategory) // Fetch foods for the selected category
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
                                     text = category,
                                     color = BlackColor,
-                                    style = MaterialTheme.typography.bodyMedium ,
-                                    modifier = Modifier.padding(start = 8.dp,end= 8.dp) ,// Add right padding
-
-
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(start = 8.dp, end = 8.dp)
                                 )
                             }
                         }
                     }
-
 
                     Box(
                         modifier = Modifier
@@ -162,11 +152,8 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            items(filteredFoods) { recipe ->
-                                FoodCard(
-                                    food = recipe,
-                                    onClick = {},
-                                )
+                            items(filteredFoods) { food ->
+                                FoodCard(food = food, onClick = {})
                             }
                             item {
                                 AddFoodCard(onClick = { navController.navigate("addingScreen") })
@@ -178,6 +165,6 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
                     }
                 }
             }
-        },
+        }
     )
 }
