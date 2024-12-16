@@ -177,8 +177,8 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                             navController.popBackStack()
                         } ,
                             modifier = Modifier
-                                .width(120.dp) // Adjust width
-                                .height(40.dp) // Adjust height
+                                .width(120.dp)
+                                .height(40.dp)
                         )
                         {
                             Text(text = "Delete", style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp))
