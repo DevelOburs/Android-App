@@ -19,6 +19,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,6 +30,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
@@ -63,6 +66,8 @@ import com.develoburs.fridgify.ui.theme.BurgundyColor
 import com.develoburs.fridgify.ui.theme.CharcoalColor
 import com.develoburs.fridgify.ui.theme.CreamColor
 import com.develoburs.fridgify.ui.theme.CreamColor2
+import com.develoburs.fridgify.ui.theme.LightCharcoalColor
+import com.develoburs.fridgify.ui.theme.LightOrangeColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
 import com.develoburs.fridgify.viewmodel.LoginViewModel
 
@@ -163,6 +168,7 @@ fun HomeScreen(navController: NavController, viewModel: RecipeListViewModel = vi
                 if (showFilterSheet) {
                     ModalBottomSheet(
                         onDismissRequest = { showFilterSheet = false },
+                        containerColor = CharcoalColor
                     ) {
                         FilterSheetContent(
                             onDismiss = { showFilterSheet = false }
@@ -179,13 +185,13 @@ fun FilterSheetContent(
     onDismiss: () -> Unit
 ) {
     var cookingTimeMin by remember { mutableStateOf(0f) }
-    var cookingTimeMax by remember { mutableStateOf(60f) }
+    var cookingTimeMax by remember { mutableStateOf(120f) }
 
     var calorieMin by remember { mutableStateOf(0f) }
-    var calorieMax by remember { mutableStateOf(500f) }
+    var calorieMax by remember { mutableStateOf(1000f) }
 
-    val selectedCategories = remember { mutableStateOf(mutableSetOf<String>()) }
     val categoryMap = mapOf(
+        "ALL" to "All",
         "APPETIZERS_AND_SNACKS" to "Appetizers and Snacks",
         "MAIN_DISHES" to "Main Dishes",
         "SIDE_DISHES" to "Side Dishes",
@@ -196,6 +202,8 @@ fun FilterSheetContent(
         "SPECIAL_DIETS" to "Special Diets"
     )
     val categories = categoryMap.values.toList()
+    var selectedCategory by remember { mutableStateOf<String?>(null) }
+    var isDropdownExpanded by remember { mutableStateOf(false) }
 
     val scrollState = rememberScrollState()
 
@@ -205,7 +213,7 @@ fun FilterSheetContent(
             .padding(16.dp)
             .verticalScroll(scrollState)
     ) {
-        Text("Filter", style = MaterialTheme.typography.labelMedium)
+        Text(text = "Filter", style = MaterialTheme.typography.labelMedium, color = CreamColor)
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -214,19 +222,19 @@ fun FilterSheetContent(
             style = MaterialTheme.typography.bodyLarge.copy(
                 lineHeight = 20.sp,
                 fontStyle = FontStyle.Italic
-            )
+            ), color = CreamColor
         )
         Row {
             Text(
-                "Min: ${cookingTimeMin.toInt()} dk",
+                "Min: ${cookingTimeMin.toInt()} mins",
                 Modifier.weight(1f),
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall, color = CreamColor
             )
             Text(
-                "Max: ${cookingTimeMax.toInt()} dk",
+                "Max: ${cookingTimeMax.toInt()} mins",
                 Modifier.weight(1f),
                 style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.End
+                textAlign = TextAlign.End, color = CreamColor
             )
         }
         RangeSlider(
@@ -236,7 +244,11 @@ fun FilterSheetContent(
                 cookingTimeMax = range.endInclusive
             },
             valueRange = 0f..120f,
-            steps = 0
+            steps = 0,
+            colors = androidx.compose.material3.SliderDefaults.colors(
+                thumbColor = OrangeColor,
+                activeTrackColor = OrangeColor
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -246,19 +258,19 @@ fun FilterSheetContent(
             style = MaterialTheme.typography.bodyLarge.copy(
                 lineHeight = 20.sp,
                 fontStyle = FontStyle.Italic
-            )
+            ), color = CreamColor
         )
         Row {
             Text(
                 "Min: ${calorieMin.toInt()} kcal",
                 Modifier.weight(1f),
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall, color = CreamColor
             )
             Text(
                 "Max: ${calorieMax.toInt()} kcal",
                 Modifier.weight(1f),
                 style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.End
+                textAlign = TextAlign.End, color = CreamColor
             )
         }
         RangeSlider(
@@ -268,7 +280,11 @@ fun FilterSheetContent(
                 calorieMax = range.endInclusive
             },
             valueRange = 0f..1000f,
-            steps = 0
+            steps = 0,
+            colors = androidx.compose.material3.SliderDefaults.colors(
+                thumbColor = OrangeColor,
+                activeTrackColor = OrangeColor
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -278,36 +294,46 @@ fun FilterSheetContent(
             style = MaterialTheme.typography.bodyLarge.copy(
                 lineHeight = 20.sp,
                 fontStyle = FontStyle.Italic
-            )
+            ), color = CreamColor
         )
-        Column {
-            categories.forEach { category ->
-                val originalCategory = categoryMap.filterValues { it == category }.keys.first()
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            if (selectedCategories.value.contains(originalCategory)) {
-                                selectedCategories.value.remove(originalCategory)
-                            } else {
-                                selectedCategories.value.add(originalCategory)
-                            }
+        Box(modifier = Modifier.fillMaxWidth()) {
+            TextButton(
+                onClick = { isDropdownExpanded = true },
+                modifier = Modifier
+                    .align(Alignment.CenterStart),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent
+                )
+            ) {
+                Text(
+                    text = selectedCategory ?: "Select a category",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = CreamColor,
+                )
+            }
+
+            DropdownMenu(
+                expanded = isDropdownExpanded,
+                onDismissRequest = { isDropdownExpanded = false },
+                modifier = Modifier.background(color = LightCharcoalColor)
+            ) {
+                categories.forEach { category ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = category,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = CreamColor
+                            )
                         },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    val isSelected = selectedCategories.value.contains(originalCategory)
-                    androidx.compose.material3.Checkbox(
-                        checked = isSelected,
-                        onCheckedChange = { isChecked ->
-                            if (isChecked) {
-                                selectedCategories.value.add(originalCategory)
-                            } else {
-                                selectedCategories.value.remove(originalCategory)
-                            }
-                        }
+                        onClick = {
+                            selectedCategory = category
+                            isDropdownExpanded = false
+                        },
+                        colors = MenuDefaults.itemColors(
+                            textColor = OrangeColor,
+                        ),
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = category, style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
@@ -318,22 +344,43 @@ fun FilterSheetContent(
             horizontalArrangement = Arrangement.End,
             modifier = Modifier.fillMaxWidth()
         ) {
-            TextButton(onClick = onDismiss) {
-                Text(text = "Cancel", style = MaterialTheme.typography.labelMedium)
+            TextButton(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent
+                )
+            ) {
+                Text(
+                    text = "Cancel",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = CreamColor
+                )
             }
             Spacer(modifier = Modifier.width(8.dp))
-            Button(onClick = {
-                //todo apply filter functionality
-                Log.d("test", "Selected Filters:")
-                Log.d(
-                    "test",
-                    "Cooking Time: Min = ${cookingTimeMin.toInt()}, Max = ${cookingTimeMax.toInt()}"
+            Button(
+                onClick = {
+                    //todo apply filter functionality
+                    Log.d("test", "Selected Filters:")
+                    Log.d(
+                        "test",
+                        "Cooking Time: Min = ${cookingTimeMin.toInt()}, Max = ${cookingTimeMax.toInt()}"
+                    )
+                    Log.d(
+                        "test",
+                        "Calorie: Min = ${calorieMin.toInt()}, Max = ${calorieMax.toInt()}"
+                    )
+                    Log.d("test", "Category: ${selectedCategory ?: "None"}")
+                    onDismiss()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = OrangeColor
                 )
-                Log.d("test", "Calorie: Min = ${calorieMin.toInt()}, Max = ${calorieMax.toInt()}")
-                Log.d("test", "Category: $${selectedCategories.value.joinToString(", ")}")
-                onDismiss()
-            }) {
-                Text(text = "Apply filters", style = MaterialTheme.typography.labelMedium)
+            ) {
+                Text(
+                    text = "Apply filters",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = CreamColor
+                )
             }
         }
     }
