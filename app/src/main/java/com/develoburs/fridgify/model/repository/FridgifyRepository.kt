@@ -20,7 +20,7 @@ interface FridgifyRepository {
     ): List<Food>
 
     suspend fun addFood(ingredientIds: List<Int>)
-    suspend fun removeFood(ingredientIds:List<Int>)
+    suspend fun removeFood(ingredientIds: List<Int>)
 
 
 }
