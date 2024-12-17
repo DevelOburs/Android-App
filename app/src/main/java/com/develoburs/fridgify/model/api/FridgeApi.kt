@@ -34,12 +34,13 @@ interface FridgeApi {
         @Body ingredientIds: AddFoodRequest
     )
 
-    @HTTP(method = "DELETE", path = "fridge-api/{userId}/remove", hasBody = true)
+    @PUT("fridge-api/{userId}/remove")
     suspend fun removeFood(
         @Header("Authorization") token: String,
         @Path("userId") userId: Int,
         @Body ingredientIds: DeleteFoodRequest
     )
+
 
     @GET("fridge-api/{userId}/notInFridge")
     suspend fun getNotInFridge(

@@ -69,6 +69,10 @@ class FridgeViewModel(private val repository: FridgifyRepositoryImpl) : ViewMode
 
 
     fun removeFood(ingredientIds:  List<Int>) {
+        if (ingredientIds.isEmpty()) {
+            Log.w("FridgeViewModel", "No ingredients selected to delete")
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 repository.removeFood(ingredientIds)

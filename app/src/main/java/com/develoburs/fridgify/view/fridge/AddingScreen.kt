@@ -34,7 +34,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.model.Food
@@ -43,11 +42,7 @@ import com.develoburs.fridgify.ui.theme.BlackColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddingScreen(
-    navController: NavController,
-    viewModel: FridgeViewModel = viewModel(),
-    onBack: () -> Unit
-) {
+fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = viewModel() ,onBack: () -> Unit) {
 
     val allFoods by viewModel.notInFridgeFood.collectAsState(initial = emptyList())
 
@@ -105,12 +100,7 @@ fun AddingScreen(
                     TextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
-                        placeholder = {
-                            Text(
-                                text = "Search",
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                        },
+                        placeholder = { Text(text = "Search", style = MaterialTheme.typography.titleMedium) },
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -163,24 +153,25 @@ fun AddingScreen(
                             .padding(16.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Button(onClick = { navController.popBackStack() },
-                            modifier = Modifier
-                                .width(120.dp) // Adjust width
-                                .height(40.dp) // Adjust height
-
-                            ) {
-                            Text(text = "Exit",     style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp) )
+                        Button(onClick = { navController.popBackStack() }) {
+                            Text(text = "Exit", style = MaterialTheme.typography.labelLarge)
                         }
                         Button(onClick = {
+                            val ingredientIds = selectedItems.mapNotNull { it.id }
+
+                            Log.d("AddingScreen", "Ingredient IDs: $ingredientIds")
+
+                            viewModel.addFood(ingredientIds)
+                            viewModel.getNotInFridgeFood()
+
+                            displaySelectedItems = selectedItems.joinToString(", ") { it.Name }
+                            selectedItems.clear()
+
+                            Log.d("AddingScreen", "Sent ingredient IDs: $ingredientIds")
 
                             navController.popBackStack()
-                        },
-                            modifier = Modifier
-                                .width(120.dp) // Adjust width
-                                .height(40.dp) // Adjust height
-                        ) {
-                            Text(text = "Add",     style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp)
-                            )
+                        }) {
+                            Text(text = "Add", style = MaterialTheme.typography.labelLarge)
                         }
 
 

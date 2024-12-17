@@ -34,7 +34,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.model.Food
@@ -48,7 +47,7 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
 
     val selectedItems = remember { mutableStateListOf<Food>() }
     var displaySelectedItems by remember { mutableStateOf("") }
-   val allFoods by viewModel.food.collectAsState(initial = emptyList())
+    val allFoods by viewModel.food.collectAsState(initial = emptyList())
     var searchQuery by remember { mutableStateOf("") }
 
     // Check if recipes are empty and trigger fetching them
@@ -159,7 +158,7 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         Button(onClick = { navController.popBackStack() }) {
-                            Text(text = "Exit", style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp))
+                            Text(text = "Exit", style = MaterialTheme.typography.labelLarge)
                         }
                         Button(onClick = {
                             val ingredientIds = selectedItems.mapNotNull { it.id }
@@ -167,7 +166,7 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                             Log.d("DeleteScreen", "Ingredient IDs: $ingredientIds")
 
                             viewModel.removeFood(ingredientIds)
-                            viewModel.getNotInFridgeFood()
+                            viewModel.getFoodList()
 
                             displaySelectedItems = selectedItems.joinToString(", ") { it.Name }
                             selectedItems.clear()
@@ -175,13 +174,8 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                             Log.d("DeleteScreen", "Sent ingredient IDs: $ingredientIds")
 
                             navController.popBackStack()
-                        } ,
-                            modifier = Modifier
-                                .width(120.dp)
-                                .height(40.dp)
-                        )
-                        {
-                            Text(text = "Delete", style = MaterialTheme.typography.labelLarge.copy(fontSize = 14.sp))
+                        }) {
+                            Text(text = "Delete", style = MaterialTheme.typography.labelLarge)
                         }
 
 
