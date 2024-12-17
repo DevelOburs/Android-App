@@ -8,11 +8,12 @@ import com.develoburs.fridgify.model.api.RetrofitInstance.fridgeapi
 
 import android.content.Context
 import com.develoburs.fridgify.model.api.FridgeApi
+import com.develoburs.fridgify.model.createRecipe
 
 class FridgifyRepositoryImpl : FridgifyRepository {
 
     private var token: String = ""
-
+    private var userName: String = ""
     private var userId: Int = 0
     fun setToken(newToken: String) {
         token = newToken
@@ -27,6 +28,14 @@ class FridgifyRepositoryImpl : FridgifyRepository {
 
     fun getUserID(): Int {
         return userId
+    }
+
+    fun setUserName(UserName: String) {
+        userName = UserName
+    }
+
+    fun getUserName(): String {
+        return userName
     }
 
 
@@ -45,12 +54,14 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         }
     }
 
-    override suspend fun getUserRecipeList(): List<Recipe> {
+    override suspend fun getUserRecipeList(limit: Int, pageNumber: Int): List<Recipe> {
         try {
             // Use getToken function to retrieve the token
             val recipes = api.getRecipesByUserId(
                 userId = getUserID(),
-                token = "Bearer ${getToken()}"
+                token = "Bearer ${getToken()}",
+                limit = limit,
+                pageNumber = pageNumber
             )
 //            Log.d("Recipe List", recipes.toString())
             return recipes
@@ -88,20 +99,13 @@ class FridgifyRepositoryImpl : FridgifyRepository {
 
         )*/
 
-<<<<<<< Updated upstream
-    fun addRecipe(recipe: Recipe) {
-        // Simulate adding the recipe to a backend or database
-        mockRecipes.add(recipe) // Add recipe to the local mutable list
-=======
     suspend fun addRecipe(id: String, recipe: createRecipe) {
         try {
             // Use getToken function to retrieve the token
             api.addRecipe(recipe = recipe, token = "Bearer ${getToken()}")
-            Log.d("Food List", recipe.toString())
         } catch (e: Exception) {
             throw Exception("Failed to get recipes, Bearer ${getToken()}", e)
         }
->>>>>>> Stashed changes
     }
 
     override suspend fun getRecipeIngredients(id: String): List<Food> {

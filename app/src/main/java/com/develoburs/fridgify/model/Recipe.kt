@@ -36,15 +36,16 @@ data class Recipe(
 
     val calories: Int?,
 
-<<<<<<< Updated upstream
-=======
+
     val cookingTime: Int?,
 
     val saveCount: Int?
 )
 
+
 data class createRecipe(
-    // Changed to Long to match integer($int64)
+    @SerializedName("id")
+    val id: String, // Changed to Long to match integer($int64)
 
     @SerializedName("name")
     val name: String?, // Updated to lowercase for consistency
@@ -52,7 +53,9 @@ data class createRecipe(
     @SerializedName("description")
     val description: String?, // Added to match schema
 
-    // Added to match schema
+
+    @SerializedName("createdAt")
+    val createdAt: String?, // Added to match schema
 
     @SerializedName("userId")
     val userId: String?, // Changed to Long to match integer($int64)
@@ -89,5 +92,4 @@ data class createRecipe(
 
     @SerializedName("cookingTime")
     val cookingTime: Int? // Added to match schema
->>>>>>> Stashed changes
 )

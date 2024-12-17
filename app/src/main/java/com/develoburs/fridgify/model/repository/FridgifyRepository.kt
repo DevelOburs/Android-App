@@ -7,7 +7,7 @@ interface FridgifyRepository {
 
     suspend fun getRecipeList(limit: Int, pageNumber: Int): List<Recipe>
 
-    suspend fun getUserRecipeList(): List<Recipe>
+    suspend fun getUserRecipeList(limit: Int, pageNumber: Int): List<Recipe>
 
     suspend fun getRecipeById(id: String): Recipe
 
@@ -20,7 +20,7 @@ interface FridgifyRepository {
     ): List<Food>
 
     suspend fun addFood(ingredientIds: List<Int>)
-    suspend fun removeFood(ingredientIds:List<Int>)
+    suspend fun removeFood(ingredientIds: List<Int>)
 
 
 }

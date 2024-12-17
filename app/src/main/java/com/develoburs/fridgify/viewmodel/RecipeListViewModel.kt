@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import androidx.navigation.NavController
 import com.develoburs.fridgify.model.Food
+import com.develoburs.fridgify.model.createRecipe
 
 class RecipeListViewModel(private val navController: NavController, private val repository: FridgifyRepositoryImpl) : ViewModel() {
     private val _recipe = MutableStateFlow<List<Recipe>>(emptyList())
@@ -25,6 +26,9 @@ class RecipeListViewModel(private val navController: NavController, private val 
 
     private var currentPage = 0
     private val pageSize = 10
+    private var usr_currentPage = 0
+    private val usr_pageSize = 10
+    private var usr_isLastPage = false
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
     private var isLastPage = false
@@ -59,12 +63,19 @@ class RecipeListViewModel(private val navController: NavController, private val 
     }
 
     fun getUserRecipesList() {
-        if (_isLoading.value) return
+        if (_isLoading.value || usr_isLastPage) return
         _isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val recipeList = repository.getUserRecipeList()
-                _userrecipe.value = _userrecipe.value + recipeList
+                Log.d(tag, "Getting recipes for page:$usr_currentPage and limit:$usr_pageSize")
+                val recipeList = repository.getUserRecipeList(usr_pageSize, usr_currentPage)
+
+                if (recipeList.isEmpty()) {
+                    usr_isLastPage = true
+                } else {
+                    _userrecipe.value = _userrecipe.value + recipeList
+                    usr_currentPage++
+                }
             } catch (e: Exception) {
                 Log.e(tag, "Failed to fetch recipe list", e)
             } finally {
@@ -85,19 +96,14 @@ class RecipeListViewModel(private val navController: NavController, private val 
         }
 
     }
-    fun addRecipe(newRecipe: Recipe) {
+    fun addRecipe(id: String, newRecipe: createRecipe) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 // Add recipe to the repository
-<<<<<<< Updated upstream
                 repository.addRecipe(newRecipe)
-
-=======
-                repository.addRecipe(id, newRecipe)
                 getUserRecipesList()
->>>>>>> Stashed changes
                 // Update the local state flow with the new recipe list
-                _recipe.value = _recipe.value + newRecipe
+                //_recipe.value = _recipe.value + newRecipe
             } catch (e: Exception) {
                 Log.e("RecipeListViewModel", "Failed to add recipe", e)
             }

@@ -28,6 +28,7 @@ class LoginViewModel(
                     // Save the token in the repository
                     repository.setToken(response.token)
                     repository.setUserID(response.userId)
+                    repository.setUserName(response.username)
                     // You might want to log the token to verify
                     Log.d("LoginViewModel", "Token set: ${repository.getToken()}")
                     Log.d("LoginViewModel","Welcome, ${response.username} (ID: ${response.userId})")

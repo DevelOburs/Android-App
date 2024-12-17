@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.navigation.NavController
@@ -30,6 +32,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -48,8 +51,9 @@ import com.develoburs.fridgify.ui.theme.OrangeColor
 fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = viewModel()) {
     val allRecipes = viewModel.userrecipe.collectAsState(initial = emptyList())
     // Check if recipes are empty and trigger fetching them
+    val isLoading by viewModel.isLoading.collectAsState()
     if (allRecipes.value.isEmpty()) {
-        viewModel.getUserRecipesList() // Call the method to fetch recipes
+        with(viewModel) { getUserRecipesList() }
     }
     val recipes = allRecipes.value
     Scaffold(
@@ -201,7 +205,7 @@ fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = 
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(recipes) { recipe ->  // Use the list of recipes
+                        itemsIndexed(recipes) { index, recipe ->  // Use the list of recipes
                             RecipeCard(
                                 recipe = recipe,
                                 onClick = {
@@ -212,6 +216,29 @@ fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = 
                                 },
                                 isProfileScreen = true
                             )
+                            if (index == viewModel.recipe.collectAsState().value.lastIndex) {
+                                viewModel.getRecipesList()
+                            }
+                        }
+                        if (isLoading) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .padding(16.dp)
+                                            .height(36.dp)
+                                            .fillMaxWidth(0.1f),
+                                        strokeWidth = 5.dp,
+                                        color = CharcoalColor
+                                    )
+                                }
+
+                            }
                         }
                     }
                 }

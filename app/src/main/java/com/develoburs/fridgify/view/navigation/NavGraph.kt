@@ -161,8 +161,9 @@ fun NavGraph(
                 navController = navController,
                 viewModel = recipeListViewModel,
                 fviewModel = fridgeViewModel,
+                repository = repository,
                 onSave = { newRecipe ->
-                    recipeListViewModel.addRecipe(newRecipe) // Add the new recipe to your ViewModel
+                    recipeListViewModel.addRecipe(repository.getUserID().toString(), newRecipe) // Add the new recipe to your ViewModel
                     navController.popBackStack() // Navigate back after saving
                 },
                 onBack = { navController.popBackStack() } // Handle back navigation

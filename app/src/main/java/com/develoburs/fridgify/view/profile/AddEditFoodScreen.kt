@@ -22,6 +22,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.develoburs.fridgify.viewmodel.FridgeViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -46,13 +47,13 @@ import com.develoburs.fridgify.ui.theme.BlackColor
 @Composable
 fun AddEditFoodScreen(navController: NavController, viewModel: FridgeViewModel = viewModel() ,onBack: () -> Unit) {
 
-    val allFoods by viewModel.food.collectAsState(initial = emptyList())
+    val allFoods by viewModel.allfood.collectAsState(initial = emptyList())
 
     var searchQuery by remember { mutableStateOf("") }
 
 
     if (allFoods.isEmpty()) {
-        viewModel.getFoodList() // Call the method to fetch recipes
+        viewModel.getAllFoodList() // Call the method to fetch recipes
     }
 
     val filteredFoods = remember("", allFoods) { // TEST FILTER
