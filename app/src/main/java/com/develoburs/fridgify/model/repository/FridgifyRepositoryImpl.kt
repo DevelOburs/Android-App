@@ -18,8 +18,6 @@ class FridgifyRepositoryImpl : FridgifyRepository {
     private var userId: Int = 0
     private var lastName: String = ""
     private var email: String = ""
-    private var userLikeCount: List<Int> = mutableListOf()
-    private var userRecipeCount: List<Int> = mutableListOf()
 
     fun setToken(newToken: String) {
         token = newToken
@@ -68,7 +66,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         return email
     }
 
-    suspend fun getUserLikeCount(): List<Int> {
+    suspend fun getUserLikeCount(): Int {
         try {
             // Use getToken function to retrieve the token
             val count = api.getUserTotalLike(
@@ -82,7 +80,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         }
     }
 
-    suspend fun getUserRecipeCount(): List<Int> {
+    suspend fun getUserRecipeCount(): Int {
         try {
             // Use getToken function to retrieve the token
             val count = api.getUserRecipeCount(
@@ -192,6 +190,15 @@ class FridgifyRepositoryImpl : FridgifyRepository {
             api.addRecipe(recipe = recipe, token = "Bearer ${getToken()}")
         } catch (e: Exception) {
             throw Exception("Failed to get recipes, Bearer ${getToken()}", e)
+        }
+    }
+
+    suspend fun updateRecipe(id: Int, recipe: createRecipe) {
+        try {
+            // Use getToken function to retrieve the token
+            api.updateRecipe(id = id, recipe = recipe, token = "Bearer ${getToken()}")
+        } catch (e: Exception) {
+            throw Exception("Failed to update recipes, Bearer ${getToken()}", e)
         }
     }
 

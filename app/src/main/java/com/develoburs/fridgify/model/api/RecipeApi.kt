@@ -30,13 +30,13 @@ interface RecipeApi {
     suspend fun getUserRecipeCount(
         @Query("userId") userId: Int,
         @Header("Authorization") token: String,
-    ): List<Int>
+    ): Int
 
     @GET("recipe-api/like/totalCountOfUser")
     suspend fun getUserTotalLike(
         @Query("userId") userId: Int,
         @Header("Authorization") token: String,
-    ): List<Int>
+    ): Int
 
     @GET("recipe-api/save/list/{userId}")
     suspend fun getUserSavedRecipes(
@@ -66,6 +66,13 @@ interface RecipeApi {
 
     @POST("recipe-api") // Define the PUT endpoint
     suspend fun addRecipe(
+        @Body recipe: createRecipe, // The updated recipe object
+        @Header("Authorization") token: String // Optional authorization token
+    )
+
+    @PUT("recipe-api/{id}") // Define the PUT endpoint
+    suspend fun updateRecipe(
+        @Path("id") id: Int,
         @Body recipe: createRecipe, // The updated recipe object
         @Header("Authorization") token: String // Optional authorization token
     )
