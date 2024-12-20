@@ -49,14 +49,25 @@ import com.develoburs.fridgify.ui.theme.OrangeColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = viewModel(),repository: FridgifyRepositoryImpl) {
+fun ProfileScreen(navController: NavController, viewModel: RecipeListViewModel = viewModel(), repository: FridgifyRepositoryImpl) {
     val allRecipes = viewModel.userrecipe.collectAsState(initial = emptyList())
     // Check if recipes are empty and trigger fetching them
     val isLoading by viewModel.isLoading.collectAsState()
     if (allRecipes.value.isEmpty()) {
         with(viewModel) { getUserRecipesList() }
     }
+    val userRecipeCount by viewModel.userRecipeCount.collectAsState(initial = null)
+    val userLikeCount by viewModel.userLikeCount.collectAsState(initial = null)
+
+    if (userRecipeCount == null) {
+        viewModel.getUserRecipeCount()
+    }
+    if (userLikeCount == null) {
+        viewModel.getUserLikeCount()
+    }
+
     val recipes = allRecipes.value
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -151,12 +162,12 @@ fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = 
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Icon(
-                                            painter = painterResource(id = R.drawable.comment_icon),
+                                            painter = painterResource(id = R.drawable.menu_book),
                                             contentDescription = null,
                                             tint = Color.White
                                         )
                                         Text(
-                                            text = "10",
+                                            text = userRecipeCount.toString(),
                                             style = MaterialTheme.typography.labelSmall,
                                             color = Color.White
                                         )
@@ -172,7 +183,7 @@ fun ProfileScreen(navController: NavController,viewModel: RecipeListViewModel = 
                                             tint = Color.White
                                         )
                                         Text(
-                                            text = "10",
+                                            text = userLikeCount.toString() ,
                                             style = MaterialTheme.typography.labelSmall,
                                             color = Color.White
                                         )

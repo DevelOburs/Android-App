@@ -42,7 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.runtime.mutableStateOf
-
+import com.develoburs.fridgify.model.createRecipe
 
 
 @Composable
@@ -114,6 +114,24 @@ fun NavGraph(
         }
 
 
+
+        composable("SettingsScreen") {
+            SettingsScreen(navController = navController, viewModel = loginViewModel)
+        }
+        composable("addRecipe") {
+            AddRecipeScreen(
+                navController = navController,
+                viewModel = recipeListViewModel,
+                fviewModel = fridgeViewModel,
+                repository = repository,
+                onSave = { newRecipe ->
+                    recipeListViewModel.addRecipe(repository.getUserID().toString(), newRecipe) // Add the new recipe to your ViewModel
+                    navController.popBackStack() // Navigate back after saving
+                },
+                onBack = { navController.popBackStack() } // Handle back navigation
+            )
+        }
+
         composable(
             "editRecipe/{recipeId}",
             arguments = listOf(navArgument("recipeId") { type = androidx.navigation.NavType.StringType })
@@ -135,9 +153,9 @@ fun NavGraph(
                     viewModel = recipeListViewModel,
                     fviewModel = fridgeViewModel,
                     repository = repository,
-                    onSave = { updatedRecipe ->
-                        recipeListViewModel.updateRecipe(updatedRecipe)
-                        navController.popBackStack()
+                    onSave = { id: Int, updatedRecipe: createRecipe ->
+                        recipeListViewModel.updateRecipe(id, updatedRecipe)
+                        navController.popBackStack() // Navigates back to the previous screen
                     },
                     onBack = { navController.popBackStack() }
                 )
@@ -152,23 +170,6 @@ fun NavGraph(
             }
         }
 
-
-        composable("SettingsScreen") {
-            SettingsScreen(navController = navController, viewModel = loginViewModel)
-        }
-        composable("addRecipe") {
-            AddRecipeScreen(
-                navController = navController,
-                viewModel = recipeListViewModel,
-                fviewModel = fridgeViewModel,
-                repository = repository,
-                onSave = { newRecipe ->
-                    recipeListViewModel.addRecipe(repository.getUserID().toString(), newRecipe) // Add the new recipe to your ViewModel
-                    navController.popBackStack() // Navigate back after saving
-                },
-                onBack = { navController.popBackStack() } // Handle back navigation
-            )
-        }
         composable(
             "recipes/{recipeType}",
             arguments = listOf(navArgument("recipeType") { type = androidx.navigation.NavType.StringType })

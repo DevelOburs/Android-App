@@ -37,6 +37,12 @@ class RecipeListViewModel(private val navController: NavController, private val 
     val isLoading: StateFlow<Boolean> = _isLoading
     private var isLastPage = false
 
+    private val _userRecipeCount = MutableStateFlow<Int?>(null)
+    val userRecipeCount: StateFlow<Int?> get() = _userRecipeCount
+
+    private val _userLikeCount = MutableStateFlow<Int?>(null)
+    val userLikeCount: StateFlow<Int?> get() = _userLikeCount
+
     private val tag = "RecipeListViewModel"
 
     init {
@@ -80,6 +86,39 @@ class RecipeListViewModel(private val navController: NavController, private val 
             }
         }
     }
+
+    fun getUserLikeCount() {
+        if (_isLoading.value) return
+        _isLoading.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val userLikeCount = repository.getUserLikeCount()
+                _userLikeCount.value = userLikeCount
+                Log.d("Count", " Like Count $userLikeCount")
+            } catch (e: Exception) {
+                Log.e(tag, "Failed to fetch recipe list", e)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun getUserRecipeCount() {
+        if (_isLoading.value) return
+        _isLoading.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val userRecipeCount = repository.getUserRecipeCount()
+                _userRecipeCount.value = userRecipeCount
+                Log.d("Count", " Recipe Count $userRecipeCount")
+            } catch (e: Exception) {
+                Log.e(tag, "Failed to fetch recipe list", e)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
 
     fun getUserSavedRecipesList() {
         if (_isLoading.value) return
@@ -143,9 +182,18 @@ class RecipeListViewModel(private val navController: NavController, private val 
             }
         }
     }
-    fun updateRecipe(updatedRecipe: createRecipe) {
-        // Update the recipe in your list and/or backend
-        return
+    fun updateRecipe(id : Int ,updatedRecipe: createRecipe) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Add recipe to the repository
+                repository.updateRecipe(id, updatedRecipe)
+                getUserRecipesList()
+                // Update the local state flow with the new recipe list
+                //_recipe.value = _recipe.value + newRecipe
+            } catch (e: Exception) {
+                Log.e("RecipeListViewModel", "Failed to add recipe", e)
+            }
+        }
 
     }
 
