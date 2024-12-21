@@ -5,10 +5,9 @@ import com.develoburs.fridgify.model.createRecipe
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
-
 import retrofit2.http.POST
 import retrofit2.http.PUT
-
+import com.develoburs.fridgify.model.RecipeLikeResponse
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -77,4 +76,16 @@ interface RecipeApi {
         @Header("Authorization") token: String // Optional authorization token
     )
 
+    @GET("recipe-api/like/userLikedRecipes")
+    suspend fun getUserLikedRecipes(
+        @Query("userId") userId: String,
+        @Header("Authorization") token: String
+    ): List<RecipeLikeResponse>
+
+    @POST("recipe-api/like/{recipeId}")
+    suspend fun likeRecipe(
+        @Path("recipeId") recipeId: String,
+        @Query("userId") userId: String,
+        @Header("Authorization") token: String
+    )
 }

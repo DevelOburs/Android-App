@@ -6,7 +6,7 @@
     <string name="recipe_details">Recipe details</string>
     <string name="back">Back</string>
     <string name="add_comment">Add a comment</string>
-    <string name="submit">Submit</string>
+    <string name="send">Send</string>
     <string name="ingredients">Ingredients:</string>
     <string name="instructions">Instructions:</string>
     <string name="comments">Comments:</string>
@@ -22,5 +22,6 @@
     <string name="no_instructions_available">No instructions available</string>
     <string name="no_ingredients_available">No ingredients available</string>
     <string name="no_comments_available">No comments yet</string>
+    <string name="unlike">Unlike</string>
     <string name="unknown_recipe">Unknown recipe</string>
 </resources>
