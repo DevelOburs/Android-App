@@ -48,17 +48,23 @@ class FridgeViewModel(private val repository: FridgifyRepositoryImpl) : ViewMode
             try {
                 val foodList = repository.getFoodList(category)
                 _food.value = foodList
+                Log.d("API_CALL", "Category sent: $category")
+                Log.d("API_RESPONSE", "Response: $_food")
             } catch (e: Exception) {
                 Log.e("FridgeViewModel", "Failed to fetch food list", e)
             }
         }
     }
-    fun getNotInFridgeFood(nameFilter: String? = null, categoryFilters: List<String>? = null) {
+    fun getNotInFridgeFood( category: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val notInFridgeFoodList = repository.getNotInFridge(nameFilter, categoryFilters)
+                val notInFridgeFoodList = repository.getNotInFridge(category)
                 _notInFridgeFood.value = notInFridgeFoodList
+                Log.d("API_CALL", "Category sent: $category")
+                Log.d("API_RESPONSE", "Response: $_notInFridgeFood")
             } catch (e: Exception) {
+                Log.d("API_CALL", "Category sent: $category")
+                Log.d("API_RESPONSE", "Response: $_notInFridgeFood")
                 Log.e("FridgeViewModel", "Failed to fetch not in fridge food list", e)
             }
         }
@@ -73,7 +79,7 @@ class FridgeViewModel(private val repository: FridgifyRepositoryImpl) : ViewMode
             try {
                 repository.addFood(ingredientIds)
                 Log.d("FridgeViewModel", "Food added successfully")
-                getFoodList() // Listeyi güncelle
+                getFoodList()
             } catch (e: Exception) {
                 Log.e("FridgeViewModel", "Failed to add food", e)
             }
@@ -90,7 +96,7 @@ class FridgeViewModel(private val repository: FridgifyRepositoryImpl) : ViewMode
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 repository.removeFood(ingredientIds)
-                getFoodList() // Refresh the food list after removing
+                getFoodList()
             } catch (e: Exception) {
                 Log.e("FridgeViewModel", "Failed to remove food", e)
             }

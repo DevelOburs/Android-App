@@ -215,25 +215,30 @@ class FridgifyRepositoryImpl : FridgifyRepository {
 
     override suspend fun getFoodList(category: String?): List<Food> {
         try {
+            Log.d("API_CALL", "getFoodList - Formatted Category: $category")
+
             val foods = fridgeapi.getFood(
                 token = "Bearer ${getToken()}",
                 userId = getUserID(),
-                category = category?.let { listOf(it) } // Pass category as a list if not null
+                category = if (category == null) null else listOf(category)
+
             )
-            Log.d("Food List", foods.toString())
+            Log.d("API_CALL", "getFoodList - Formatted Category: $category")
+
+
             return foods
         } catch (e: Exception) {
+
             throw Exception("Failed to fetch food list", e)
         }
     }
 
-    override suspend fun getNotInFridge(nameFilter: String?, categoryFilters: List<String>?): List<Food> {
+    override suspend fun getNotInFridge(category: String?): List<Food> {
         try {
             val foods = fridgeapi.getNotInFridge(
                 "Bearer ${getToken()}",
                 userId = getUserID(),
-                nameFilter = nameFilter,
-                categoryFilters = categoryFilters
+                category = if (category == null) null else listOf(category)
             )
             Log.d("Not In Fridge Food List", foods.toString())
             return foods

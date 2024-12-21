@@ -54,25 +54,25 @@ import com.develoburs.fridgify.viewmodel.LoginViewModel
 fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = viewModel()) {
     val allFoods by viewModel.food.collectAsState(initial = emptyList())
     var searchQuery by remember { mutableStateOf("") }
-    var selectedCategory by remember { mutableStateOf<String?>(null) }
     fun formatCategoryForApi(category: String): String {
         return category.uppercase().replace(" ", "_")
     }
     val categories = listOf(
-        "PRODUCE",
-        "DAIRY AND EGGS",
-        "MEAT AND PROTEINS",
-        "BAKING AND PANTRY",
-        "CANNED AND PRESERVED FOODS",
-        "BEVERAGES AND SWEETENERS",
-        "NUTS SEEDS AND LEGUMES",
-        "GRAINS AND CEREALS"
+        "All",
+        "Produce",
+        "Dairy and Eggs",
+        "Meat and Proteins",
+        "Baking and Pantry",
+        "Canned and Preserved Foods",
+        "Beverages and Sweeteners",
+        "Nuts Seeds and Legumes",
+        "Grains and Cereals"
     )
 
 
-    // Trigger fetching all foods on initial load
+
     LaunchedEffect(Unit) {
-        viewModel.getFoodList() // Fetch all foods on screen load
+        viewModel.getFoodList()
     }
 
     val filteredFoods = remember(searchQuery, allFoods) {
@@ -108,7 +108,7 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
                         placeholder = { Text(text = "Search", style = MaterialTheme.typography.titleMedium) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color(0xFFFFE4B5) // Light orange color
+                            containerColor = Color(0xFFFFE4B5)
                         )
                     )
 
@@ -122,12 +122,11 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
                         categories.forEach { category ->
                             Box(
                                 modifier = Modifier
-                                    .width(100.dp)
-                                    .height(40.dp)
+                                    .height(35.dp)
                                     .background(color = OrangeColor, shape = MaterialTheme.shapes.medium)
                                     .clickable {
-                                        val formattedCategory = formatCategoryForApi(category)
-                                        viewModel.getFoodList(formattedCategory) // Fetch foods for the selected category
+                                        val formattedCategory = if (category == "All") null else formatCategoryForApi(category)
+                                        viewModel.getFoodList(formattedCategory)
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -135,7 +134,7 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
                                     text = category,
                                     color = BlackColor,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.padding(start = 8.dp, end = 8.dp)
+                                    modifier = Modifier.padding(horizontal = 16.dp)
                                 )
                             }
                         }
