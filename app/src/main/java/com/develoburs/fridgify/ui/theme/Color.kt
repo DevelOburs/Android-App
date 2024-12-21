@@ -34,3 +34,19 @@ val LightCharcoalColor = Color(0xFF523B37)
 val BrightGreenColor = Color(0xFF32CD32)
 val MintColor = Color(0xFF98FF98)
 val CreamColor2 = Color(0xFFFFF4E0)
+
+val Oriole = Color(0xFFF56600)        // PANTONE 17-1350 TCX
+val Daffodil = Color(0xFFFFD662)      // PANTONE 14-0850 TCX
+val Zinnia = Color(0xFFFFA400)        // PANTONE 14-1159 TCX
+val FlameOrange = Color(0xFFFF7A00)   // PANTONE 15-1157 TCX
+val BrightMarigold = Color(0xFFFF8C22)// PANTONE 15-1164 TCX
+val Citrus = Color(0xFFFFA62B)        // PANTONE 14-0955 TCX
+val AutumnGlory = Color(0xFFFF8700)   // PANTONE 15-1263 TCX
+val Saffron = Color(0xFFFFC000)       // PANTONE 14-1064 TCX
+val GoldenHaze = Color(0xFFF3D39E)    // PANTONE 12-0826 TCX
+
+val DarkCoffee = Color(0xFF4A2E2C)   // Dark Brown
+val Coffee = Color(0xFF6F513A)       // Coffee Brown
+val LightCoffee = Color(0xFF916A53)  // Light Brown
+val Cream = Color(0xFFFFFCD4)        // Cream
+val LightCream = Color(0xFFFFF0BF)   // Light Cream

@@ -1,9 +1,11 @@
 package com.develoburs.fridgify.view.profile
 
+import android.graphics.fonts.FontStyle
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,109 +18,107 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.outlined.Lock
-import androidx.navigation.NavController
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.develoburs.fridgify.ui.theme.BrightGreenColor
+import com.develoburs.fridgify.ui.theme.CreamColor
+import com.develoburs.fridgify.ui.theme.CreamColor2
+import com.develoburs.fridgify.ui.theme.DarkBlueColor
+import com.develoburs.fridgify.ui.theme.PaleBlackColor
 import com.develoburs.fridgify.viewmodel.LoginViewModel
+
+val LightRedColor = Color(0xFFFF4500)
+val OrangeColor = Color(0xFFFF8C00)
+val LightOrangeColor = Color(0xFFFFB45F)
+val YellowColor = Color(0xFFFFC107)
+val BurgundyColor = Color(0xFF8B0000)
+val DarkOrangeColor = Color(0xFFD2691E)
 
 @Composable
 fun SettingsScreen(navController: NavController, viewModel: LoginViewModel = viewModel()) {
+    var expandedUserSettings by remember { mutableStateOf(false) }
+    var expandedRecipes by remember { mutableStateOf(false) }
     var showChangePasswordDialog by remember { mutableStateOf(false) }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(CreamColor2)
             .padding(16.dp)
     ) {
-        // App Settings Row
-        ExpandableSettingRow(
-            title = "App Settings",
-            settings = listOf("Enable Notifications", "Dark Mode"),
-        )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // User Settings Row without Change Password functionality
-        ExpandableSettingRow(
+        // User Settings Dropdown
+        DropdownMenuSection(
             title = "User Settings",
-            settings = listOf("Privacy Mode", "Location Access"),
-        )
-
-        // Change Password button placed directly in SettingsScreen
-        Button(
-            onClick = { showChangePasswordDialog = true },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            Text(text = "Change Password", style = MaterialTheme.typography.labelMedium)
-        }
-
-        // Show the dialog if needed
-        if (showChangePasswordDialog) {
-            ShowChangePasswordDialog(
-                onDismiss = { showChangePasswordDialog = false }, // Close the dialog
-                viewModel = viewModel // Pass the ViewModel to the dialog
+            isExpanded = expandedUserSettings,
+            onToggleExpand = { expandedUserSettings = !expandedUserSettings },
+            items = listOf(
+                DropdownMenuItem("Change Password") {
+                    showChangePasswordDialog = true // Toggle dialog visibility
+                }
             )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Button to navigate to Liked Recipes
-        CustomButton(
-            text = "Liked Recipes",
-            onClick = { navController.navigate("recipes/liked") }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Button to navigate to Saved Recipes
-        CustomButton(
-            text = "Saved Recipes",
-            onClick = { navController.navigate("recipes/saved") }
+        // Recipes Dropdown
+        DropdownMenuSection(
+            title = "Recipes",
+            isExpanded = expandedRecipes,
+            onToggleExpand = { expandedRecipes = !expandedRecipes },
+            items = listOf(
+                DropdownMenuItem("Liked Recipes") { navController.navigate("recipes/liked") },
+                DropdownMenuItem("Saved Recipes") { navController.navigate("recipes/saved") }
+            )
         )
 
         // Spacer to push Logout button to the bottom
         Spacer(modifier = Modifier.weight(1f))
 
-        // Button to redirect to the Login page
+        // Logout Button
         CustomButton(
             text = "Logout",
             onClick = { navController.navigate("login") },
-            buttonColor = Color(0xFFB00020)
+            buttonColor = LightRedColor
         )
+
+        // Display the dialog if needed
+        if (showChangePasswordDialog) {
+            ShowChangePasswordDialog(
+                onDismiss = { showChangePasswordDialog = false },
+                viewModel = viewModel
+            )
+        }
     }
 }
 
-
 @Composable
-fun ExpandableSettingRow(
+fun DropdownMenuSection(
     title: String,
-    settings: List<String>,
+    isExpanded: Boolean,
+    onToggleExpand: () -> Unit,
+    items: List<DropdownMenuItem>
 ) {
-    var isExpanded by remember { mutableStateOf(false) }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant, shape = MaterialTheme.shapes.medium)
+            .background(LightOrangeColor, shape = MaterialTheme.shapes.medium)
             .padding(8.dp)
-            .clickable { isExpanded = !isExpanded }
     ) {
-        // Row Title
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .clickable { onToggleExpand() }
                 .padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(start = 32.dp)
+                style = MaterialTheme.typography.bodyLarge.copy(color= CreamColor, fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(start = 16.dp)
+
             )
 
             Icon(
@@ -127,36 +127,37 @@ fun ExpandableSettingRow(
             )
         }
 
-        // Settings Toggles (shown only when expanded)
         if (isExpanded) {
-            settings.forEach { setting ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = setting,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    var isToggled by remember { mutableStateOf(false) }
-                    Switch(
-                        checked = isToggled,
-                        onCheckedChange = { isToggled = it },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.primary
+            items.forEach { item ->
+                Column { // Use Column to arrange Rows vertically
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(OrangeColor, RoundedCornerShape(8.dp))
+                            .clickable {
+                                item.onClick()
+                            }
+                            .padding(vertical = 16.dp, horizontal = 16.dp) // Button-like padding
+                    ) {
+                        Text(
+                            text = item.label,
+                            style = MaterialTheme.typography.bodyMedium.copy(color = CreamColor),
+                            modifier = Modifier.padding(start = 8.dp)
                         )
-                    )
+                    }
+                    // Add spacing between rows
+                    Spacer(modifier = Modifier.height(8.dp)) // Adjust the height as needed
                 }
             }
         }
     }
 }
 
+data class DropdownMenuItem(val label: String, val onClick: () -> Unit)
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShowChangePasswordDialog(onDismiss: () -> Unit,  viewModel: LoginViewModel = viewModel()) {
+fun ShowChangePasswordDialog(onDismiss: () -> Unit, viewModel: LoginViewModel = viewModel()) {
     var showDialog by remember { mutableStateOf(true) }
     var username by remember { mutableStateOf("") }
     var oldPassword by remember { mutableStateOf("") }
@@ -177,6 +178,12 @@ fun ShowChangePasswordDialog(onDismiss: () -> Unit,  viewModel: LoginViewModel =
                         onValueChange = { username = it },
                         label = { Text(text = "Username", style = MaterialTheme.typography.bodyLarge) },
                         singleLine = true,
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = OrangeColor,
+                            unfocusedBorderColor = LightOrangeColor,
+                            focusedLabelColor = OrangeColor,
+                            unfocusedLabelColor = DarkBlueColor
+                        ),
                         modifier = Modifier.fillMaxWidth()
                     )
                     OutlinedTextField(
@@ -191,12 +198,18 @@ fun ShowChangePasswordDialog(onDismiss: () -> Unit,  viewModel: LoginViewModel =
                                 Icon(imageVector = visibilityIcon, contentDescription = "Toggle Password Visibility")
                             }
                         },
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = OrangeColor,
+                            unfocusedBorderColor = LightOrangeColor,
+                            focusedLabelColor = OrangeColor,
+                            unfocusedLabelColor = DarkBlueColor
+                        ),
                         modifier = Modifier.fillMaxWidth()
                     )
                     OutlinedTextField(
                         value = newPassword,
                         onValueChange = { newPassword = it },
-                        label = { Text(text = "New Password" , style = MaterialTheme.typography.bodyLarge) },
+                        label = { Text(text = "New Password", style = MaterialTheme.typography.bodyLarge) },
                         singleLine = true,
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         trailingIcon = {
@@ -205,6 +218,12 @@ fun ShowChangePasswordDialog(onDismiss: () -> Unit,  viewModel: LoginViewModel =
                                 Icon(imageVector = visibilityIcon, contentDescription = "Toggle Password Visibility")
                             }
                         },
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = OrangeColor,
+                            unfocusedBorderColor = LightOrangeColor,
+                            focusedLabelColor = OrangeColor,
+                            unfocusedLabelColor = DarkBlueColor
+                        ),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -221,23 +240,30 @@ fun ShowChangePasswordDialog(onDismiss: () -> Unit,  viewModel: LoginViewModel =
                                 Log.e("ChangePasswordDialog", "Failed to change password")
                             }
                         }
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = BrightGreenColor
+                    )
                 ) {
                     Text(text = "OK", style = MaterialTheme.typography.bodyLarge)
                 }
             },
             dismissButton = {
-                Button(onClick = {
-                    showDialog = false
-                    onDismiss()
-                }) {
+                Button(
+                    onClick = {
+                        showDialog = false
+                        onDismiss()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = BurgundyColor
+                    )
+                ) {
                     Text(text = "Cancel", style = MaterialTheme.typography.bodyLarge)
                 }
             }
         )
     }
 }
-
 
 @Composable
 fun CustomButton(

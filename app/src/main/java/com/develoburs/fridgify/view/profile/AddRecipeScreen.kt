@@ -1,10 +1,10 @@
 package com.develoburs.fridgify.view.profile
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
+
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -31,31 +33,30 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.develoburs.fridgify.R
+
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.model.Recipe
+
 import com.develoburs.fridgify.model.createRecipe
 import com.develoburs.fridgify.model.repository.FridgifyRepositoryImpl
+
+
 import com.develoburs.fridgify.view.fridge.AddFoodCard
-import com.develoburs.fridgify.view.fridge.DeleteFoodCard
 import com.develoburs.fridgify.view.fridge.FoodCard
 import com.develoburs.fridgify.viewmodel.FridgeViewModel
-import com.develoburs.fridgify.viewmodel.FridgeViewModelFactory
 import com.develoburs.fridgify.viewmodel.RecipeListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,13 +69,16 @@ fun AddRecipeScreen(
     onSave: (createRecipe) -> Unit,
     onBack: () -> Unit
 ) {
-    var name by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var ingredients by remember { mutableStateOf(listOf<String>()) }
+
+    var name by rememberSaveable { mutableStateOf("") }
+    var description by rememberSaveable { mutableStateOf("") }
+    var ingredients by rememberSaveable { mutableStateOf(listOf<String>()) }
+
     var calories by remember { mutableStateOf(0) }
     var cookingTime by remember { mutableStateOf(0) }
     var imageUrl by remember { mutableStateOf<String?>(null) }
     var category by remember { mutableStateOf("APPETIZERS_AND_SNACKS") }
+
 
     val categoryMap = mapOf(
         "ALL" to "All",
@@ -235,11 +239,10 @@ fun AddRecipeScreen(
                 // Save Button positioned at the bottom
                 Button(
                     onClick = {
+
                         val newRecipe = createRecipe(
-                            id = "165565", // Replace with actual ID logic
                             name = name,
                             description = description,
-                            createdAt = System.currentTimeMillis().toString(),
                             userId = repository.getUserID().toString(), // Replace with actual user ID
                             userUsername = repository.getUserName(),
                             userFirstName = repository.getUserName(),
@@ -248,11 +251,13 @@ fun AddRecipeScreen(
                             commentCount = 0,
                             saveCount = 0,
                             ingredients = selectedItems.map { it.Name },
-                            imageUrl = imageUrl ?: "",
+                            imageUrl = imageUrl ?: "deneme",
                             category = category,
                             calories = calories,
                             cookingTime = cookingTime
                         )
+                        // Debug log
+                        Log.d("RecipeCreation", "New recipe created: $newRecipe")
                         onSave(newRecipe)
                         selectedItems.clear()
                     },

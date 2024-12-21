@@ -21,9 +21,13 @@ import androidx.navigation.NavController
 import com.develoburs.fridgify.view.bottombar.BottomBarScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.develoburs.fridgify.R
+import com.develoburs.fridgify.ui.theme.DarkBlueColor
+import com.develoburs.fridgify.ui.theme.LightOrangeColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
+import com.develoburs.fridgify.ui.theme.PaleWhiteColor
 import com.develoburs.fridgify.viewmodel.LoginViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = viewModel()) {
     var username by remember { mutableStateOf("") }
@@ -31,6 +35,8 @@ fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = v
     var password by remember { mutableStateOf("") }
     var loginResult by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) } // Loading state
+    var isErrorDialogVisible by remember { mutableStateOf(false) } // State for error dialog visibility
 
     Column(
         modifier = Modifier
@@ -54,7 +60,14 @@ fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = v
             onValueChange = { username = it },
             label = { Text(text = "Username", style = MaterialTheme.typography.titleMedium) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = OrangeColor, // Color for focused state
+            unfocusedBorderColor = LightOrangeColor, // Color for unfocused state
+            focusedLabelColor = OrangeColor, // Label color when focused
+            unfocusedLabelColor = DarkBlueColor // Label color when not focused
+        ),
+
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -75,35 +88,63 @@ fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = v
             },
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { /* Handle done action */ }),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = OrangeColor, // Color for focused state
+            unfocusedBorderColor = LightOrangeColor, // Color for unfocused state
+            focusedLabelColor = OrangeColor, // Label color when focused
+            unfocusedLabelColor = DarkBlueColor // Label color when not focused
+        ),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            colors = ButtonColors(
-                containerColor = OrangeColor, contentColor = OrangeColor,
-                disabledContainerColor = OrangeColor,
-                disabledContentColor = OrangeColor,
-            ),
-            onClick = {
-                viewModel.login(username, email, password) { response ->
-                    loginResult = if (response.error.isNullOrEmpty()) {
-                        navController.navigate(BottomBarScreen.Home.route) {
-                            // Clear the back stack so the user can't return to the login screen
-                            popUpTo("login") { inclusive = true }
+        // Show Loading Indicator or Login Button
+        if (isLoading) {
+            CircularProgressIndicator(color = OrangeColor)
+        } else {
+            Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = OrangeColor,
+                    contentColor = Color.White,
+                    disabledContainerColor = Color.White,
+                    disabledContentColor = Color.White
+                ),
+                onClick = {
+                    isLoading = true // Show loading indicator
+                    viewModel.login(username, email, password) { response ->
+                        isLoading = false // Hide loading indicator
+                        if (response.error.isNullOrEmpty()) {
+                            navController.navigate(BottomBarScreen.Home.route) {
+                                popUpTo("login") { inclusive = true }
+                            }
+                            loginResult = "Welcome, ${response.username} (ID: ${response.userId})"
+                        } else {
+                            loginResult = response.error
+                            isErrorDialogVisible = true // Show error dialog
                         }
-                        "Welcome, ${response.username} (ID: ${response.userId})"
-                    } else {
-                        "Error: ${response.error}"
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Text(text = "Login", style = MaterialTheme.typography.titleMedium, color = Color.White)
+            }
+        }
+        // Error dialog
+        if (isErrorDialogVisible) {
+            AlertDialog(
+                onDismissRequest = { isErrorDialogVisible = false },
+                title = { Text(text = "Error", style = MaterialTheme.typography.titleLarge) },
+                text = { Text(text = loginResult ?: "Unknown error occurred.") },
+                confirmButton = {
+                    Button(onClick = { isErrorDialogVisible = false }) {
+                        Text("OK")
                     }
                 }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            Text(text = "Login", style = MaterialTheme.typography.titleMedium, color = Color.White)
+            )
         }
+
         Spacer(modifier = Modifier.height(8.dp))
 
         // Register Button (Navigate to Register Page)
@@ -113,7 +154,7 @@ fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = v
                 navController.navigate("register")
             }
         ) {
-            Text(text = "Not registered? Create an account", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Not registered? Create an account", style = MaterialTheme.typography.bodyMedium, color = OrangeColor)
         }
     }
 }

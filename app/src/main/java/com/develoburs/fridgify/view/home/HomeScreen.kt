@@ -67,6 +67,7 @@ import com.develoburs.fridgify.ui.theme.CharcoalColor
 import com.develoburs.fridgify.ui.theme.CreamColor
 import com.develoburs.fridgify.ui.theme.CreamColor2
 import com.develoburs.fridgify.ui.theme.LightCharcoalColor
+import com.develoburs.fridgify.ui.theme.LightCoffee
 import com.develoburs.fridgify.ui.theme.LightOrangeColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
 import com.develoburs.fridgify.viewmodel.LoginViewModel
@@ -315,7 +316,7 @@ fun FilterSheetContent(
             DropdownMenu(
                 expanded = isDropdownExpanded,
                 onDismissRequest = { isDropdownExpanded = false },
-                modifier = Modifier.background(color = LightCharcoalColor)
+                modifier = Modifier.background(color = LightCoffee)
             ) {
                 categories.forEach { category ->
                     DropdownMenuItem(
