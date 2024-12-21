@@ -11,6 +11,10 @@ interface FridgifyRepository {
 
     suspend fun getRecipeById(id: String): Recipe
 
+    suspend fun likeRecipe(recipeId: String, userId: String)
+
+    suspend fun getUserLikedRecipes(userId: String): List<String>
+
     suspend fun getRecipeIngredients(id: String): List<Food>
 
     suspend fun getFoodList(category: String? = null): List<Food>

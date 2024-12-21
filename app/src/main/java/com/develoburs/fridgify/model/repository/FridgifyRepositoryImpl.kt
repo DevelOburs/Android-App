@@ -6,7 +6,6 @@ import com.develoburs.fridgify.model.Recipe
 import com.develoburs.fridgify.model.api.RetrofitInstance.api
 import com.develoburs.fridgify.model.api.RetrofitInstance.fridgeapi
 
-import android.content.Context
 import com.develoburs.fridgify.model.api.FridgeApi
 import com.develoburs.fridgify.model.createRecipe
 
@@ -281,9 +280,27 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         }
     }
 
+    override suspend fun likeRecipe(recipeId: String, userId: String) {
+        try {
+            val token = "Bearer ${getToken()}" // Get the authorization token
+            api.likeRecipe(recipeId, userId, token) // Call the API endpoint
+            Log.d("Repository", "Toggled like for recipe: $recipeId by user: $userId")
+        } catch (e: Exception) {
+            Log.e("Repository", "Failed to toggle like for recipe: $recipeId by user: $userId", e)
+            throw Exception("Failed to toggle like", e)
+        }
+    }
 
-
-
+    override suspend fun getUserLikedRecipes(userId: String): List<String> {
+        try {
+            val token = "Bearer ${getToken()}"
+            val likedRecipes = api.getUserLikedRecipes(userId, token)
+            return likedRecipes.map { it.id } // Extract only the `id` field
+        } catch (e: Exception) {
+            Log.e("FridgifyRepositoryImpl", "Failed to fetch user liked recipes for userId: $userId", e)
+            throw Exception("Failed to fetch user liked recipes", e)
+        }
+    }
 
 
 }
