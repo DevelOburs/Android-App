@@ -35,7 +35,6 @@ import com.develoburs.fridgify.ui.theme.OrangeColor
 import com.develoburs.fridgify.ui.theme.YellowColor
 
 
-//val PurpleColor = Color(0xFF800080)
 
 
 @Composable
@@ -63,9 +62,8 @@ fun FoodCard(
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween // Added to center align content
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Image Section
             Box(
                 modifier = Modifier
                     .size(cardSize * 0.75f),
@@ -78,11 +76,10 @@ fun FoodCard(
                 )
             }
 
-            // Center-aligned Food Name
             Box(
                 modifier = Modifier
-                    .fillMaxWidth() // Adjusted to use width instead of size
-                    .padding(bottom = 8.dp), // Optional padding
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(

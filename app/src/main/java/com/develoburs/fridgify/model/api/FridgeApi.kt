@@ -47,9 +47,8 @@ interface FridgeApi {
         @Header("Authorization") token: String,
         @Path("userId") userId: Int,
         @Query("nameFilter") nameFilter: String? = null,
-        @Query("categoryFilters") categoryFilters: List<String>? = null
-    ): List<Food>
-
+        @Query("category") category: List<String>? = null
+        ): List<Food>
 
 
 
