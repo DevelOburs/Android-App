@@ -1,5 +1,6 @@
 package com.develoburs.fridgify.view.home
 
+import android.util.Log
 import com.develoburs.fridgify.model.Recipe
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -29,11 +30,15 @@ import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.BlackColor
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.develoburs.fridgify.viewmodel.RecipeListViewModel
 import com.develoburs.fridgify.viewmodel.RecipeListViewModelFactory
 import androidx.navigation.NavController
 import com.develoburs.fridgify.model.repository.FridgifyRepositoryImpl
+import com.develoburs.fridgify.ui.theme.CreamColor2
+import com.develoburs.fridgify.ui.theme.MintColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,24 +51,31 @@ fun RecipeDetailsScreen(
     onLoadingFinished: () -> Unit
 ) {
     // Initialize the ViewModel
-    val viewModel: RecipeListViewModel = viewModel(factory = RecipeListViewModelFactory(
-        navController = navController,
-        repository = repository
-    ))
+    val viewModel: RecipeListViewModel = viewModel(
+        factory = RecipeListViewModelFactory(
+            navController = navController,
+            repository = repository
+        )
+    )
 
     // Fetch the recipe details when the screen is loaded
     LaunchedEffect(recipeId) {
         viewModel.getRecipeById(recipeId)
+        viewModel.fetchUserLikedRecipes(repository.getUserID().toString()) // Fetch liked recipes
     }
 
     // Collect the recipe details state
     val recipe by viewModel.recipeDetail.collectAsState()
+    val userLikedRecipes by viewModel.userLikedRecipes.collectAsState()
+
     if (recipe != null) {
         onLoadingFinished() // Notify the parent that loading is complete
     }
-    
+
     // State for like, save, and new comment
-    var isLiked by remember { mutableStateOf<Boolean?>(null) }
+    val isLiked = userLikedRecipes.contains(recipeId)
+    Log.d("RecipeDetailsScreen", "Recipe ID: $recipeId, isLiked: $isLiked")
+
     var isSaved by remember { mutableStateOf<Boolean?>(null) }
     var newComment by remember { mutableStateOf("") }
     val comments = remember {
@@ -91,13 +103,31 @@ fun RecipeDetailsScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                 actions = {
-                    IconButton(onClick = { isLiked = isLiked != true }) {
-                        Icon(
-                            imageVector = if (isLiked == true) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                            contentDescription = stringResource(id = if (isLiked == true) R.string.liked else R.string.like),
-                            tint = if (isLiked == true) Color.Red else BlackColor
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        // Like Button
+                        IconButton(
+                            onClick = { viewModel.likeOrUnlikeRecipe(recipeId,
+                                repository.getUserID().toString()
+                            ) }
+                        ) {
+                            val isLiked = userLikedRecipes.contains(recipeId)
+                            Icon(
+                                imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                contentDescription = stringResource(
+                                    id = if (isLiked) R.string.unlike else R.string.like
+                                ),
+                                tint = if (isLiked) Color.Red else BlackColor
+                            )
+                        }
+
+                        // Like Count
+                        Text(
+                            text = recipe?.Likes?.toString() ?: "0", // Use Likes from recipe details
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = BlackColor
                         )
                     }
+                    // Save Button
                     IconButton(onClick = { isSaved = isSaved != true }) {
                         Icon(
                             imageVector = if (isSaved == true) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
@@ -109,156 +139,201 @@ fun RecipeDetailsScreen(
             )
         },
         content = { paddingValues ->
-            Surface(modifier = Modifier.fillMaxSize()) {
-                Column(
+            Surface(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = CreamColor2)
+                )
+                LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
                         .padding(16.dp)
                 ) {
                     // Recipe Details Content
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .verticalScroll(rememberScrollState())
-                    ) {
-                        // Recipe Image
-                        recipe?.Image?.let { imageUrl ->
-                            Image(
-                                painter = rememberAsyncImagePainter(imageUrl),
-                                contentDescription = stringResource(id = R.string.recipe_image_description),
+                    item {
+                        Column {
+                            // Recipe Image
+                            recipe?.Image?.let { imageUrl ->
+                                Image(
+                                    painter = rememberAsyncImagePainter(imageUrl),
+                                    contentDescription = stringResource(id = R.string.recipe_image_description),
+                                    modifier = Modifier
+                                        .size(340.dp)
+                                        .padding(6.dp)
+                                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 16.dp, bottomEnd = 16.dp))
+                                        .align(Alignment.CenterHorizontally), // Centralized alignment
+                                    contentScale = ContentScale.Crop
+                                )
+                            } ?: Text(
+                                text = stringResource(id = R.string.no_image_available),
+                                color = Color.Black,
                                 modifier = Modifier
-                                    .size(320.dp)
-                                    .padding(6.dp),
-                                contentScale = ContentScale.Crop
+                                    .padding(8.dp)
+                                    .align(Alignment.CenterHorizontally), // Centralize the "no image" text
+                                style = MaterialTheme.typography.bodySmall
                             )
-                        } ?: Text(
-                            text = stringResource(id = R.string.no_image_available),
-                            color = Color.Gray,
-                            modifier = Modifier.padding(8.dp),
-                            style = MaterialTheme.typography.bodySmall
-                        )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Ingredients
+                            Text(
+                                text = stringResource(id = R.string.ingredients),
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                color = Color.Black
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            recipe?.ingredients?.let { ingredients ->
+                                ingredients.forEach { ingredient ->
+                                    Text(
+                                        text = "• $ingredient",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color.Black
+                                    )
+                                }
+                            } ?: Text(
+                                text = stringResource(id = R.string.no_ingredients_available),
+                                color = Color.Black,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Instructions
+                            Text(
+                                text = stringResource(id = R.string.instructions),
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                color = Color.Black
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = recipe?.instructions
+                                    ?: stringResource(id = R.string.no_instructions_available),
+                                color = Color.Black,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
 
                         Spacer(modifier = Modifier.height(16.dp))
+                    }
 
-                        // Ingredients
+                    // Comments Section Header
+                    item {
                         Text(
-                            text = stringResource(id = R.string.ingredients),
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        recipe?.ingredients?.let { ingredients ->
-                            ingredients.forEach { ingredient ->
-                                Text(text = "• $ingredient", style = MaterialTheme.typography.bodySmall)
-                            }
-                        } ?: Text(
-                            text = stringResource(id = R.string.no_ingredients_available),
-                            color = Color.Gray,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Instructions
-                        Text(
-                            text = stringResource(id = R.string.instructions),
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = recipe?.instructions ?: stringResource(id = R.string.no_instructions_available),
-                            color = if (recipe?.instructions == null) Color.Gray else Color.Unspecified,
-                            style = MaterialTheme.typography.bodySmall
+                            text = stringResource(id = R.string.comments),
+                            modifier = Modifier.padding(bottom = 8.dp),
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontSize = 18.sp
+                            ),
+                            color = Color.Black
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Static Comment Section
-                    Text(
-                        text = stringResource(id = R.string.comments),
-                        modifier = Modifier.padding(bottom = 8.dp),
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontSize = 18.sp
-                        )
-                    )
-
                     // Comment Box
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.dp) // Static height for the comment section
-                            .background(Color.LightGray, shape = MaterialTheme.shapes.medium)
-                            .padding(8.dp)
-                    ) {
-                        if (comments.isEmpty()) {
-                            // Show "No comments yet" placeholder
-                            Text(
-                                text = stringResource(id = R.string.no_comments_available),
-                                color = Color.Gray,
-                                modifier = Modifier.align(Alignment.Center),
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                        } else {
-                            // Display comments in a scrollable list (most recent first)
-                            LazyColumn(reverseLayout = true) {
-                                items(comments) { (username, comment) ->
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(vertical = 4.dp)
-                                            .background(Color.White, shape = MaterialTheme.shapes.small)
-                                            .padding(8.dp)
-                                    ) {
-                                        Text(
-                                            text = username,
-                                            color = Color.Black,
-                                            style = MaterialTheme.typography.bodySmall.copy(
-                                                fontWeight = FontWeight.Bold,
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp) // Fixed height for the comment section
+                                .background(color = CreamColor2, shape = MaterialTheme.shapes.medium)
+                                .padding(8.dp)
+                        ) {
+                            if (comments.isEmpty()) {
+                                // Show "No comments yet" placeholder
+                                Text(
+                                    text = stringResource(id = R.string.no_comments_available),
+                                    color = Color.Gray,
+                                    modifier = Modifier.align(Alignment.Center),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                            } else {
+                                // Display comments in a scrollable list (most recent first)
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize(),
+                                    reverseLayout = true // Ensures most recent comments appear at the top
+                                ) {
+                                    items(comments) { (username, comment) ->
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 4.dp)
+                                                .background(
+                                                    Color.White,
+                                                    shape = MaterialTheme.shapes.small
+                                                )
+                                                .padding(8.dp)
+                                        ) {
+                                            Text(
+                                                text = username,
+                                                color = Color.Black,
+                                                style = MaterialTheme.typography.bodySmall.copy(
+                                                    fontWeight = FontWeight.Bold,
+                                                )
                                             )
-                                        )
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text(
-                                            text = comment,
-                                            color = Color.DarkGray,
-                                            style = MaterialTheme.typography.bodySmall.copy(
-                                                fontSize = 16.sp,
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(
+                                                text = comment,
+                                                color = Color.DarkGray,
+                                                style = MaterialTheme.typography.bodySmall.copy(
+                                                    fontSize = 16.sp,
+                                                )
                                             )
-                                        )
+                                        }
                                     }
                                 }
                             }
                         }
+
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
                     // Add New Comment Section
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp)
-                    ) {
-                        OutlinedTextField(
-                            value = newComment,
-                            onValueChange = { newComment = it },
-                            modifier = Modifier.weight(1f),
-                            placeholder = { Text(text = stringResource(id = R.string.add_comment), style = MaterialTheme.typography.bodyMedium) },
-                            singleLine = true
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Button(onClick = {
-                            if (newComment.isNotBlank()) {
-                                comments.add(0, Pair(loggedInUsername, newComment)) // Add comment with logged-in username
-                                newComment = "" // Clear input
+                    item {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp)
+                        ) {
+                            OutlinedTextField(
+                                value = newComment,
+                                onValueChange = { newComment = it },
+                                modifier = Modifier.weight(1f),
+                                placeholder = {
+                                    Text(
+                                        text = stringResource(id = R.string.add_comment),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                },
+                                singleLine = true
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(onClick = {
+                                if (newComment.isNotBlank()) {
+                                    comments.add(
+                                        0,
+                                        Pair(loggedInUsername, newComment)
+                                    ) // Add comment with logged-in username
+                                    newComment = "" // Clear input
+                                }
+                            },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MintColor, // Background color
+                                    contentColor = Color.Black // Text color
+                                )
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.send),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
                             }
-                        }) {
-                            Text(text = stringResource(id = R.string.submit), style = MaterialTheme.typography.titleMedium)
                         }
                     }
                 }

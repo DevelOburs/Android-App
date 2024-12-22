@@ -28,6 +28,12 @@ class RecipeListViewModel(private val navController: NavController, private val 
     private val _food = MutableStateFlow<List<Food>>(emptyList())
     val food: StateFlow<List<Food>> = _food
 
+    private val _recipeLikeCount = MutableStateFlow<Int?>(null)
+    val recipeLikeCount: StateFlow<Int?> = _recipeLikeCount
+
+    private val _userLikedRecipes = MutableStateFlow<List<String>>(emptyList())
+    val userLikedRecipes: StateFlow<List<String>> = _userLikedRecipes
+
     private var currentPage = 0
     private val pageSize = 10
     private var usr_currentPage = 0
@@ -169,6 +175,48 @@ class RecipeListViewModel(private val navController: NavController, private val 
         }
 
     }
+
+    fun likeOrUnlikeRecipe(recipeId: String, userId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val isCurrentlyLiked = _userLikedRecipes.value.contains(recipeId)
+
+                // Call the like endpoint (assumed to toggle the like state)
+                repository.likeRecipe(recipeId, userId)
+
+                // Optimistically update UI state
+                if (isCurrentlyLiked) {
+                    // Unlike the recipe
+                    _userLikedRecipes.value = _userLikedRecipes.value - recipeId
+                    _recipeDetail.value = _recipeDetail.value?.let { recipe ->
+                        recipe.copy(Likes = (recipe.Likes ?: 0) - 1) // Decrement like count
+                    }
+                } else {
+                    // Like the recipe
+                    _userLikedRecipes.value = _userLikedRecipes.value + recipeId
+                    _recipeDetail.value = _recipeDetail.value?.let { recipe ->
+                        recipe.copy(Likes = (recipe.Likes ?: 0) + 1) // Increment like count
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("RecipeListViewModel", "Failed to toggle like for recipe: $recipeId", e)
+            }
+        }
+    }
+
+
+    fun fetchUserLikedRecipes(userId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val likedRecipes = repository.getUserLikedRecipes(userId)
+                _userLikedRecipes.value = likedRecipes // Ensure the state is updated
+            } catch (e: Exception) {
+                Log.e("RecipeListViewModel", "Failed to fetch user liked recipes", e)
+            }
+        }
+    }
+
+
     fun addRecipe(id: String, newRecipe: createRecipe) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
