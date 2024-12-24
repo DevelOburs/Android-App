@@ -128,7 +128,7 @@ fun HomeScreen(navController: NavController, viewModel: RecipeListViewModel = vi
                         )
 
                         if (index == viewModel.recipe.collectAsState().value.lastIndex) {
-                            viewModel.getRecipesList()
+                            viewModel.getRecipesList() //todo fix this
                         }
                     }
 
@@ -375,6 +375,8 @@ fun FilterSheetContent(
             Spacer(modifier = Modifier.width(8.dp))
             Button(
                 onClick = {
+                    viewModel.resetPageCount()
+
                     if (isPersonalized) {
                         viewModel.getPersonalizedRecipes(
                             cookingTimeMin = cookingTimeMin.toInt(),

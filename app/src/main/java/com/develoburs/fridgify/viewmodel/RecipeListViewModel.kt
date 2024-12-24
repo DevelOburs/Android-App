@@ -59,12 +59,19 @@ class RecipeListViewModel(
         getUserRecipesList()
     }
 
+    fun resetPageCount(){
+        Log.d("test", "reset page count")
+        currentPage = 0
+        isLastPage = false
+        _recipe.value = emptyList()
+    }
+
     fun getRecipesList() {
         if (_isLoading.value || isLastPage) return
         _isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                Log.d(tag, "Getting recipes for page:$currentPage and limit:$pageSize")
+                Log.d(tag, "1 Getting recipes for page:$currentPage and limit:$pageSize")
                 val recipeList = repository.getRecipeList(pageSize, currentPage)
 
                 if (recipeList.isEmpty()) {
@@ -93,6 +100,7 @@ class RecipeListViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                Log.d(tag, "2 Getting recipes for page:$currentPage and limit:$pageSize")
                 val recipes = repository.getRecipeList(
                     pageSize, currentPage, cookingTimeMin, cookingTimeMax, calorieMin, calorieMax, category
                 )
@@ -110,7 +118,7 @@ class RecipeListViewModel(
         _isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                Log.d(tag, "Getting recipes for page:$currentPage and limit:$pageSize")
+                Log.d(tag, "3 Getting recipes for page:$currentPage and limit:$pageSize")
                 val recipeList = repository.getPersonalizedRecipeList(pageSize, currentPage)
 
                 if (recipeList.isEmpty()) {
@@ -137,6 +145,7 @@ class RecipeListViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                Log.d(tag, "4 Getting recipes for page:$currentPage and limit:$pageSize")
                 val recipes = repository.getPersonalizedRecipeList(
                     pageSize, currentPage, cookingTimeMin, cookingTimeMax, calorieMin, calorieMax, category
                 )
