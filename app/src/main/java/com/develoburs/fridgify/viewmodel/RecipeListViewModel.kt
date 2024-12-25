@@ -13,7 +13,10 @@ import androidx.navigation.NavController
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.model.createRecipe
 
-class RecipeListViewModel(private val navController: NavController, private val repository: FridgifyRepositoryImpl) : ViewModel() {
+class RecipeListViewModel(
+    private val navController: NavController,
+    private val repository: FridgifyRepositoryImpl
+) : ViewModel() {
     private val _recipe = MutableStateFlow<List<Recipe>>(emptyList())
     val recipe: StateFlow<List<Recipe>> = _recipe
     private val _userrecipe = MutableStateFlow<List<Recipe>>(emptyList())
@@ -56,12 +59,19 @@ class RecipeListViewModel(private val navController: NavController, private val 
         getUserRecipesList()
     }
 
+    fun resetPageCount(){
+        Log.d("test", "reset page count")
+        currentPage = 0
+        isLastPage = false
+        _recipe.value = emptyList()
+    }
+
     fun getRecipesList() {
         if (_isLoading.value || isLastPage) return
         _isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                Log.d(tag, "Getting recipes for page:$currentPage and limit:$pageSize")
+                Log.d(tag, "1 Getting recipes for page:$currentPage and limit:$pageSize")
                 val recipeList = repository.getRecipeList(pageSize, currentPage)
 
                 if (recipeList.isEmpty()) {
@@ -72,6 +82,76 @@ class RecipeListViewModel(private val navController: NavController, private val 
                 }
             } catch (e: Exception) {
                 Log.e(tag, "Failed to fetch recipe list", e)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun getRecipesList(
+        cookingTimeMin: Int? = null,
+        cookingTimeMax: Int? = null,
+        calorieMin: Int? = null,
+        calorieMax: Int? = null,
+        category: String? = null
+    ) {
+        if (_isLoading.value || isLastPage) return
+        _isLoading.value = true
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                Log.d(tag, "2 Getting recipes for page:$currentPage and limit:$pageSize")
+                val recipes = repository.getRecipeList(
+                    pageSize, currentPage, cookingTimeMin, cookingTimeMax, calorieMin, calorieMax, category
+                )
+                _recipe.value = recipes
+            } catch (e: Exception) {
+                Log.e("RecipeViewModel", "Error fetching recipe list", e)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun getPersonalizedRecipes() {
+        if (_isLoading.value || isLastPage) return
+        _isLoading.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                Log.d(tag, "3 Getting recipes for page:$currentPage and limit:$pageSize")
+                val recipeList = repository.getPersonalizedRecipeList(pageSize, currentPage)
+
+                if (recipeList.isEmpty()) {
+                    isLastPage = true
+                } else {
+                    _recipe.value = _recipe.value + recipeList
+                    currentPage++
+                }
+            } catch (e: Exception) {
+                Log.e(tag, "Failed to fetch recipe list", e)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun getPersonalizedRecipes(
+        cookingTimeMin: Int? = null,
+        cookingTimeMax: Int? = null,
+        calorieMin: Int? = null,
+        calorieMax: Int? = null,
+        category: String? = null
+    ) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                Log.d(tag, "4 Getting recipes for page:$currentPage and limit:$pageSize")
+                val recipes = repository.getPersonalizedRecipeList(
+                    pageSize, currentPage, cookingTimeMin, cookingTimeMax, calorieMin, calorieMax, category
+                )
+                _recipe.value = recipes
+            } catch (e: Exception) {
+                Log.e("RecipeViewModel", "Error fetching personalized recipes", e)
             } finally {
                 _isLoading.value = false
             }
@@ -163,7 +243,7 @@ class RecipeListViewModel(private val navController: NavController, private val 
         }
     }
 
-    fun getRecipeById(id: String){
+    fun getRecipeById(id: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val recipe = repository.getRecipeById(id)
@@ -230,7 +310,8 @@ class RecipeListViewModel(private val navController: NavController, private val 
             }
         }
     }
-    fun updateRecipe(id : Int ,updatedRecipe: createRecipe) {
+
+    fun updateRecipe(id: Int, updatedRecipe: createRecipe) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 // Add recipe to the repository

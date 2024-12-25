@@ -1,9 +1,7 @@
 package com.develoburs.fridgify.view.home
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,9 +17,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -47,7 +45,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -55,22 +52,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.develoburs.fridgify.viewmodel.RecipeListViewModel
 import androidx.navigation.NavController
 import com.develoburs.fridgify.R
-import com.develoburs.fridgify.ui.theme.BlackColor
-import com.develoburs.fridgify.ui.theme.BlueColor
-import com.develoburs.fridgify.ui.theme.BurgundyColor
 import com.develoburs.fridgify.ui.theme.CharcoalColor
 import com.develoburs.fridgify.ui.theme.CreamColor
 import com.develoburs.fridgify.ui.theme.CreamColor2
-import com.develoburs.fridgify.ui.theme.LightCharcoalColor
 import com.develoburs.fridgify.ui.theme.LightCoffee
-import com.develoburs.fridgify.ui.theme.LightOrangeColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
-import com.develoburs.fridgify.viewmodel.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,7 +70,7 @@ fun HomeScreen(navController: NavController, viewModel: RecipeListViewModel = vi
     var showFilterSheet by remember { mutableStateOf(false) }
 
     if (allRecipes.value.isEmpty()) {
-        with(viewModel) { getRecipesList() }
+        with(viewModel) { getPersonalizedRecipes() }
     }
 
     Scaffold(
@@ -139,7 +128,7 @@ fun HomeScreen(navController: NavController, viewModel: RecipeListViewModel = vi
                         )
 
                         if (index == viewModel.recipe.collectAsState().value.lastIndex) {
-                            viewModel.getRecipesList()
+                            viewModel.getRecipesList() //todo fix this
                         }
                     }
 
@@ -169,10 +158,12 @@ fun HomeScreen(navController: NavController, viewModel: RecipeListViewModel = vi
                 if (showFilterSheet) {
                     ModalBottomSheet(
                         onDismissRequest = { showFilterSheet = false },
-                        containerColor = CharcoalColor
-                    ) {
+                        containerColor = CharcoalColor,
+
+                        ) {
                         FilterSheetContent(
-                            onDismiss = { showFilterSheet = false }
+                            onDismiss = { showFilterSheet = false },
+                            viewModel = viewModel
                         )
                     }
                 }
@@ -183,10 +174,11 @@ fun HomeScreen(navController: NavController, viewModel: RecipeListViewModel = vi
 
 @Composable
 fun FilterSheetContent(
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    viewModel: RecipeListViewModel
 ) {
     var cookingTimeMin by remember { mutableStateOf(0f) }
-    var cookingTimeMax by remember { mutableStateOf(120f) }
+    var cookingTimeMax by remember { mutableStateOf(360f) }
 
     var calorieMin by remember { mutableStateOf(0f) }
     var calorieMax by remember { mutableStateOf(1000f) }
@@ -205,6 +197,7 @@ fun FilterSheetContent(
     val categories = categoryMap.values.toList()
     var selectedCategory by remember { mutableStateOf<String?>(null) }
     var isDropdownExpanded by remember { mutableStateOf(false) }
+    var isPersonalized by remember { mutableStateOf(true) }
 
     val scrollState = rememberScrollState()
 
@@ -215,6 +208,28 @@ fun FilterSheetContent(
             .verticalScroll(scrollState)
     ) {
         Text(text = "Filter", style = MaterialTheme.typography.labelMedium, color = CreamColor)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = isPersonalized,
+                onCheckedChange = { isPersonalized = it },
+                colors = CheckboxDefaults.colors(
+                    checkedColor = OrangeColor,
+                    uncheckedColor = CreamColor
+                )
+            )
+            Text(
+                text = "Filter by My Fridge",
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    lineHeight = 20.sp,
+                ),
+                color = CreamColor
+            )
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -244,7 +259,7 @@ fun FilterSheetContent(
                 cookingTimeMin = range.start
                 cookingTimeMax = range.endInclusive
             },
-            valueRange = 0f..120f,
+            valueRange = 0f..360f,
             steps = 0,
             colors = androidx.compose.material3.SliderDefaults.colors(
                 thumbColor = OrangeColor,
@@ -360,8 +375,36 @@ fun FilterSheetContent(
             Spacer(modifier = Modifier.width(8.dp))
             Button(
                 onClick = {
-                    //todo apply filter functionality
-                    Log.d("test", "Selected Filters:")
+                    viewModel.resetPageCount()
+
+                    if (isPersonalized) {
+                        viewModel.getPersonalizedRecipes(
+                            cookingTimeMin = cookingTimeMin.toInt(),
+                            cookingTimeMax = cookingTimeMax.toInt(),
+                            calorieMin = calorieMin.toInt(),
+                            calorieMax = calorieMax.toInt(),
+                            category = if (selectedCategory == "All") {
+                                null
+                            } else {
+                                categoryMap.entries.find { it.value == selectedCategory }?.key
+                            }
+                        )
+                    } else {
+                        viewModel.getRecipesList(
+                            cookingTimeMin = cookingTimeMin.toInt(),
+                            cookingTimeMax = cookingTimeMax.toInt(),
+                            calorieMin = calorieMin.toInt(),
+                            calorieMax = calorieMax.toInt(),
+                            category = if (selectedCategory == "All") {
+                                null
+                            } else {
+                                categoryMap.entries.find { it.value == selectedCategory }?.key
+                            }
+                        )
+                    }
+                    Log.d(
+                        "test", "Selected Filters:"
+                    )
                     Log.d(
                         "test",
                         "Cooking Time: Min = ${cookingTimeMin.toInt()}, Max = ${cookingTimeMax.toInt()}"

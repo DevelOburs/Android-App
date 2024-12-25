@@ -7,6 +7,28 @@ interface FridgifyRepository {
 
     suspend fun getRecipeList(limit: Int, pageNumber: Int): List<Recipe>
 
+    suspend fun getRecipeList(
+        limit: Int,
+        pageNumber: Int,
+        cookingTimeMin: Int?,
+        cookingTimeMax: Int?,
+        calorieMin: Int?,
+        calorieMax: Int?,
+        category: String?
+    ): List<Recipe>
+
+    suspend fun getPersonalizedRecipeList(limit: Int, pageNumber: Int): List<Recipe>
+
+    suspend fun getPersonalizedRecipeList(
+        limit: Int,
+        pageNumber: Int,
+        cookingTimeMin: Int?,
+        cookingTimeMax: Int?,
+        calorieMin: Int?,
+        calorieMax: Int?,
+        category: String?
+    ): List<Recipe>
+
     suspend fun getUserRecipeList(limit: Int, pageNumber: Int): List<Recipe>
 
     suspend fun getRecipeById(id: String): Recipe

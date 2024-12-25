@@ -6,7 +6,6 @@ import com.develoburs.fridgify.model.Recipe
 import com.develoburs.fridgify.model.api.RetrofitInstance.api
 import com.develoburs.fridgify.model.api.RetrofitInstance.fridgeapi
 
-import android.content.Context
 import com.develoburs.fridgify.model.api.FridgeApi
 import com.develoburs.fridgify.model.createRecipe
 
@@ -26,6 +25,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
     fun getToken(): String {
         return token
     }
+
     fun setUserID(UserID: Int) {
         userId = UserID
     }
@@ -58,7 +58,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         return lastName
     }
 
-    fun setUserEmail(Email:String) {
+    fun setUserEmail(Email: String) {
         email = Email
     }
 
@@ -109,6 +109,85 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         }
     }
 
+    override suspend fun getRecipeList(
+        limit: Int,
+        pageNumber: Int,
+        cookingTimeMin: Int?,
+        cookingTimeMax: Int?,
+        calorieMin: Int?,
+        calorieMax: Int?,
+        category: String?
+    ): List<Recipe> {
+        try {
+            // Use getToken function to retrieve the token
+            val recipes = api.getRecipes(
+                token = "Bearer ${getToken()}",
+                limit = limit,
+                pageNumber = pageNumber,
+                cookingTimeMin = cookingTimeMin,
+                cookingTimeMax = cookingTimeMax,
+                calorieMin = calorieMin,
+                calorieMax = calorieMax,
+                category = category
+            )
+            Log.d(
+                "Recipe List",
+                "limit:$limit, \npageno:$pageNumber, \nmincookingtime:$cookingTimeMin, \nmaxcookingtime:$cookingTimeMax, \nmincalorie:$calorieMin, \nmaxcalorie:$calorieMax, \ncategory:$category"
+            )
+            return recipes
+        } catch (e: Exception) {
+            throw Exception("Failed to get filtered recipes, Bearer ${getToken()}", e)
+        }
+    }
+
+    override suspend fun getPersonalizedRecipeList(limit: Int, pageNumber: Int): List<Recipe> {
+        try {
+            // Use getToken function to retrieve the token
+            val recipes = api.getPersonalizedRecipes(
+                token = "Bearer ${getToken()}",
+                userId = getUserID(),
+                limit = limit,
+                pageNumber = pageNumber
+            )
+//            Log.d("Recipe List", recipes.toString())
+            return recipes
+        } catch (e: Exception) {
+            throw Exception("Failed to get recipes, Bearer ${getToken()}", e)
+        }
+    }
+
+    override suspend fun getPersonalizedRecipeList(
+        limit: Int,
+        pageNumber: Int,
+        cookingTimeMin: Int?,
+        cookingTimeMax: Int?,
+        calorieMin: Int?,
+        calorieMax: Int?,
+        category: String?
+    ): List<Recipe> {
+        try {
+            // Use getToken function to retrieve the token
+            val recipes = api.getPersonalizedRecipes(
+                token = "Bearer ${getToken()}",
+                userId = getUserID(),
+                limit = limit,
+                pageNumber = pageNumber,
+                cookingTimeMin = cookingTimeMin,
+                cookingTimeMax = cookingTimeMax,
+                calorieMin = calorieMin,
+                calorieMax = calorieMax,
+                category = category
+            )
+            Log.d(
+                "Recipe List",
+                "limit:$limit, \npageno:$pageNumber, \nmincookingtime:$cookingTimeMin, \nmaxcookingtime:$cookingTimeMax, \nmincalorie:$calorieMin, \nmaxcalorie:$calorieMax, \ncategory:$category"
+            )
+            return recipes
+        } catch (e: Exception) {
+            throw Exception("Failed to get filtered recipes, Bearer ${getToken()}", e)
+        }
+    }
+
     override suspend fun getUserRecipeList(limit: Int, pageNumber: Int): List<Recipe> {
         try {
             // Use getToken function to retrieve the token
@@ -152,7 +231,6 @@ class FridgifyRepositoryImpl : FridgifyRepository {
             throw Exception("Failed to get saved recipes, Bearer ${getToken()}", e)
         }
     }
-
 
 
     override suspend fun getRecipeById(id: String): Recipe {
@@ -264,7 +342,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
     }
 
 
-    override suspend fun removeFood(ingredientIds:  List<Int>) {
+    override suspend fun removeFood(ingredientIds: List<Int>) {
         try {
             val request = FridgeApi.DeleteFoodRequest(ingredientIds)
             fridgeapi.removeFood(
@@ -296,12 +374,14 @@ class FridgifyRepositoryImpl : FridgifyRepository {
             val likedRecipes = api.getUserLikedRecipes(userId, token)
             return likedRecipes.map { it.id } // Extract only the `id` field
         } catch (e: Exception) {
-            Log.e("FridgifyRepositoryImpl", "Failed to fetch user liked recipes for userId: $userId", e)
+            Log.e(
+                "FridgifyRepositoryImpl",
+                "Failed to fetch user liked recipes for userId: $userId",
+                e
+            )
             throw Exception("Failed to fetch user liked recipes", e)
         }
     }
-
-
 
 
 }

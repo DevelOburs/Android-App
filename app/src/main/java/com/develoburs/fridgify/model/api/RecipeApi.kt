@@ -1,4 +1,5 @@
 package com.develoburs.fridgify.model.api
+
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.model.Recipe
 import com.develoburs.fridgify.model.createRecipe
@@ -17,6 +18,39 @@ interface RecipeApi {
         @Header("Authorization") token: String,
         @Query("limit") limit: Int,
         @Query("pageNumber") pageNumber: Int
+    ): List<Recipe>
+
+    @GET("recipe-api")
+    suspend fun getRecipes(
+        @Header("Authorization") token: String,
+        @Query("limit") limit: Int,
+        @Query("pageNumber") pageNumber: Int,
+        @Query("minCookingTime") cookingTimeMin: Int?,
+        @Query("maxCookingTime") cookingTimeMax: Int?,
+        @Query("minCalories") calorieMin: Int?,
+        @Query("maxCalories") calorieMax: Int?,
+        @Query("category") category: String?
+    ): List<Recipe>
+
+    @GET("recipe-api/personalized/{userId}")
+    suspend fun getPersonalizedRecipes(
+        @Header("Authorization") token: String,
+        @Path("userId") userId: Int,
+        @Query("limit") limit: Int,
+        @Query("pageNumber") pageNumber: Int
+    ): List<Recipe>
+
+    @GET("recipe-api/personalized/{userId}")
+    suspend fun getPersonalizedRecipes(
+        @Header("Authorization") token: String,
+        @Path("userId") userId: Int,
+        @Query("limit") limit: Int,
+        @Query("pageNumber") pageNumber: Int,
+        @Query("minCookingTime") cookingTimeMin: Int?,
+        @Query("maxCookingTime") cookingTimeMax: Int?,
+        @Query("minCalories") calorieMin: Int?,
+        @Query("maxCalories") calorieMax: Int?,
+        @Query("category") category: String?
     ): List<Recipe>
 
     @GET("recipe-api/like/userLikedRecipes")
