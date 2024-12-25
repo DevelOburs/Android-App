@@ -326,6 +326,16 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         }
     }
 
+    suspend fun deleteRecipe(id: String) {
+        try {
+            api.deleteRecipeById(id = id,token = "Bearer ${getToken()}")
+            Log.d("RecipeApi", "recipe deleted successfully")
+        } catch (e: Exception) {
+            Log.e("RecipeApi", "Failed to delete recipe", e)
+            throw Exception("Failed to delete recipe: ${e.message}", e)
+        }
+    }
+
     override suspend fun addFood(ingredientIds: List<Int>) {
         try {
             val request = FridgeApi.AddFoodRequest(ingredientIds)
@@ -340,8 +350,6 @@ class FridgifyRepositoryImpl : FridgifyRepository {
             throw Exception("Failed to add food: ${e.message}", e)
         }
     }
-
-
     override suspend fun removeFood(ingredientIds: List<Int>) {
         try {
             val request = FridgeApi.DeleteFoodRequest(ingredientIds)

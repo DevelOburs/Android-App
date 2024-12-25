@@ -311,6 +311,17 @@ class RecipeListViewModel(
         }
     }
 
+    fun deleteRecipe(id: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Add recipe to the repository
+                repository.deleteRecipe(id)
+            } catch (e: Exception) {
+                Log.e("RecipeListViewModel", "Failed to delete recipe", e)
+            }
+        }
+    }
+
     fun updateRecipe(id: Int, updatedRecipe: createRecipe) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -331,7 +342,7 @@ class RecipeListViewModel(
             try {
                 val foodList = repository.getRecipeIngredients(id)
                 _food.value = foodList
-                Log.d("ViewModel", "Recipe set to state: $recipe")
+                Log.d("ViewModel", "Recipe set to state: $food")
             } catch (e: Exception) {
                 Log.e("RecipeListViewModel", "Failed to fetch recipe detail", e)
             }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -30,12 +32,15 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -58,7 +63,8 @@ fun EditRecipeScreen(
     recipe: Recipe,
     repository: FridgifyRepositoryImpl,
     onSave: (Int, createRecipe) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onDelete: (String) -> Unit,
 ) {
     var name by remember { mutableStateOf(recipe.Name) }
     var description by remember { mutableStateOf(recipe.instructions) }
@@ -66,6 +72,11 @@ fun EditRecipeScreen(
     var cookingTime by remember { mutableStateOf(recipe.cookingTime) }
     var imageUrl by remember { mutableStateOf(recipe.Image ?: "") }
     var category by remember { mutableStateOf("APPETIZERS_AND_SNACKS") }
+
+    LaunchedEffect(recipe.id) {
+        viewModel.getRecipeIngredients(recipe.id)
+    }
+    val foods by viewModel.food.collectAsState()
 
     val categoryMap = mapOf(
         "ALL" to "All",
@@ -80,7 +91,7 @@ fun EditRecipeScreen(
     )
 
     val selectedItems = fviewModel.selectedFoods
-
+    //selectedItems += foods
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -213,7 +224,7 @@ fun EditRecipeScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier.height(200.dp)
                         ) {
-                            items(selectedItems) { food ->
+                            items(selectedItems+ foods ) { food ->
                                 FoodCard(
                                     food = food,
                                     onClick = {}
@@ -227,36 +238,63 @@ fun EditRecipeScreen(
                     }
                 }
 
-                // Save Button positioned at the bottom
-                Button(
-                    onClick = {
-                        val updatedRecipe = createRecipe(
-                            name = name,
-                            description = description,
-                            userId = repository.getUserID().toString(), // Replace with actual user ID
-                            userUsername = repository.getUserName(),
-                            userFirstName = repository.getUserName(),
-                            userLastName = repository.getUserName(),
-                            likeCount = recipe.Likes,
-                            commentCount = recipe.Comments,
-                            saveCount = recipe.saveCount,
-                            ingredients = recipe.ingredients?.plus(selectedItems.map { it.Name }),
-                            imageUrl = imageUrl ?: "deneme",
-                            category = category,
-                            calories = calories,
-                            cookingTime = cookingTime
-                        )
-                        // Debug log
-                        Log.d("RecipeUpdate", "Updated recipe: $updatedRecipe")
-                        selectedItems.clear()
-                        onSave(recipe.id.toInt(), updatedRecipe)
-
-                    },
+                Box(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(16.dp)
                 ) {
-                    Text(text = "Save Changes", style = MaterialTheme.typography.bodyLarge)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = com.develoburs.fridgify.ui.theme.BurgundyColor,
+                                contentColor = Color.White,
+                                disabledContainerColor = Color.White,
+                                disabledContentColor = Color.White
+                            ),
+                            onClick = {
+                                selectedItems.clear()
+                                onDelete(recipe.id)
+                            },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(text = "Delete Recipe", style = MaterialTheme.typography.bodyLarge)
+                        }
+                        Button(
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = com.develoburs.fridgify.ui.theme.BrightGreenColor,
+                                contentColor = Color.White,
+                                disabledContainerColor = Color.White,
+                                disabledContentColor = Color.White
+                            ),
+                            onClick = {
+                                val updatedRecipe = createRecipe(
+                                    name = name,
+                                    description = description,
+                                    userId = repository.getUserID().toString(),
+                                    userUsername = repository.getUserName(),
+                                    userFirstName = repository.getUserName(),
+                                    userLastName = repository.getUserName(),
+                                    likeCount = recipe.Likes,
+                                    commentCount = recipe.Comments,
+                                    saveCount = recipe.saveCount,
+                                    ingredients = recipe.ingredients?.plus(selectedItems.map { it.Name }),
+                                    imageUrl = imageUrl ?: "deneme",
+                                    category = category,
+                                    calories = calories,
+                                    cookingTime = cookingTime
+                                )
+                                Log.d("RecipeUpdate", "Updated recipe: $updatedRecipe")
+                                selectedItems.clear()
+                                onSave(recipe.id.toInt(), updatedRecipe)
+                            },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(text = "Save Changes", style = MaterialTheme.typography.bodyLarge)
+                        }
+                    }
                 }
             }
         }

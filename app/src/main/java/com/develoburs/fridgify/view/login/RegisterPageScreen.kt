@@ -1,25 +1,37 @@
 package com.develoburs.fridgify.view.login
 
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.Icons
-import androidx.compose.ui.graphics.Color
+import com.develoburs.fridgify.view.bottombar.BottomBarScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.develoburs.fridgify.R
+import com.develoburs.fridgify.ui.theme.DarkBlueColor
+import com.develoburs.fridgify.ui.theme.LightOrangeColor
+import com.develoburs.fridgify.ui.theme.OrangeColor
+import com.develoburs.fridgify.ui.theme.PaleWhiteColor
 import com.develoburs.fridgify.viewmodel.LoginViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel = viewModel()) {
     var username by remember { mutableStateOf("") }
@@ -41,17 +53,18 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
     ) {
         // Title Text
         Text(
-            text = "Register",
-            style = MaterialTheme.typography.labelMedium,
-            color = Color(0xFF6200EA),
+            text = stringResource(id = R.string.app_name),
+            style = MaterialTheme.typography.labelLarge,
+            color = OrangeColor,
             modifier = Modifier.padding(bottom = 32.dp)
         )
 
         // User Information Section
         Text(
             text = "User Information",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(vertical = 16.dp)
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(vertical = 16.dp),
+            color = DarkBlueColor
         )
 
         // First Name
@@ -59,6 +72,10 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
             value = firstName,
             onValueChange = { firstName = it },
             label = { Text(text = "First Name", style = MaterialTheme.typography.bodySmall) },
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = OrangeColor,
+                unfocusedBorderColor = LightOrangeColor
+            ),
             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
         )
 
@@ -67,6 +84,10 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
             value = lastName,
             onValueChange = { lastName = it },
             label = { Text(text = "Last Name", style = MaterialTheme.typography.bodySmall) },
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = OrangeColor,
+                unfocusedBorderColor = LightOrangeColor
+            ),
             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
         )
 
@@ -76,6 +97,10 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
             onValueChange = { email = it },
             label = { Text(text = "Email", style = MaterialTheme.typography.bodySmall) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = OrangeColor,
+                unfocusedBorderColor = LightOrangeColor
+            ),
             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
         )
 
@@ -85,14 +110,19 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
             onValueChange = { phoneNumber = it },
             label = { Text(text = "Phone Number", style = MaterialTheme.typography.bodySmall) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = OrangeColor,
+                unfocusedBorderColor = LightOrangeColor
+            ),
             modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
         )
 
         // Account Information Section
         Text(
             text = "Account Information",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(vertical = 16.dp)
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(vertical = 16.dp),
+            color = DarkBlueColor
         )
 
         // Username
@@ -100,6 +130,10 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
             value = username,
             onValueChange = { username = it },
             label = { Text(text = "Username", style = MaterialTheme.typography.bodySmall) },
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = OrangeColor,
+                unfocusedBorderColor = LightOrangeColor
+            ),
             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
         )
 
@@ -116,6 +150,10 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
                 }
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = OrangeColor,
+                unfocusedBorderColor = LightOrangeColor
+            ),
             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
         )
 
@@ -125,7 +163,6 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
                 viewModel.register(username, email, password, firstName, lastName) { response ->
                     registerResult = if (response.userId != -1) {
                         navController.navigate("login") {
-                            // Clear the back stack so the user can't return to the login screen
                             popUpTo("register") { inclusive = true }
                         }
                         "Welcome, ${response.username} (ID: ${response.userId})"
@@ -134,16 +171,20 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
                     }
                 }
             },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = OrangeColor,
+                contentColor = Color.White
+            ),
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
         ) {
-            Text(text = "Register", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Register", style = MaterialTheme.typography.titleMedium)
         }
 
         // Back to Login Button
         TextButton(
             onClick = { navController.navigate("login") }
         ) {
-            Text(text = "Already have an account? Login", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Already have an account? Login", style = MaterialTheme.typography.bodyMedium, color = OrangeColor)
         }
     }
 }

@@ -157,7 +157,10 @@ fun NavGraph(
                         recipeListViewModel.updateRecipe(id, updatedRecipe)
                         navController.popBackStack() // Navigates back to the previous screen
                     },
-                    onBack = { navController.popBackStack() }
+                    onBack = { navController.popBackStack() },
+                    onDelete = { id: String ->
+                                recipeListViewModel.deleteRecipe(id)
+                                navController.popBackStack() }
                 )
             } else {
                 // Show a loading indicator while waiting for the recipe
