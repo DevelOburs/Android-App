@@ -131,19 +131,39 @@ fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = v
                 Text(text = "Login", style = MaterialTheme.typography.titleMedium, color = Color.White)
             }
         }
-        // Error dialog
         if (isErrorDialogVisible) {
             AlertDialog(
                 onDismissRequest = { isErrorDialogVisible = false },
-                title = { Text(text = "Error", style = MaterialTheme.typography.titleLarge) },
-                text = { Text(text = loginResult ?: "Unknown error occurred.") },
+                title = {
+                    Text(
+                        text = "Error",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Color.White
+                    )
+                },
+                text = {
+                    Text(
+                        text = loginResult ?: "Unknown error occurred.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White
+                    )
+                },
                 confirmButton = {
-                    Button(onClick = { isErrorDialogVisible = false }) {
-                        Text("OK")
+                    Button(
+                        onClick = { isErrorDialogVisible = false },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = OrangeColor,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("OK", style = MaterialTheme.typography.bodyMedium)
                     }
-                }
+                },
+                containerColor = LightOrangeColor, // Optional: background color for dialog
+                tonalElevation = 4.dp
             )
         }
+
 
         Spacer(modifier = Modifier.height(8.dp))
 
