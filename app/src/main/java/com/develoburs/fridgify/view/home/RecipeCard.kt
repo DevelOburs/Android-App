@@ -36,6 +36,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.DarkBlueColor
 import com.develoburs.fridgify.ui.theme.DarkerBlueColor
@@ -67,9 +68,12 @@ fun RecipeCard(
             .fillMaxSize()
             .clip(RoundedCornerShape(cornerRadius))) {
             Image(
-                painter = rememberAsyncImagePainter(
-                    model = recipe.Image ?: R.drawable.menu_book,
-                    error = painterResource(R.drawable.menu_book)
+                painter = rememberImagePainter(
+                    data = recipe.Image ?: R.drawable.menu_book,
+                    builder = {
+                        crossfade(true) // Enable crossfade transition
+                        error(R.drawable.menu_book) // Set error placeholder
+                    }
                 ),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(cornerRadius)),

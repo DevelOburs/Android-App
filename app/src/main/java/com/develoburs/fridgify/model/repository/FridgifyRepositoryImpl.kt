@@ -5,23 +5,17 @@ import android.net.Uri
 import android.util.Log
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.model.Recipe
-import com.develoburs.fridgify.model.api.CloudinaryResponse
 import com.develoburs.fridgify.model.api.RetrofitInstance.api
 import com.develoburs.fridgify.model.api.RetrofitInstance.fridgeapi
 
 import com.develoburs.fridgify.model.api.FridgeApi
-import com.develoburs.fridgify.model.api.RetrofitInstance
-import com.develoburs.fridgify.model.api.RetrofitInstance.cloudinaryApi
 import com.develoburs.fridgify.model.createRecipe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import java.io.File
+
 import com.cloudinary.Cloudinary
 import com.cloudinary.utils.ObjectUtils
+
 class FridgifyRepositoryImpl : FridgifyRepository {
 
     private var token: String = ""
