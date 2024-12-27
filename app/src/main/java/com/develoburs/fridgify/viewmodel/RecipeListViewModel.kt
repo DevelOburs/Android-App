@@ -1,6 +1,11 @@
 package com.develoburs.fridgify.viewmodel
 
+import android.app.Application
+import android.content.Context
+import android.net.Uri
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.develoburs.fridgify.model.Recipe
@@ -12,6 +17,7 @@ import kotlinx.coroutines.launch
 import androidx.navigation.NavController
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.model.createRecipe
+import kotlinx.coroutines.flow.asStateFlow
 
 class RecipeListViewModel(
     private val navController: NavController,
@@ -51,6 +57,9 @@ class RecipeListViewModel(
 
     private val _userLikeCount = MutableStateFlow<Int?>(null)
     val userLikeCount: StateFlow<Int?> get() = _userLikeCount
+
+    private val _imageUrl = MutableStateFlow<String?>(null)
+    val imageUrl: StateFlow<String?> get() = _imageUrl
 
     private val tag = "RecipeListViewModel"
 
@@ -321,6 +330,19 @@ class RecipeListViewModel(
             }
         }
     }
+
+    fun uploadImage(uri: Uri) {
+        viewModelScope.launch {
+            try {
+                // Assuming you want to directly update the LiveData with the URI
+                _imageUrl.value = uri.toString() // Convert URI to string if needed for the LiveData
+
+            } catch (e: Exception) {
+                Log.e("RecipeViewModel", "Image upload failed", e)
+            }
+        }
+    }
+
 
     fun updateRecipe(id: Int, updatedRecipe: createRecipe) {
         viewModelScope.launch(Dispatchers.IO) {

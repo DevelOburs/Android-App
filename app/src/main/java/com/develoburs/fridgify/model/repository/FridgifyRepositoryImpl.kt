@@ -1,5 +1,7 @@
 package com.develoburs.fridgify.model.repository
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.model.Recipe
@@ -8,6 +10,11 @@ import com.develoburs.fridgify.model.api.RetrofitInstance.fridgeapi
 
 import com.develoburs.fridgify.model.api.FridgeApi
 import com.develoburs.fridgify.model.createRecipe
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+import com.cloudinary.Cloudinary
+import com.cloudinary.utils.ObjectUtils
 
 class FridgifyRepositoryImpl : FridgifyRepository {
 
@@ -64,6 +71,19 @@ class FridgifyRepositoryImpl : FridgifyRepository {
 
     fun getUserEmail(): String {
         return email
+    }
+
+
+    suspend fun uploadImageToCloudinary(filePath: String): String {
+        val cloudinary = Cloudinary("cloudinary://149264464184652:3qops1ZjNi57WJpFh7ooMHJ2rwQ@deqoujrau")
+        return withContext(Dispatchers.IO) {
+            try {
+                val uploadResult = cloudinary.uploader().upload(filePath, ObjectUtils.emptyMap())
+                uploadResult["secure_url"] as String // Returns the URL of the uploaded image
+            } catch (e: Exception) {
+                throw RuntimeException("Failed to upload image to Cloudinary", e)
+            }
+        }
     }
 
     suspend fun getUserLikeCount(): Int {
