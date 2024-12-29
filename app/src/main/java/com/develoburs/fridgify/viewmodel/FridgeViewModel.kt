@@ -29,6 +29,7 @@ class FridgeViewModel(private val repository: FridgifyRepositoryImpl) : ViewMode
 
     init {
         getFoodList()
+
         getAllFoodList()
     }
 
@@ -38,7 +39,6 @@ class FridgeViewModel(private val repository: FridgifyRepositoryImpl) : ViewMode
                 val foodList = repository.getFoodList(category)
                 _allfood.value = foodList
             } catch (e: Exception) {
-                Log.e("FridgeViewModel", "Failed to fetch food list", e)
             }
         }
     }
@@ -48,10 +48,11 @@ class FridgeViewModel(private val repository: FridgifyRepositoryImpl) : ViewMode
             try {
                 val foodList = repository.getFoodList(category)
                 _food.value = foodList
+                _food.emit(foodList)
+
                 Log.d("API_CALL", "Category sent: $category")
                 Log.d("API_RESPONSE", "Response: $_food")
             } catch (e: Exception) {
-                Log.e("FridgeViewModel", "Failed to fetch food list", e)
             }
         }
     }
@@ -60,12 +61,10 @@ class FridgeViewModel(private val repository: FridgifyRepositoryImpl) : ViewMode
             try {
                 val notInFridgeFoodList = repository.getNotInFridge(category)
                 _notInFridgeFood.value = notInFridgeFoodList
+                _notInFridgeFood.emit(notInFridgeFoodList)
                 Log.d("API_CALL", "Category sent: $category")
                 Log.d("API_RESPONSE", "Response: $_notInFridgeFood")
             } catch (e: Exception) {
-                Log.d("API_CALL", "Category sent: $category")
-                Log.d("API_RESPONSE", "Response: $_notInFridgeFood")
-                Log.e("FridgeViewModel", "Failed to fetch not in fridge food list", e)
             }
         }
     }
@@ -81,7 +80,6 @@ class FridgeViewModel(private val repository: FridgifyRepositoryImpl) : ViewMode
                 Log.d("FridgeViewModel", "Food added successfully")
                 getFoodList()
             } catch (e: Exception) {
-                Log.e("FridgeViewModel", "Failed to add food", e)
             }
         }
     }
@@ -98,7 +96,6 @@ class FridgeViewModel(private val repository: FridgifyRepositoryImpl) : ViewMode
                 repository.removeFood(ingredientIds)
                 getFoodList()
             } catch (e: Exception) {
-                Log.e("FridgeViewModel", "Failed to remove food", e)
             }
         }
     }

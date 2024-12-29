@@ -3,6 +3,7 @@ package com.develoburs.fridgify.view.fridge
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 
 import androidx.compose.foundation.clickable
@@ -29,6 +30,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -46,37 +48,29 @@ import androidx.navigation.NavController
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.BlackColor
 import com.develoburs.fridgify.ui.theme.CreamColor2
+import com.develoburs.fridgify.ui.theme.DarkOrangeColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
 import com.develoburs.fridgify.viewmodel.FridgeViewModel
 import com.develoburs.fridgify.viewmodel.LoginViewModel
+import kotlinx.coroutines.delay
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = viewModel()) {
     val allFoods by viewModel.food.collectAsState(initial = emptyList())
     var searchQuery by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf("All") }
+    var isLoading by remember { mutableStateOf(true) }
+
     fun formatCategoryForApi(category: String): String {
         return category.uppercase().replace(" ", "_")
     }
-    val categories = listOf(
-        "All",
-        "Produce",
-        "Dairy and Eggs",
-        "Meat and Proteins",
-        "Baking and Pantry",
-        "Canned and Preserved Foods",
-        "Beverages and Sweeteners",
-        "Nuts Seeds and Legumes",
-        "Grains and Cereals"
-    )
-
-
 
     LaunchedEffect(Unit) {
+        isLoading = true
         viewModel.getFoodList()
-    }
-
-    val filteredFoods = remember(searchQuery, allFoods) {
-        allFoods.filter { it.Name.contains(searchQuery, ignoreCase = true) }
+        delay(3000)
+        isLoading = false
     }
 
     Scaffold(
@@ -97,61 +91,83 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
         },
         content = { paddingValues ->
             Surface(modifier = Modifier.fillMaxSize()) {
-                Column(
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .padding(top = 21.dp)
-                ) {
-                    TextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        placeholder = { Text(text = "Search", style = MaterialTheme.typography.titleMedium) },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color(0xFFFFE4B5)
-                        )
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        categories.forEach { category ->
-                            Box(
-                                modifier = Modifier
-                                    .height(35.dp)
-                                    .background(color = OrangeColor, shape = MaterialTheme.shapes.medium)
-                                    .clickable {
-                                        val formattedCategory = if (category == "All") null else formatCategoryForApi(category)
-                                        viewModel.getFoodList(formattedCategory)
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = category,
-                                    color = BlackColor,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.padding(horizontal = 16.dp)
-                                )
-                            }
-                        }
-                    }
+                if (isLoading) {
 
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize(),
+                        modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
+                        CircularProgressIndicator(color = OrangeColor)
+                    }
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .padding(paddingValues)
+                            .padding(top = 21.dp)
+                    ) {
+                        TextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            placeholder = { Text(text = "Search", style = MaterialTheme.typography.titleMedium) },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = TextFieldDefaults.textFieldColors(
+                                containerColor = Color(0xFFFFE4B5)
+                            )
+                        )
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .horizontalScroll(rememberScrollState()),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            val categories = listOf(
+                                "All",
+                                "Produce",
+                                "Dairy and Eggs",
+                                "Meat and Proteins",
+                                "Baking and Pantry",
+                                "Canned and Preserved Foods",
+                                "Beverages and Sweeteners",
+                                "Nuts Seeds and Legumes",
+                                "Grains and Cereals"
+                            )
+                            categories.forEach { category ->
+                                val isSelected = selectedCategory == category
+                                Box(
+                                    modifier = Modifier
+                                        .height(35.dp)
+                                        .background(
+                                            color = if (isSelected) DarkOrangeColor else OrangeColor,
+                                            shape = MaterialTheme.shapes.medium
+                                        )
+                                        .clickable {
+                                            selectedCategory = category
+                                            val formattedCategory = if (category == "All") null else formatCategoryForApi(category)
+                                            isLoading = true
+                                            viewModel.getFoodList(formattedCategory)
+                                            isLoading = false
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = category,
+                                        color = if (isSelected) BlackColor else Color.White,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.padding(horizontal = 16.dp)
+                                    )
+                                }
+                            }
+                        }
+
                         LazyVerticalGrid(
                             columns = GridCells.Fixed(4),
                             contentPadding = PaddingValues(8.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            items(filteredFoods) { food ->
+                            items(allFoods.filter { it.Name.contains(searchQuery, ignoreCase = true) }) { food ->
                                 FoodCard(food = food, onClick = {})
                             }
                             item {

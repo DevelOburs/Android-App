@@ -25,6 +25,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,11 +43,13 @@ import com.develoburs.fridgify.R
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.ui.theme.BlackColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
+import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = viewModel() ,onBack: () -> Unit) {
+    var isLoading by remember { mutableStateOf(true) }
 
 
     val selectedItems = remember { mutableStateListOf<Food>() }
@@ -61,8 +64,6 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
     )
     if (allFoods.isEmpty()) {
         viewModel.getFoodList()
-
-
     }
     fun formatCategoryForApi(category: String): String {
         return category.uppercase().replace(" ", "_")
@@ -73,7 +74,10 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
         allFoods.filter { it.Name.contains(searchQuery, ignoreCase = true) }
     }
     LaunchedEffect(Unit) {
-        viewModel.getFoodList()
+        isLoading = true
+        viewModel.getNotInFridgeFood()
+        delay(2000)
+        isLoading = false
     }
     Scaffold(
         topBar = {
@@ -100,8 +104,18 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                 modifier = Modifier.height(50.dp)
             )
         },
+
         content = { paddingValues ->
             Surface(modifier = Modifier.fillMaxSize()) {
+                if (isLoading) {
+
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = OrangeColor)
+                    }
+                }else {
                 Image(
                     painter = painterResource(id = R.drawable.background_image),
                     contentDescription = null,
@@ -189,8 +203,6 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                                             }
                                         }
                                     )
-
-
                                 }
                             }
                         }
@@ -229,7 +241,7 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
 
                 }
             }
-        }
+        }}
     )
 
 
