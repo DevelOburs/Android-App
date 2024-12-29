@@ -160,14 +160,12 @@ class FridgifyRepositoryImpl : FridgifyRepository {
 
     override suspend fun getPersonalizedRecipeList(limit: Int, pageNumber: Int): List<Recipe> {
         try {
-            // Use getToken function to retrieve the token
             val recipes = api.getPersonalizedRecipes(
                 token = "Bearer ${getToken()}",
                 userId = getUserID(),
                 limit = limit,
                 pageNumber = pageNumber
             )
-//            Log.d("Recipe List", recipes.toString())
             return recipes
         } catch (e: Exception) {
             throw Exception("Failed to get recipes, Bearer ${getToken()}", e)

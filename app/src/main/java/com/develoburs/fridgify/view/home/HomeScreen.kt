@@ -71,10 +71,6 @@ fun HomeScreen(navController: NavController, viewModel: RecipeListViewModel = vi
 
     var showFilterSheet by remember { mutableStateOf(false) }
 
-//    if (allRecipes.value.isEmpty()) {
-//        with(viewModel) { getPersonalizedRecipes() }
-//    }
-
     var hasLoaded = viewModel.hasLoaded.collectAsState()
 
     LaunchedEffect(key1 = hasLoaded.value) {
