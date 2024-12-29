@@ -57,21 +57,24 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = viewModel()) {
-    val allFoods by viewModel.food.collectAsState(initial = emptyList())
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("All") }
-    var isLoading by remember { mutableStateOf(true) }
+    val isLoading by viewModel.isLoading.collectAsState()
 
     fun formatCategoryForApi(category: String): String {
         return category.uppercase().replace(" ", "_")
     }
 
     LaunchedEffect(Unit) {
-        isLoading = true
         viewModel.getFoodList()
-        delay(3000)
-        isLoading = false
     }
+    LaunchedEffect(isLoading) {
+        if (isLoading) {
+            viewModel.getFoodList()
+        }
+    }
+    val allFoods by viewModel.food.collectAsState(initial = emptyList())
+
 
     Scaffold(
         topBar = {
@@ -145,9 +148,7 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
                                         .clickable {
                                             selectedCategory = category
                                             val formattedCategory = if (category == "All") null else formatCategoryForApi(category)
-                                            isLoading = true
                                             viewModel.getFoodList(formattedCategory)
-                                            isLoading = false
                                         },
                                     contentAlignment = Alignment.Center
                                 ) {

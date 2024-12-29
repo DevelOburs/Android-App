@@ -1,5 +1,4 @@
 package com.develoburs.fridgify.view.fridge
-
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -15,8 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.develoburs.fridgify.viewmodel.FridgeViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,7 +28,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
@@ -43,20 +39,21 @@ import com.develoburs.fridgify.R
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.ui.theme.BlackColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
-import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = viewModel() ,onBack: () -> Unit) {
-    var isLoading by remember { mutableStateOf(true) }
 
+    val isLoading by viewModel.isLoading.collectAsState()
 
     val selectedItems = remember { mutableStateListOf<Food>() }
     var displaySelectedItems by remember { mutableStateOf("") }
     val allFoods by viewModel.food.collectAsState(initial = emptyList())
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf<String?>(null) }
+    var addTriggered by remember { mutableStateOf(false) }
+
     val categories = listOf(
         "All", "Produce", "Dairy and Eggs", "Meat and Proteins",
         "Baking and Pantry", "Canned and Preserved Foods",
@@ -74,10 +71,13 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
         allFoods.filter { it.Name.contains(searchQuery, ignoreCase = true) }
     }
     LaunchedEffect(Unit) {
-        isLoading = true
-        viewModel.getNotInFridgeFood()
-        delay(2000)
-        isLoading = false
+        viewModel.getFoodList()
+
+    }
+    LaunchedEffect(isLoading, addTriggered) {
+        if (addTriggered && !isLoading) {
+            navController.popBackStack()
+        }
     }
     Scaffold(
         topBar = {
@@ -218,9 +218,9 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                             Text(text = "Exit", style = MaterialTheme.typography.labelMedium)
                         }
                         Button(onClick = {
+                            addTriggered = true
                             val ingredientIds = selectedItems.mapNotNull { it.id }
 
-                            Log.d("DeleteScreen", "Ingredient IDs: $ingredientIds")
 
                             viewModel.removeFood(ingredientIds)
                             viewModel.getFoodList()
@@ -228,12 +228,20 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                             displaySelectedItems = selectedItems.joinToString(", ") { it.Name }
                             selectedItems.clear()
 
-                            Log.d("DeleteScreen", "Sent ingredient IDs: $ingredientIds")
 
                             navController.popBackStack()
-                        }) {
-                            Text(text = "Delete", style = MaterialTheme.typography.labelMedium)
-                        }
+                        } ,
+                            modifier = Modifier.height(40.dp),
+                            enabled = !isLoading
+                        ) {
+                            if (isLoading && addTriggered) {
+                                CircularProgressIndicator(
+                                    color = Color.White,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            } else {
+                                Text(text = "Delete", style = MaterialTheme.typography.labelMedium)
+                            }                        }
 
 
                     }

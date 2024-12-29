@@ -15,8 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.develoburs.fridgify.viewmodel.FridgeViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,7 +30,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
@@ -44,7 +41,6 @@ import com.develoburs.fridgify.R
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.ui.theme.BlackColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
-import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,7 +48,6 @@ import kotlinx.coroutines.delay
 fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = viewModel() ,onBack: () -> Unit) {
 
     val allFoods by viewModel.notInFridgeFood.collectAsState(initial = emptyList())
-    var isLoading by remember { mutableStateOf(true) }
 
     var searchQuery by remember { mutableStateOf("") }
     val selectedItems = remember { mutableStateListOf<Food>() }
@@ -61,6 +56,8 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
         "Baking and Pantry", "Canned and Preserved Foods",
         "Beverages and Sweeteners", "Nuts Seeds and Legumes", "Grains and Cereals"
     )
+    val isLoading by viewModel.isLoading.collectAsState()
+
     var displaySelectedItems by remember { mutableStateOf("") }
     if (allFoods.isEmpty()) {
         viewModel.getNotInFridgeFood()
@@ -74,10 +71,15 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
         allFoods.filter { it.Name.contains(searchQuery, ignoreCase = true) }
     }
     LaunchedEffect(Unit) {
-        isLoading = true
+
         viewModel.getNotInFridgeFood()
-        delay(2000)
-        isLoading = false
+    }
+    var addTriggered by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isLoading, addTriggered) {
+        if (addTriggered && !isLoading) {
+            navController.popBackStack()
+        }
     }
     Scaffold(
         topBar = {
@@ -217,24 +219,29 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
                         Button(onClick = { navController.popBackStack() },modifier = Modifier.height(40.dp)) {
                             Text(text = "Exit", style = MaterialTheme.typography.labelMedium)
                         }
-                        Button(onClick = {
-                            val ingredientIds = selectedItems.mapNotNull { it.id }
+                        Button(
+                            onClick = {
+                                val ingredientIds = selectedItems.mapNotNull { it.id }
+                                addTriggered = true
+                                if (ingredientIds.isNotEmpty()) {
+                                    viewModel.addFood(ingredientIds)
+                                    viewModel.getNotInFridgeFood()
+                                    displaySelectedItems = selectedItems.joinToString(", ") { it.Name }
+                                    selectedItems.clear()
+                                }
+                            },
+                            modifier = Modifier.height(40.dp),
+                            enabled = !isLoading
 
-                            Log.d("AddingScreen", "Ingredient IDs: $ingredientIds")
-
-                            viewModel.addFood(ingredientIds)
-                            viewModel.getNotInFridgeFood()
-
-                            displaySelectedItems = selectedItems.joinToString(", ") { it.Name }
-                            selectedItems.clear()
-
-                            Log.d("AddingScreen", "Sent ingredient IDs: $ingredientIds")
-
-                            navController.popBackStack()
-
-                        },modifier = Modifier.height(40.dp)
                         ) {
-                            Text(text = "Add", style = MaterialTheme.typography.labelMedium)
+                            if (isLoading && addTriggered) {
+                                CircularProgressIndicator(
+                                    color = Color.White,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            } else {
+                                Text(text = "Add", style = MaterialTheme.typography.labelMedium)
+                            }
                         }
 
 
