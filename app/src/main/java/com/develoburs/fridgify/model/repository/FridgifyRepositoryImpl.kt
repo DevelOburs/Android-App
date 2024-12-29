@@ -266,7 +266,21 @@ class FridgifyRepositoryImpl : FridgifyRepository {
     }
 
 
+    /*
+        private val mockFoods = listOf(
+            Food(
+                id = 1, Name = "Radish", ImageUrl = "Radish", Category =
+            ),
+            Food(id = 2, Name = "Blueberry", ImageUrl = "Blueberry"),
+            Food(id = 3, Name = "Guava", ImageUrl = "Guava"),
+            Food(id = 4, Name = "Mushroom", ImageUrl = "Mushroom"),
+            Food(id = 5, Name = "Kiwi", ImageUrl = "Kiwi"),
+            Food(id = 6, Name = "Raspberry", ImageUrl = "Raspberry"),
+            Food(id = 7, Name = "Avocado", ImageUrl = "Avocado"),
+            Food(id = 8, Name = "Papaya", ImageUrl = "Papaya"),
+            Food(id = 9, Name = "Zucchini", ImageUrl = "Zucchini"),
 
+        )*/
 
     suspend fun addRecipe(recipe: createRecipe) {
         try {
@@ -299,24 +313,37 @@ class FridgifyRepositoryImpl : FridgifyRepository {
 
     override suspend fun getFoodList(category: String?): List<Food> {
         try {
+            Log.d("API_CALL", "getFoodList - Formatted Category: $category")
+
             val foods = fridgeapi.getFood(
                 token = "Bearer ${getToken()}",
                 userId = getUserID(),
                 category = if (category == null) null else listOf(category)
+
             )
+            Log.d("API_CALL", "getFoodList - Formatted Category: $category")
+
+
             return foods
         } catch (e: Exception) {
+
             throw Exception("Failed to fetch food list", e)
         }
     }
 
     override suspend fun getNotInFridge(category: String?): List<Food> {
+        try {
             val foods = fridgeapi.getNotInFridge(
                 "Bearer ${getToken()}",
                 userId = getUserID(),
                 category = if (category == null) null else listOf(category)
             )
+            Log.d("Not In Fridge Food List", foods.toString())
             return foods
+        } catch (e: Exception) {
+            Log.e("FridgifyRepositoryImpl", "Failed to get not in fridge foods", e)
+            throw Exception("Failed to get not in fridge foods", e)
+        }
     }
 
     suspend fun deleteRecipe(id: String) {
@@ -324,11 +351,13 @@ class FridgifyRepositoryImpl : FridgifyRepository {
             api.deleteRecipeById(id = id,token = "Bearer ${getToken()}")
             Log.d("RecipeApi", "recipe deleted successfully")
         } catch (e: Exception) {
-
+            Log.e("RecipeApi", "Failed to delete recipe", e)
+            throw Exception("Failed to delete recipe: ${e.message}", e)
         }
     }
 
     override suspend fun addFood(ingredientIds: List<Int>) {
+        try {
             val request = FridgeApi.AddFoodRequest(ingredientIds)
             fridgeapi.addFood(
                 token = "Bearer ${getToken()}",
@@ -336,8 +365,13 @@ class FridgifyRepositoryImpl : FridgifyRepository {
                 ingredientIds = request
             )
             Log.d("FridgifyRepositoryImpl", "Food added successfully")
+        } catch (e: Exception) {
+            Log.e("FridgifyRepositoryImpl", "Failed to add food", e)
+            throw Exception("Failed to add food: ${e.message}", e)
+        }
     }
     override suspend fun removeFood(ingredientIds: List<Int>) {
+        try {
             val request = FridgeApi.DeleteFoodRequest(ingredientIds)
             fridgeapi.removeFood(
                 "Bearer ${getToken()}",
@@ -345,6 +379,10 @@ class FridgifyRepositoryImpl : FridgifyRepository {
                 ingredientIds = request
             )
             Log.d("FridgifyRepositoryImpl", "Food removed successfully")
+        } catch (e: Exception) {
+            Log.e("FridgifyRepositoryImpl", "Failed to remove food", e)
+            throw Exception("Failed to remove food", e)
+        }
     }
 
     override suspend fun likeRecipe(recipeId: String, userId: String) {
