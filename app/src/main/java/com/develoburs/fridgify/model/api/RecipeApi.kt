@@ -1,5 +1,6 @@
 package com.develoburs.fridgify.model.api
 
+import com.develoburs.fridgify.model.Comment
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.model.Recipe
 import com.develoburs.fridgify.model.createRecipe
@@ -129,4 +130,45 @@ interface RecipeApi {
         @Query("userId") userId: String,
         @Header("Authorization") token: String
     )
+
+    @GET("recipe-api/save/list/{userId}")
+    suspend fun getUserSavedRecipes(
+        @Path("userId") userId: String,
+        @Header("Authorization") token: String
+    ): List<Recipe>
+
+    @GET("recipe-api/save/{recipeId}/{userId}")
+    suspend fun saveRecipe(
+        @Path("recipeId") recipeId: String,
+        @Path("userId") userId: String,
+        @Header("Authorization") token: String
+    )
+
+    @GET("recipe-api/save/{recipeId}/count")
+    suspend fun getSaveCount(
+        @Path("recipeId") recipeId: String
+    ): Int
+
+    @GET("recipe-api/comment/{recipeId}")
+    suspend fun getComments(
+        @Path("recipeId") recipeId: String,
+        @Header("Authorization") token: String
+    ): List<Comment>
+
+    @POST("recipe-api/comment/{recipeId}")
+    suspend fun addComment(
+        @Path("recipeId") recipeId: String,
+        @Query("userId") userId: String,
+        @Body comment: Comment,
+        @Header("Authorization") token: String
+    )
+
+    @DELETE("recipe-api/comment/recipes/{recipeId}/comments/{commentId}")
+    suspend fun deleteComment(
+        @Path("recipeId") recipeId: String,
+        @Path("commentId") commentId: String,
+        @Query("userId") userId: String,
+        @Header("Authorization") token: String
+    )
+
 }

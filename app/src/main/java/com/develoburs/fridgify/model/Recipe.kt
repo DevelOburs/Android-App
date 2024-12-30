@@ -36,7 +36,6 @@ data class Recipe(
 
     val calories: Int?,
 
-
     val cookingTime: Int?,
 
     val saveCount: Int?
@@ -87,4 +86,25 @@ data class createRecipe(
 
     @SerializedName("cookingTime")
     val cookingTime: Int? // Added to match schema
+)
+
+// Comment data class to represent each comment
+data class Comment(
+    @SerializedName("id")
+    val id: String? = null, // Matches the JSON key "id"
+
+    @SerializedName("recipeId")
+    val recipeId: String,
+
+    @SerializedName("userId")
+    val userId: String,
+
+    @SerializedName("username")
+    val username: String? = null,
+
+    @SerializedName("comment")
+    val comment: String,
+
+    @SerializedName("createdAt")
+    val createdAt: String? = null // Matches the JSON key "createdAt"
 )
