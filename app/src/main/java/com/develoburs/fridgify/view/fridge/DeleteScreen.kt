@@ -1,5 +1,4 @@
 package com.develoburs.fridgify.view.fridge
-
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -15,8 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.develoburs.fridgify.viewmodel.FridgeViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,12 +22,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
@@ -41,6 +38,7 @@ import androidx.navigation.NavController
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.ui.theme.BlackColor
+import com.develoburs.fridgify.ui.theme.DarkOrangeColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
 
 
@@ -48,12 +46,16 @@ import com.develoburs.fridgify.ui.theme.OrangeColor
 @Composable
 fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = viewModel() ,onBack: () -> Unit) {
 
+    val isLoading by viewModel.isLoading.collectAsState()
 
     val selectedItems = remember { mutableStateListOf<Food>() }
     var displaySelectedItems by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf("All") }
+
     val allFoods by viewModel.food.collectAsState(initial = emptyList())
     var searchQuery by remember { mutableStateOf("") }
-    var selectedCategory by remember { mutableStateOf<String?>(null) }
+    var addTriggered by remember { mutableStateOf(false) }
+
     val categories = listOf(
         "All", "Produce", "Dairy and Eggs", "Meat and Proteins",
         "Baking and Pantry", "Canned and Preserved Foods",
@@ -61,8 +63,6 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
     )
     if (allFoods.isEmpty()) {
         viewModel.getFoodList()
-
-
     }
     fun formatCategoryForApi(category: String): String {
         return category.uppercase().replace(" ", "_")
@@ -74,6 +74,14 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
     }
     LaunchedEffect(Unit) {
         viewModel.getFoodList()
+
+    }
+    LaunchedEffect(isLoading, addTriggered) {
+        if (addTriggered && !isLoading) {
+            navController.navigate("FridgeScreen") {
+                popUpTo("DeleteScreen") { inclusive = true }
+            }
+        }
     }
     Scaffold(
         topBar = {
@@ -100,8 +108,18 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                 modifier = Modifier.height(50.dp)
             )
         },
+
         content = { paddingValues ->
             Surface(modifier = Modifier.fillMaxSize()) {
+                if (isLoading) {
+
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = OrangeColor)
+                    }
+                }else {
                 Image(
                     painter = painterResource(id = R.drawable.background_image),
                     contentDescription = null,
@@ -124,33 +142,48 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                         )
                     )
                     Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                                .horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                    categories.forEach { category ->
-                        Box(
-                            modifier = Modifier
-                                .height(35.dp)
-                                .background(color = OrangeColor, shape = MaterialTheme.shapes.medium)
-                                .clickable {
-                                    val formattedCategory = if (category == "All") null else formatCategoryForApi(category)
-                                    viewModel.getFoodList(formattedCategory)
-
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = category,
-                                color = BlackColor,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.padding(horizontal = 16.dp)
-                            )
+                        val categories = listOf(
+                            "All",
+                            "Produce",
+                            "Dairy and Eggs",
+                            "Meat and Proteins",
+                            "Baking and Pantry",
+                            "Canned and Preserved Foods",
+                            "Beverages and Sweeteners",
+                            "Nuts Seeds and Legumes",
+                            "Grains and Cereals"
+                        )
+                        categories.forEach { category ->
+                            val isSelected = selectedCategory == category
+                            Box(
+                                modifier = Modifier
+                                    .height(35.dp)
+                                    .background(
+                                        color = if (isSelected) DarkOrangeColor else OrangeColor,
+                                        shape = MaterialTheme.shapes.medium
+                                    )
+                                    .clickable {
+                                        selectedCategory = category
+                                        val formattedCategory = if (category == "All") null else formatCategoryForApi(category)
+                                        viewModel.getFoodList(formattedCategory)
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = category,
+                                    color = if (isSelected) BlackColor else Color.White,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                )
+                            }
                         }
                     }
-                }
 
 
                     Box(
@@ -189,8 +222,6 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                                             }
                                         }
                                     )
-
-
                                 }
                             }
                         }
@@ -205,31 +236,37 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                         Button(onClick = { navController.popBackStack() }) {
                             Text(text = "Exit", style = MaterialTheme.typography.labelMedium)
                         }
-                        Button(onClick = {
-                            val ingredientIds = selectedItems.mapNotNull { it.id }
+                        Button(
+                            onClick = {
+                                val ingredientIds = selectedItems.mapNotNull { it.id }
+                                addTriggered = true
+                                if (ingredientIds.isNotEmpty()) {
+                                    viewModel.removeFood(ingredientIds)
+                                    viewModel.getFoodList()
+                                    displaySelectedItems = selectedItems.joinToString(", ") { it.Name }
+                                    selectedItems.clear()
+                                }
 
-                            Log.d("DeleteScreen", "Ingredient IDs: $ingredientIds")
+                            },
+                            modifier = Modifier.height(40.dp),
+                            enabled = !isLoading
 
-                            viewModel.removeFood(ingredientIds)
-                            viewModel.getFoodList()
-
-                            displaySelectedItems = selectedItems.joinToString(", ") { it.Name }
-                            selectedItems.clear()
-
-                            Log.d("DeleteScreen", "Sent ingredient IDs: $ingredientIds")
-
-                            navController.popBackStack()
-                        }) {
-                            Text(text = "Delete", style = MaterialTheme.typography.labelMedium)
+                        ) {
+                            if (isLoading && addTriggered) {
+                                CircularProgressIndicator(
+                                    color = Color.White,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            } else {
+                                Text(text = "Delete", style = MaterialTheme.typography.labelMedium)
+                            }
                         }
-
-
                     }
 
 
                 }
             }
-        }
+        }}
     )
 
 

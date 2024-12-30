@@ -37,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,17 +61,23 @@ import com.develoburs.fridgify.ui.theme.CreamColor
 import com.develoburs.fridgify.ui.theme.CreamColor2
 import com.develoburs.fridgify.ui.theme.LightCoffee
 import com.develoburs.fridgify.ui.theme.OrangeColor
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController, viewModel: RecipeListViewModel = viewModel()) {
     val allRecipes = viewModel.recipe.collectAsState(initial = emptyList())
-    val isLoading by viewModel.isLoading.collectAsState()
+    val isLoading = viewModel.isLoading.collectAsState()
 
     var showFilterSheet by remember { mutableStateOf(false) }
 
-    if (allRecipes.value.isEmpty()) {
-        with(viewModel) { getPersonalizedRecipes() }
+    val hasLoaded = viewModel.hasLoaded.collectAsState()
+
+    LaunchedEffect(key1 = hasLoaded.value) {
+        if (!hasLoaded.value) {
+            with(viewModel) { getPersonalizedRecipes() }
+            viewModel.hasLoaded = MutableStateFlow(true)
+        }
     }
 
     Scaffold(
@@ -128,11 +135,11 @@ fun HomeScreen(navController: NavController, viewModel: RecipeListViewModel = vi
                         )
 
                         if (index == viewModel.recipe.collectAsState().value.lastIndex) {
-                            viewModel.getRecipesList() //todo fix this
+                            viewModel.fetchNextPage()
                         }
                     }
 
-                    if (isLoading) {
+                    if (isLoading.value) {
                         item {
                             Box(
                                 modifier = Modifier
@@ -181,7 +188,7 @@ fun FilterSheetContent(
     var cookingTimeMax by remember { mutableStateOf(360f) }
 
     var calorieMin by remember { mutableStateOf(0f) }
-    var calorieMax by remember { mutableStateOf(1000f) }
+    var calorieMax by remember { mutableStateOf(1500f) }
 
     val categoryMap = mapOf(
         "ALL" to "All",
@@ -295,7 +302,7 @@ fun FilterSheetContent(
                 calorieMin = range.start
                 calorieMax = range.endInclusive
             },
-            valueRange = 0f..1000f,
+            valueRange = 0f..1500f,
             steps = 0,
             colors = androidx.compose.material3.SliderDefaults.colors(
                 thumbColor = OrangeColor,

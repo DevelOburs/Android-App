@@ -9,6 +9,11 @@ import com.develoburs.fridgify.model.api.RetrofitInstance.fridgeapi
 
 import com.develoburs.fridgify.model.api.FridgeApi
 import com.develoburs.fridgify.model.createRecipe
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+import com.cloudinary.Cloudinary
+import com.cloudinary.utils.ObjectUtils
 
 class FridgifyRepositoryImpl : FridgifyRepository {
 
@@ -59,12 +64,16 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         return lastName
     }
 
-    fun setUserEmail(Email: String) {
-        email = Email
-    }
-
-    fun getUserEmail(): String {
-        return email
+    suspend fun uploadImageToCloudinary(filePath: String): String {
+        val cloudinary = Cloudinary("cloudinary://149264464184652:3qops1ZjNi57WJpFh7ooMHJ2rwQ@deqoujrau")
+        return withContext(Dispatchers.IO) {
+            try {
+                val uploadResult = cloudinary.uploader().upload(filePath, ObjectUtils.emptyMap())
+                uploadResult["secure_url"] as String // Returns the URL of the uploaded image
+            } catch (e: Exception) {
+                throw RuntimeException("Failed to upload image to Cloudinary", e)
+            }
+        }
     }
 
     suspend fun getUserLikeCount(): Int {
@@ -131,10 +140,6 @@ class FridgifyRepositoryImpl : FridgifyRepository {
                 calorieMax = calorieMax,
                 category = category
             )
-            Log.d(
-                "Recipe List",
-                "limit:$limit, \npageno:$pageNumber, \nmincookingtime:$cookingTimeMin, \nmaxcookingtime:$cookingTimeMax, \nmincalorie:$calorieMin, \nmaxcalorie:$calorieMax, \ncategory:$category"
-            )
             return recipes
         } catch (e: Exception) {
             throw Exception("Failed to get filtered recipes, Bearer ${getToken()}", e)
@@ -143,14 +148,12 @@ class FridgifyRepositoryImpl : FridgifyRepository {
 
     override suspend fun getPersonalizedRecipeList(limit: Int, pageNumber: Int): List<Recipe> {
         try {
-            // Use getToken function to retrieve the token
             val recipes = api.getPersonalizedRecipes(
                 token = "Bearer ${getToken()}",
                 userId = getUserID(),
                 limit = limit,
                 pageNumber = pageNumber
             )
-//            Log.d("Recipe List", recipes.toString())
             return recipes
         } catch (e: Exception) {
             throw Exception("Failed to get recipes, Bearer ${getToken()}", e)
@@ -178,10 +181,6 @@ class FridgifyRepositoryImpl : FridgifyRepository {
                 calorieMin = calorieMin,
                 calorieMax = calorieMax,
                 category = category
-            )
-            Log.d(
-                "Recipe List",
-                "limit:$limit, \npageno:$pageNumber, \nmincookingtime:$cookingTimeMin, \nmaxcookingtime:$cookingTimeMax, \nmincalorie:$calorieMin, \nmaxcalorie:$calorieMax, \ncategory:$category"
             )
             return recipes
         } catch (e: Exception) {
@@ -247,21 +246,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
     }
 
 
-    /*
-        private val mockFoods = listOf(
-            Food(
-                id = 1, Name = "Radish", ImageUrl = "Radish", Category =
-            ),
-            Food(id = 2, Name = "Blueberry", ImageUrl = "Blueberry"),
-            Food(id = 3, Name = "Guava", ImageUrl = "Guava"),
-            Food(id = 4, Name = "Mushroom", ImageUrl = "Mushroom"),
-            Food(id = 5, Name = "Kiwi", ImageUrl = "Kiwi"),
-            Food(id = 6, Name = "Raspberry", ImageUrl = "Raspberry"),
-            Food(id = 7, Name = "Avocado", ImageUrl = "Avocado"),
-            Food(id = 8, Name = "Papaya", ImageUrl = "Papaya"),
-            Food(id = 9, Name = "Zucchini", ImageUrl = "Zucchini"),
 
-        )*/
 
     suspend fun addRecipe(recipe: createRecipe) {
         try {

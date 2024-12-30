@@ -67,7 +67,7 @@ fun NavGraph(
     NavHost(navController = navController, startDestination = if (userToken == "") "login" else startDestination) {
         // Define composable screens with checks for user token
         composable(BottomBarScreen.Fridge.route) {
-            FridgeScreen(navController = navController, viewModel = fridgeViewModel)
+            FridgeScreen(navController = navController, viewModel = fridgeViewModel, onBack = { navController.popBackStack() })
         }
         composable(BottomBarScreen.Home.route) {
             HomeScreen(navController = navController, viewModel = recipeListViewModel)
@@ -77,6 +77,9 @@ fun NavGraph(
         }
         composable("AddingScreen") {
             AddingScreen(navController = navController, viewModel = fridgeViewModel, onBack = { navController.popBackStack() })
+        }
+        composable("FridgeScreen") {
+            FridgeScreen(navController = navController, viewModel = fridgeViewModel, onBack = { navController.popBackStack() })
         }
         composable("AddEditFoodScreen") {
             AddEditFoodScreen(navController = navController, viewModel = fridgeViewModel, onBack = { navController.popBackStack() })
