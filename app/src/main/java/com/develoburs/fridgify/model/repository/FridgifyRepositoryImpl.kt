@@ -1,7 +1,5 @@
 package com.develoburs.fridgify.model.repository
 
-import android.content.Context
-import android.net.Uri
 import android.util.Log
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.model.Recipe
@@ -64,15 +62,6 @@ class FridgifyRepositoryImpl : FridgifyRepository {
     fun getUserLastName(): String {
         return lastName
     }
-
-    fun setUserEmail(Email: String) {
-        email = Email
-    }
-
-    fun getUserEmail(): String {
-        return email
-    }
-
 
     suspend fun uploadImageToCloudinary(filePath: String): String {
         val cloudinary = Cloudinary("cloudinary://149264464184652:3qops1ZjNi57WJpFh7ooMHJ2rwQ@deqoujrau")
@@ -150,10 +139,6 @@ class FridgifyRepositoryImpl : FridgifyRepository {
                 calorieMax = calorieMax,
                 category = category
             )
-            Log.d(
-                "Recipe List",
-                "limit:$limit, \npageno:$pageNumber, \nmincookingtime:$cookingTimeMin, \nmaxcookingtime:$cookingTimeMax, \nmincalorie:$calorieMin, \nmaxcalorie:$calorieMax, \ncategory:$category"
-            )
             return recipes
         } catch (e: Exception) {
             throw Exception("Failed to get filtered recipes, Bearer ${getToken()}", e)
@@ -162,14 +147,12 @@ class FridgifyRepositoryImpl : FridgifyRepository {
 
     override suspend fun getPersonalizedRecipeList(limit: Int, pageNumber: Int): List<Recipe> {
         try {
-            // Use getToken function to retrieve the token
             val recipes = api.getPersonalizedRecipes(
                 token = "Bearer ${getToken()}",
                 userId = getUserID(),
                 limit = limit,
                 pageNumber = pageNumber
             )
-//            Log.d("Recipe List", recipes.toString())
             return recipes
         } catch (e: Exception) {
             throw Exception("Failed to get recipes, Bearer ${getToken()}", e)
@@ -197,10 +180,6 @@ class FridgifyRepositoryImpl : FridgifyRepository {
                 calorieMin = calorieMin,
                 calorieMax = calorieMax,
                 category = category
-            )
-            Log.d(
-                "Recipe List",
-                "limit:$limit, \npageno:$pageNumber, \nmincookingtime:$cookingTimeMin, \nmaxcookingtime:$cookingTimeMax, \nmincalorie:$calorieMin, \nmaxcalorie:$calorieMax, \ncategory:$category"
             )
             return recipes
         } catch (e: Exception) {

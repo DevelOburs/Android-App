@@ -2,7 +2,6 @@ package com.develoburs.fridgify.view.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,17 +28,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.develoburs.fridgify.R
-import com.develoburs.fridgify.ui.theme.DarkBlueColor
-import com.develoburs.fridgify.ui.theme.DarkerBlueColor
 import com.develoburs.fridgify.ui.theme.LightOrangeColor
 import com.develoburs.fridgify.ui.theme.PaleWhiteColor
 import com.develoburs.fridgify.ui.theme.WhiteColor
