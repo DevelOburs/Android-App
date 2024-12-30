@@ -245,21 +245,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
     }
 
 
-    /*
-        private val mockFoods = listOf(
-            Food(
-                id = 1, Name = "Radish", ImageUrl = "Radish", Category =
-            ),
-            Food(id = 2, Name = "Blueberry", ImageUrl = "Blueberry"),
-            Food(id = 3, Name = "Guava", ImageUrl = "Guava"),
-            Food(id = 4, Name = "Mushroom", ImageUrl = "Mushroom"),
-            Food(id = 5, Name = "Kiwi", ImageUrl = "Kiwi"),
-            Food(id = 6, Name = "Raspberry", ImageUrl = "Raspberry"),
-            Food(id = 7, Name = "Avocado", ImageUrl = "Avocado"),
-            Food(id = 8, Name = "Papaya", ImageUrl = "Papaya"),
-            Food(id = 9, Name = "Zucchini", ImageUrl = "Zucchini"),
 
-        )*/
 
     suspend fun addRecipe(recipe: createRecipe) {
         try {

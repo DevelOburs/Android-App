@@ -15,8 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.develoburs.fridgify.viewmodel.FridgeViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,12 +24,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
@@ -42,6 +40,7 @@ import androidx.navigation.NavController
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.ui.theme.BlackColor
+import com.develoburs.fridgify.ui.theme.DarkOrangeColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
 
 
@@ -53,11 +52,15 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
 
     var searchQuery by remember { mutableStateOf("") }
     val selectedItems = remember { mutableStateListOf<Food>() }
+    var selectedCategory by remember { mutableStateOf("All") }
+
     val categories = listOf(
         "All", "Produce", "Dairy and Eggs", "Meat and Proteins",
         "Baking and Pantry", "Canned and Preserved Foods",
         "Beverages and Sweeteners", "Nuts Seeds and Legumes", "Grains and Cereals"
     )
+    val isLoading by viewModel.isLoading.collectAsState()
+
     var displaySelectedItems by remember { mutableStateOf("") }
     if (allFoods.isEmpty()) {
         viewModel.getNotInFridgeFood()
@@ -71,7 +74,16 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
         allFoods.filter { it.Name.contains(searchQuery, ignoreCase = true) }
     }
     LaunchedEffect(Unit) {
+
         viewModel.getNotInFridgeFood()
+    }
+    var addTriggered by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isLoading, addTriggered) {
+        if (addTriggered && !isLoading) {
+            navController.navigate("FridgeScreen") {
+                popUpTo("AddingScreen") { inclusive = true }         }
+        }
     }
     Scaffold(
         topBar = {
@@ -100,6 +112,15 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
         },
         content = { paddingValues ->
             Surface(modifier = Modifier.fillMaxSize()) {
+                if (isLoading) {
+
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = OrangeColor)
+                    }
+                }else {
                 Image(
                     painter = painterResource(id = R.drawable.background_image),
                     contentDescription = null,
@@ -122,33 +143,48 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
                         )
                     )
                     Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                                .horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                    categories.forEach { category ->
-                        Box(
-                            modifier = Modifier
-                                .height(35.dp)
-                                .background(color = OrangeColor, shape = MaterialTheme.shapes.medium)
-                                .clickable {
-                                    val formattedCategory = if (category == "All") null else formatCategoryForApi(category)
-                                    viewModel.getNotInFridgeFood(formattedCategory)
-
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = category,
-                                color = BlackColor,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.padding(horizontal = 16.dp)
-                            )
+                        val categories = listOf(
+                            "All",
+                            "Produce",
+                            "Dairy and Eggs",
+                            "Meat and Proteins",
+                            "Baking and Pantry",
+                            "Canned and Preserved Foods",
+                            "Beverages and Sweeteners",
+                            "Nuts Seeds and Legumes",
+                            "Grains and Cereals"
+                        )
+                        categories.forEach { category ->
+                            val isSelected = selectedCategory == category
+                            Box(
+                                modifier = Modifier
+                                    .height(35.dp)
+                                    .background(
+                                        color = if (isSelected) DarkOrangeColor else OrangeColor,
+                                        shape = MaterialTheme.shapes.medium
+                                    )
+                                    .clickable {
+                                        selectedCategory = category
+                                        val formattedCategory = if (category == "All") null else formatCategoryForApi(category)
+                                        viewModel.getFoodList(formattedCategory)
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = category,
+                                    color = if (isSelected) BlackColor else Color.White,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                )
+                            }
                         }
                     }
-                }
 
                     Box(
                         modifier = Modifier.weight(1f),
@@ -202,24 +238,30 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
                         Button(onClick = { navController.popBackStack() },modifier = Modifier.height(40.dp)) {
                             Text(text = "Exit", style = MaterialTheme.typography.labelMedium)
                         }
-                        Button(onClick = {
-                            val ingredientIds = selectedItems.mapNotNull { it.id }
+                        Button(
+                            onClick = {
+                                val ingredientIds = selectedItems.mapNotNull { it.id }
+                                addTriggered = true
+                                if (ingredientIds.isNotEmpty()) {
+                                    viewModel.addFood(ingredientIds)
+                                    viewModel.getNotInFridgeFood()
+                                    displaySelectedItems = selectedItems.joinToString(", ") { it.Name }
+                                    selectedItems.clear()
+                                }
 
-                            Log.d("AddingScreen", "Ingredient IDs: $ingredientIds")
+                            },
+                            modifier = Modifier.height(40.dp),
+                            enabled = !isLoading
 
-                            viewModel.addFood(ingredientIds)
-                            viewModel.getNotInFridgeFood()
-
-                            displaySelectedItems = selectedItems.joinToString(", ") { it.Name }
-                            selectedItems.clear()
-
-                            Log.d("AddingScreen", "Sent ingredient IDs: $ingredientIds")
-
-                            navController.popBackStack()
-
-                        },modifier = Modifier.height(40.dp)
                         ) {
-                            Text(text = "Add", style = MaterialTheme.typography.labelMedium)
+                            if (isLoading && addTriggered) {
+                                CircularProgressIndicator(
+                                    color = Color.White,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            } else {
+                                Text(text = "Add", style = MaterialTheme.typography.labelMedium)
+                            }
                         }
 
 
@@ -228,7 +270,7 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
 
                 }
             }
-        }
+        }}
     )
 
 
