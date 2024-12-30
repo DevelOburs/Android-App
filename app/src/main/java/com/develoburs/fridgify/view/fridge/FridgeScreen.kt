@@ -56,7 +56,7 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = viewModel()) {
+fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = viewModel(),onBack: () -> Unit) {
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("All") }
     val isLoading by viewModel.isLoading.collectAsState()

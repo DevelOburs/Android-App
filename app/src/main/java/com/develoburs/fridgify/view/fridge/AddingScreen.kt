@@ -40,6 +40,7 @@ import androidx.navigation.NavController
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.ui.theme.BlackColor
+import com.develoburs.fridgify.ui.theme.DarkOrangeColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
 
 
@@ -51,6 +52,8 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
 
     var searchQuery by remember { mutableStateOf("") }
     val selectedItems = remember { mutableStateListOf<Food>() }
+    var selectedCategory by remember { mutableStateOf("All") }
+
     val categories = listOf(
         "All", "Produce", "Dairy and Eggs", "Meat and Proteins",
         "Baking and Pantry", "Canned and Preserved Foods",
@@ -78,7 +81,8 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
 
     LaunchedEffect(isLoading, addTriggered) {
         if (addTriggered && !isLoading) {
-            navController.popBackStack()
+            navController.navigate("FridgeScreen") {
+                popUpTo("AddingScreen") { inclusive = true }         }
         }
     }
     Scaffold(
@@ -139,33 +143,48 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
                         )
                     )
                     Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                                .horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                    categories.forEach { category ->
-                        Box(
-                            modifier = Modifier
-                                .height(35.dp)
-                                .background(color = OrangeColor, shape = MaterialTheme.shapes.medium)
-                                .clickable {
-                                    val formattedCategory = if (category == "All") null else formatCategoryForApi(category)
-                                    viewModel.getNotInFridgeFood(formattedCategory)
-
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = category,
-                                color = BlackColor,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.padding(horizontal = 16.dp)
-                            )
+                        val categories = listOf(
+                            "All",
+                            "Produce",
+                            "Dairy and Eggs",
+                            "Meat and Proteins",
+                            "Baking and Pantry",
+                            "Canned and Preserved Foods",
+                            "Beverages and Sweeteners",
+                            "Nuts Seeds and Legumes",
+                            "Grains and Cereals"
+                        )
+                        categories.forEach { category ->
+                            val isSelected = selectedCategory == category
+                            Box(
+                                modifier = Modifier
+                                    .height(35.dp)
+                                    .background(
+                                        color = if (isSelected) DarkOrangeColor else OrangeColor,
+                                        shape = MaterialTheme.shapes.medium
+                                    )
+                                    .clickable {
+                                        selectedCategory = category
+                                        val formattedCategory = if (category == "All") null else formatCategoryForApi(category)
+                                        viewModel.getFoodList(formattedCategory)
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = category,
+                                    color = if (isSelected) BlackColor else Color.White,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                )
+                            }
                         }
                     }
-                }
 
                     Box(
                         modifier = Modifier.weight(1f),
@@ -229,6 +248,7 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
                                     displaySelectedItems = selectedItems.joinToString(", ") { it.Name }
                                     selectedItems.clear()
                                 }
+
                             },
                             modifier = Modifier.height(40.dp),
                             enabled = !isLoading
