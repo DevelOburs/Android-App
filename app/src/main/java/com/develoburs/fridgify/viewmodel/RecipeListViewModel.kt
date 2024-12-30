@@ -88,12 +88,10 @@ class RecipeListViewModel(
     }
 
     fun fetchNextPage() {
-        Log.d(tag, "fetch metch ${_isLoading.value} & ${isLastPage}")
         if (_isLoading.value || isLastPage) return
 
-        _isLoading.value = true
-
         viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.value = true
             try {
                 when (currentFetchType) {
                     RecipeFetchType.ALL_RECIPES -> {
@@ -131,8 +129,8 @@ class RecipeListViewModel(
 
     fun getRecipesList() {
         currentFetchType = RecipeFetchType.ALL_RECIPES
-        _isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.value = true
             try {
                 Log.d(tag, "ALL_RECIPES for page:$currentPage and limit:$pageSize")
                 val recipeList = repository.getRecipeList(pageSize, currentPage)
@@ -159,10 +157,11 @@ class RecipeListViewModel(
         category: String? = null
     ) {
         currentFetchType = RecipeFetchType.FILTERED_RECIPES
-        _isLoading.value = true
         lastFilterParams = FilterParams(cookingTimeMin, cookingTimeMax, calorieMin, calorieMax, category)
-        viewModelScope.launch {
+        viewModelScope.launch (Dispatchers.IO) {
+            _isLoading.value = true
             try {
+
                 Log.d(tag, "FILTERED_RECIPES for page:$currentPage and limit:$pageSize")
                 val recipeList = repository.getRecipeList(
                     pageSize, currentPage, cookingTimeMin, cookingTimeMax, calorieMin, calorieMax, category
@@ -184,9 +183,10 @@ class RecipeListViewModel(
 
     fun getPersonalizedRecipes() {
         currentFetchType = RecipeFetchType.PERSONALIZED_RECIPES
-        _isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.value = true
             try {
+
                 Log.d(tag, "PERSONALIZED_RECIPES for page:$currentPage and limit:$pageSize")
                 val recipeList = repository.getPersonalizedRecipeList(pageSize, currentPage)
                 if (recipeList.isEmpty()) {
@@ -212,9 +212,9 @@ class RecipeListViewModel(
         category: String? = null
     ) {
         currentFetchType = RecipeFetchType.FILTERED_PERSONALIZED_RECIPES
-        _isLoading.value = true
         lastFilterParams = FilterParams(cookingTimeMin, cookingTimeMax, calorieMin, calorieMax, category)
         viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.value = true
             try {
                 Log.d(tag, "FILTERED_PERSONALIZED_RECIPES for page:$currentPage and limit:$pageSize")
                 val recipeList = repository.getPersonalizedRecipeList(

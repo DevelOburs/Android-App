@@ -63,15 +63,6 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         return lastName
     }
 
-    fun setUserEmail(Email: String) {
-        email = Email
-    }
-
-    fun getUserEmail(): String {
-        return email
-    }
-
-
     suspend fun uploadImageToCloudinary(filePath: String): String {
         val cloudinary = Cloudinary("cloudinary://149264464184652:3qops1ZjNi57WJpFh7ooMHJ2rwQ@deqoujrau")
         return withContext(Dispatchers.IO) {
@@ -148,10 +139,6 @@ class FridgifyRepositoryImpl : FridgifyRepository {
                 calorieMax = calorieMax,
                 category = category
             )
-            Log.d(
-                "Recipe List",
-                "limit:$limit, \npageno:$pageNumber, \nmincookingtime:$cookingTimeMin, \nmaxcookingtime:$cookingTimeMax, \nmincalorie:$calorieMin, \nmaxcalorie:$calorieMax, \ncategory:$category"
-            )
             return recipes
         } catch (e: Exception) {
             throw Exception("Failed to get filtered recipes, Bearer ${getToken()}", e)
@@ -193,10 +180,6 @@ class FridgifyRepositoryImpl : FridgifyRepository {
                 calorieMin = calorieMin,
                 calorieMax = calorieMax,
                 category = category
-            )
-            Log.d(
-                "Recipe List",
-                "limit:$limit, \npageno:$pageNumber, \nmincookingtime:$cookingTimeMin, \nmaxcookingtime:$cookingTimeMax, \nmincalorie:$calorieMin, \nmaxcalorie:$calorieMax, \ncategory:$category"
             )
             return recipes
         } catch (e: Exception) {

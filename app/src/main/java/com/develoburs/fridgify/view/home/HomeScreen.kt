@@ -67,11 +67,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 @Composable
 fun HomeScreen(navController: NavController, viewModel: RecipeListViewModel = viewModel()) {
     val allRecipes = viewModel.recipe.collectAsState(initial = emptyList())
-    val isLoading by viewModel.isLoading.collectAsState()
+    val isLoading = viewModel.isLoading.collectAsState()
 
     var showFilterSheet by remember { mutableStateOf(false) }
 
-    var hasLoaded = viewModel.hasLoaded.collectAsState()
+    val hasLoaded = viewModel.hasLoaded.collectAsState()
 
     LaunchedEffect(key1 = hasLoaded.value) {
         if (!hasLoaded.value) {
@@ -139,7 +139,7 @@ fun HomeScreen(navController: NavController, viewModel: RecipeListViewModel = vi
                         }
                     }
 
-                    if (isLoading) {
+                    if (isLoading.value) {
                         item {
                             Box(
                                 modifier = Modifier
