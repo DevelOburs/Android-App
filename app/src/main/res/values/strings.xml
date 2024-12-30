@@ -21,7 +21,19 @@
     <string name="no_image_available">No image available</string>
     <string name="no_instructions_available">No instructions available</string>
     <string name="no_ingredients_available">No ingredients available</string>
-    <string name="no_comments_available">No comments yet</string>
     <string name="unlike">Unlike</string>
     <string name="unknown_recipe">Unknown recipe</string>
+    <string name="unsaved">Unsaved</string>
+    <string name="no_comments_available">No comments available</string>
+    <string name="confirm_delete_title">Confirm Deletion</string>
+    <string name="confirm_delete_message">Are you sure you want to delete this comment?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="confirm_delete">Confirm Delete</string>
+    <string name="delete_confirmation_message">Are you sure you want to delete this comment?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete_comment">Delete Comment</string>
+    <string name="unknown_user">Unknown User</string>
+
 </resources>

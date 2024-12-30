@@ -1,6 +1,7 @@
 package com.develoburs.fridgify.model.repository
 
 import android.util.Log
+import com.develoburs.fridgify.model.Comment
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.model.Recipe
 import com.develoburs.fridgify.model.api.RetrofitInstance.api
@@ -375,6 +376,88 @@ class FridgifyRepositoryImpl : FridgifyRepository {
             throw Exception("Failed to fetch user liked recipes", e)
         }
     }
+
+    override suspend fun saveRecipe(recipeId: String, userId: String) {
+        try {
+            val token = "Bearer ${getToken()}"
+            Log.d("Repository", "Saving recipe. Recipe ID: $recipeId, User ID: $userId, Token: $token")
+            api.saveRecipe(recipeId, userId, token)
+            Log.d("Repository", "Successfully saved recipe: $recipeId for user: $userId")
+        } catch (e: Exception) {
+            Log.e("Repository", "Failed to save recipe: $recipeId for user: $userId", e)
+            throw Exception("Failed to save recipe", e)
+        }
+    }
+
+
+    override suspend fun getUserSavedRecipes(userId: String): List<String> {
+        try {
+            val token = "Bearer ${getToken()}" // Get the authorization token
+            Log.d("Repository", "Fetching saved recipes for user: $userId")
+            val savedRecipes = api.getUserSavedRecipes(userId, token) // Call the API
+            Log.d("Repository", "Fetched saved recipes: $savedRecipes")
+            return savedRecipes.map { it.id } // Return only the IDs of the saved recipes
+        } catch (e: Exception) {
+            Log.e("Repository", "Failed to fetch saved recipes for user: $userId", e)
+            throw Exception("Failed to fetch saved recipes", e)
+        }
+    }
+
+
+    override suspend fun getSaveCount(recipeId: String): Int {
+        try {
+            Log.d("Repository", "Fetching save count for recipe: $recipeId")
+            val saveCount = api.getSaveCount(recipeId) // Call the API to get the save count
+            Log.d("Repository", "Save count for recipe $recipeId: $saveCount")
+            return saveCount
+        } catch (e: Exception) {
+            Log.e("Repository", "Failed to fetch save count for recipe: $recipeId", e)
+            throw Exception("Failed to fetch save count", e)
+        }
+    }
+
+    override suspend fun fetchComments(recipeId: String): List<Comment> {
+        val token = "Bearer ${getToken()}" // Securely retrieve the token
+        return try {
+            api.getComments(recipeId, token)
+        } catch (e: Exception) {
+            Log.e("Repository", "Failed to fetch comments for recipe: $recipeId", e)
+            emptyList()
+        }
+    }
+
+    override suspend fun addComment(recipeId: String, userId: String, commentText: String) {
+        try {
+            val token = "Bearer ${getToken()}"
+            val comment = Comment(
+                recipeId = recipeId,
+                userId = userId,
+                comment = commentText
+            )
+            api.addComment(
+                recipeId = recipeId,
+                userId = userId,
+                comment = comment,
+                token = token
+            )
+            Log.d("Repository", "Comment added successfully for recipe $recipeId by user $userId")
+        } catch (e: Exception) {
+            Log.e("Repository", "Failed to add comment for recipe $recipeId by user $userId", e)
+            throw Exception("Failed to add comment", e)
+        }
+    }
+
+    override suspend fun deleteComment(recipeId: String, commentId: String, userId: String) {
+        try {
+            val token = "Bearer ${getToken()}" // Ensure the token is not null or empty
+            api.deleteComment(recipeId, commentId, userId, token)
+            Log.d("Repository", "Comment deleted successfully: recipeId=$recipeId, commentId=$commentId")
+        } catch (e: Exception) {
+            Log.e("Repository", "Unexpected error while deleting comment", e)
+            throw Exception("Failed to delete comment", e)
+        }
+    }
+
 
 
 }

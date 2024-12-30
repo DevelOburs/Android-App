@@ -11,8 +11,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import androidx.navigation.NavController
+import com.develoburs.fridgify.model.Comment
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.model.createRecipe
+import kotlinx.coroutines.withContext
 
 class RecipeListViewModel(
     private val navController: NavController,
@@ -38,6 +40,34 @@ class RecipeListViewModel(
     private val _userLikedRecipes = MutableStateFlow<List<String>>(emptyList())
     val userLikedRecipes: StateFlow<List<String>> = _userLikedRecipes
 
+    // State for user-saved recipes
+    private val _userSavedRecipes = MutableStateFlow<List<String>>(emptyList())
+    val userSavedRecipes: StateFlow<List<String>> = _userSavedRecipes
+
+    // State for the save count of a specific recipe
+    private val _saveCount = MutableStateFlow(0)
+    val saveCount: StateFlow<Int> = _saveCount
+
+    private val _comments = MutableStateFlow<List<Comment>>(emptyList())
+    val comments: StateFlow<List<Comment>> = _comments
+
+    private val _isLiking = MutableStateFlow(false)
+    val isLiking: StateFlow<Boolean> = _isLiking
+
+    private val _isSaving = MutableStateFlow(false)
+    val isSaving: StateFlow<Boolean> = _isSaving
+
+    fun setIsLikingLoading(isLoading: Boolean) {
+        _isLiking.value = isLoading
+    }
+
+    fun setIsSavingLoading(isLoading: Boolean) {
+        _isSaving.value = isLoading
+    }
+
+
+
+
     private var currentPage = 0
     private val pageSize = 10
     private var usr_currentPage = 0
@@ -52,6 +82,9 @@ class RecipeListViewModel(
 
     private val _userLikeCount = MutableStateFlow<Int?>(null)
     val userLikeCount: StateFlow<Int?> get() = _userLikeCount
+
+    private val _commentCount = MutableStateFlow(0)
+    val commentCount: StateFlow<Int> = _commentCount
 
     private val _imageUrl = MutableStateFlow<String?>(null)
     val imageUrl: StateFlow<String?> get() = _imageUrl
@@ -335,43 +368,62 @@ class RecipeListViewModel(
 
     fun likeOrUnlikeRecipe(recipeId: String, userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            _isLiking.emit(true) // Start loading
+            val isCurrentlyLiked = _userLikedRecipes.value.contains(recipeId)
+
+            // Optimistically update the like count
+            _recipeDetail.value = _recipeDetail.value?.let { recipe ->
+                recipe.copy(
+                    Likes = if (isCurrentlyLiked) (recipe.Likes ?: 0) - 1 else (recipe.Likes ?: 0) + 1
+                )
+            }
+
+            // Optimistically update the liked recipes list
+            if (isCurrentlyLiked) {
+                _userLikedRecipes.emit(_userLikedRecipes.value - recipeId)
+            } else {
+                _userLikedRecipes.emit(_userLikedRecipes.value + recipeId)
+            }
+
             try {
-                val isCurrentlyLiked = _userLikedRecipes.value.contains(recipeId)
-
-                // Call the like endpoint (assumed to toggle the like state)
-                repository.likeRecipe(recipeId, userId)
-
-                // Optimistically update UI state
-                if (isCurrentlyLiked) {
-                    // Unlike the recipe
-                    _userLikedRecipes.value = _userLikedRecipes.value - recipeId
-                    _recipeDetail.value = _recipeDetail.value?.let { recipe ->
-                        recipe.copy(Likes = (recipe.Likes ?: 0) - 1) // Decrement like count
-                    }
-                } else {
-                    // Like the recipe
-                    _userLikedRecipes.value = _userLikedRecipes.value + recipeId
-                    _recipeDetail.value = _recipeDetail.value?.let { recipe ->
-                        recipe.copy(Likes = (recipe.Likes ?: 0) + 1) // Increment like count
-                    }
-                }
+                repository.likeRecipe(recipeId, userId) // Perform the API call
             } catch (e: Exception) {
-                Log.e("RecipeListViewModel", "Failed to toggle like for recipe: $recipeId", e)
+                Log.e("RecipeListViewModel", "Failed to like/unlike recipe", e)
+
+                // Revert the optimistic update on failure
+                _recipeDetail.value = _recipeDetail.value?.let { recipe ->
+                    recipe.copy(
+                        Likes = if (isCurrentlyLiked) (recipe.Likes ?: 0) + 1 else (recipe.Likes ?: 0) - 1
+                    )
+                }
+                if (isCurrentlyLiked) {
+                    _userLikedRecipes.emit(_userLikedRecipes.value + recipeId)
+                } else {
+                    _userLikedRecipes.emit(_userLikedRecipes.value - recipeId)
+                }
+            } finally {
+                _isLiking.emit(false) // Stop loading
             }
         }
     }
+
+
 
 
     fun fetchUserLikedRecipes(userId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
+                setIsLikingLoading(true) // Set loading state
                 val likedRecipes = repository.getUserLikedRecipes(userId)
-                _userLikedRecipes.value = likedRecipes // Ensure the state is updated
+                _userLikedRecipes.value = likedRecipes // Update the state with fetched data
             } catch (e: Exception) {
-                Log.e("RecipeListViewModel", "Failed to fetch user liked recipes", e)
+                Log.e("RecipeListViewModel", "Error fetching liked recipes: $e")
+            } finally {
+                setIsLikingLoading(false) // Turn off loading state
             }
         }
     }
+
 
 
     fun addRecipe(id: String, newRecipe: createRecipe) {
@@ -438,4 +490,106 @@ class RecipeListViewModel(
             }
         }
     }
+
+    // Fetch user saved recipes
+    fun fetchUserSavedRecipes(userId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val savedRecipes = repository.getUserSavedRecipes(userId)
+                _userSavedRecipes.emit(savedRecipes)
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    // Log error or display an error message
+                    println("Failed to fetch user saved recipes: $e")
+                }
+            }
+        }
+    }
+
+    // Save or unsave a recipe
+    fun saveOrUnsaveRecipe(recipeId: String, userId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isSaving.emit(true) // Start loading
+            try {
+                val isCurrentlySaved = _userSavedRecipes.value.contains(recipeId)
+                repository.saveRecipe(recipeId, userId)
+                if (isCurrentlySaved) {
+                    _userSavedRecipes.emit(_userSavedRecipes.value - recipeId)
+                } else {
+                    _userSavedRecipes.emit(_userSavedRecipes.value + recipeId)
+                }
+            } catch (e: Exception) {
+                Log.e("RecipeListViewModel", "Failed to save/unsave recipe", e)
+            } finally {
+                _isSaving.emit(false) // Stop loading
+            }
+        }
+    }
+
+
+    // Fetch save count for a specific recipe
+    fun fetchSaveCount(recipeId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val count = repository.getSaveCount(recipeId)
+                _saveCount.emit(count)
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    // Log error or display an error message
+                    println("Failed to fetch save count for recipe: $recipeId, Error: $e")
+                }
+            }
+        }
+    }
+
+    // Fetch comments for a specific recipe
+    fun fetchComments(recipeId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val fetchedComments = repository.fetchComments(recipeId)
+
+                // Emit updated comments
+                _comments.emit(fetchedComments)
+            } catch (e: Exception) {
+                Log.e("ViewModel", "Failed to fetch comments for recipe: $recipeId", e)
+            }
+        }
+    }
+
+
+
+    fun addComment(recipeId: String, userId: String, comment: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                repository.addComment(recipeId, userId, comment)
+                fetchComments(recipeId) // Refresh comments after adding
+
+                // Increment the comment count in the Recipe object
+                _recipeDetail.value = _recipeDetail.value?.copy(
+                    Comments = (_recipeDetail.value?.Comments ?: 0) + 1
+                )
+            } catch (e: Exception) {
+                Log.e("RecipeListViewModel", "Failed to add comment", e)
+            }
+        }
+    }
+
+
+    fun deleteComment(recipeId: String, commentId: String, userId: String) {
+        viewModelScope.launch {
+            try {
+                repository.deleteComment(recipeId, commentId, userId)
+                fetchComments(recipeId) // Refresh comments after deletion
+
+                // Decrement the comment count in the Recipe object
+                _recipeDetail.value = _recipeDetail.value?.copy(
+                    Comments = (_recipeDetail.value?.Comments ?: 1) - 1
+                )
+            } catch (e: Exception) {
+                Log.e("ViewModel", "Failed to delete comment: ${e.message}")
+            }
+        }
+    }
+
+
 }
