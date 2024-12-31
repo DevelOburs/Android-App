@@ -245,7 +245,7 @@ fun RecipeDetailsScreen(
                                     contentDescription = stringResource(
                                         id = if (isSaved) R.string.unsaved else R.string.save
                                     ),
-                                    tint = if (isSaved) Color.Blue else Color.Gray
+                                    tint = if (isSaved) Color.Blue else BlackColor
                                 )
                             }
                         }

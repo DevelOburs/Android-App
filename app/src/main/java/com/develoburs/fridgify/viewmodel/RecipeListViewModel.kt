@@ -498,6 +498,7 @@ class RecipeListViewModel(
     fun fetchUserSavedRecipes(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                setIsSavingLoading(true) // Set loading state
                 val savedRecipes = repository.getUserSavedRecipes(userId)
                 _userSavedRecipes.emit(savedRecipes)
             } catch (e: Exception) {
@@ -505,6 +506,8 @@ class RecipeListViewModel(
                     // Log error or display an error message
                     println("Failed to fetch user saved recipes: $e")
                 }
+            } finally {
+                setIsSavingLoading(false) // Turn off loading state
             }
         }
     }
