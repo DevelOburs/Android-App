@@ -313,17 +313,49 @@ fun RecipeDetailsScreen(
                             recipe?.ingredients?.let { ingredients ->
                                 ingredients.forEach { ingredient ->
                                     Text(
-                                        text = "• $ingredient",
+                                        text = "• ${ingredient.Name}", // Access the 'name' property of each ingredient
                                         style = MaterialTheme.typography.bodySmall,
                                         color = Color.Black
                                     )
                                 }
-                            } ?: Text(
+                            }
+                                ?: Text(
                                 text = stringResource(id = R.string.no_ingredients_available),
                                 color = Color.Black,
                                 style = MaterialTheme.typography.bodySmall
                             )
 
+                            Spacer(modifier = Modifier.height(16.dp))
+// Recipe Calories
+                            Text(
+                                text = stringResource(id = R.string.calories),
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                color = Color.Black
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "${recipe?.calories ?: stringResource(id = R.string.not_available)} kcal",
+                                color = Color.Black,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+
+// Cooking Time
+                            Text(
+                                text = stringResource(id = R.string.cooking_time),
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                color = Color.Black
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "${recipe?.cookingTime ?: stringResource(id = R.string.not_available)} minutes",
+                                color = Color.Black,
+                                style = MaterialTheme.typography.bodySmall
+                            )
                             Spacer(modifier = Modifier.height(16.dp))
 
                             // Instructions

@@ -57,6 +57,9 @@ class RecipeListViewModel(
     private val _isSaving = MutableStateFlow(false)
     val isSaving: StateFlow<Boolean> = _isSaving
 
+    private val _isCommentLoading = MutableStateFlow(false)
+    val isCommentLoading: StateFlow<Boolean> = _isCommentLoading
+
     fun setIsLikingLoading(isLoading: Boolean) {
         _isLiking.value = isLoading
     }
@@ -575,7 +578,7 @@ class RecipeListViewModel(
     }
 
 
-    fun deleteComment(recipeId: String, commentId: String, userId: String) {
+    fun deleteComment(commentId: String, recipeId: String, userId: String) {
         viewModelScope.launch {
             try {
                 repository.deleteComment(recipeId, commentId, userId)

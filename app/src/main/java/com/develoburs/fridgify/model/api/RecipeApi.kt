@@ -163,10 +163,10 @@ interface RecipeApi {
         @Header("Authorization") token: String
     )
 
-    @DELETE("recipe-api/comment/recipes/{recipeId}/comments/{commentId}")
+    @DELETE("recipe-api/comment/{commentId}")
     suspend fun deleteComment(
-        @Path("recipeId") recipeId: String,
         @Path("commentId") commentId: String,
+        @Query("recipeId") recipeId: String,
         @Query("userId") userId: String,
         @Header("Authorization") token: String
     )
