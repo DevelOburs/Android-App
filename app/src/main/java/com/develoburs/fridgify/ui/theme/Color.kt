@@ -46,7 +46,7 @@ val Saffron = Color(0xFFFFC000)       // PANTONE 14-1064 TCX
 val GoldenHaze = Color(0xFFF3D39E)    // PANTONE 12-0826 TCX
 
 val DarkCoffee = Color(0xFF4A2E2C)   // Dark Brown
-val Coffee = Color(0xFF6F513A)       // Coffee Brown
-val LightCoffee = Color(0xFF916A53)  // Light Brown
+val CoffeeColor = Color(0xFF6F513A)       // Coffee Brown
+val LightCoffeeColor = Color(0xFF916A53)  // Light Brown
 val Cream = Color(0xFFFFFCD4)        // Cream
 val LightCream = Color(0xFFFFF0BF)   // Light Cream

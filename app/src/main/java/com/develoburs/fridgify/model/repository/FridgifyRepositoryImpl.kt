@@ -126,7 +126,8 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         cookingTimeMax: Int?,
         calorieMin: Int?,
         calorieMax: Int?,
-        category: String?
+        category: String?,
+        searchQuery: String?
     ): List<Recipe> {
         try {
             // Use getToken function to retrieve the token
@@ -138,7 +139,8 @@ class FridgifyRepositoryImpl : FridgifyRepository {
                 cookingTimeMax = cookingTimeMax,
                 calorieMin = calorieMin,
                 calorieMax = calorieMax,
-                category = category
+                category = category,
+                search = searchQuery
             )
             return recipes
         } catch (e: Exception) {
@@ -167,7 +169,8 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         cookingTimeMax: Int?,
         calorieMin: Int?,
         calorieMax: Int?,
-        category: String?
+        category: String?,
+        searchQuery: String?
     ): List<Recipe> {
         try {
             // Use getToken function to retrieve the token
@@ -180,7 +183,8 @@ class FridgifyRepositoryImpl : FridgifyRepository {
                 cookingTimeMax = cookingTimeMax,
                 calorieMin = calorieMin,
                 calorieMax = calorieMax,
-                category = category
+                category = category,
+                search = searchQuery
             )
             return recipes
         } catch (e: Exception) {

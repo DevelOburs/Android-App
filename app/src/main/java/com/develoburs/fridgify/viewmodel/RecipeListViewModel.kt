@@ -68,9 +68,6 @@ class RecipeListViewModel(
         _isSaving.value = isLoading
     }
 
-
-
-
     private var currentPage = 0
     private val pageSize = 10
     private var usr_currentPage = 0
@@ -79,6 +76,9 @@ class RecipeListViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
     private var isLastPage = false
+
+    private val _showNoRecipeDialog = MutableStateFlow(false)
+    val showNoRecipeDialog: StateFlow<Boolean> = _showNoRecipeDialog
 
     private val _userRecipeCount = MutableStateFlow<Int?>(null)
     val userRecipeCount: StateFlow<Int?> get() = _userRecipeCount
@@ -113,7 +113,8 @@ class RecipeListViewModel(
         val cookingTimeMax: Int? = null,
         val calorieMin: Int? = null,
         val calorieMax: Int? = null,
-        val category: String? = null
+        val category: String? = null,
+        val searchQuery: String? = null
     )
 
     fun resetPageCount(){
@@ -139,7 +140,8 @@ class RecipeListViewModel(
                             lastFilterParams?.cookingTimeMax,
                             lastFilterParams?.calorieMin,
                             lastFilterParams?.calorieMax,
-                            lastFilterParams?.category
+                            lastFilterParams?.category,
+                            lastFilterParams?.searchQuery
                         )
                     }
                     RecipeFetchType.PERSONALIZED_RECIPES -> {
@@ -151,7 +153,8 @@ class RecipeListViewModel(
                             lastFilterParams?.cookingTimeMax,
                             lastFilterParams?.calorieMin,
                             lastFilterParams?.calorieMax,
-                            lastFilterParams?.category
+                            lastFilterParams?.category,
+                            lastFilterParams?.searchQuery
                         )
                     }
                 }
@@ -170,11 +173,15 @@ class RecipeListViewModel(
             try {
                 Log.d(tag, "ALL_RECIPES for page:$currentPage and limit:$pageSize")
                 val recipeList = repository.getRecipeList(pageSize, currentPage)
+                if(currentPage == 0 && recipeList.isEmpty()){
+                    setShowNoRecipeDialog(true)
+                }
                 if (recipeList.isEmpty()) {
                     isLastPage = true
                 } else {
                     _recipe.value = _recipe.value + recipeList
                     currentPage++
+                    if(recipeList.size < 10) isLastPage = true
                 }
                 Log.d(tag, "${recipeList.lastOrNull()?.Name}")
             } catch (e: Exception) {
@@ -190,23 +197,27 @@ class RecipeListViewModel(
         cookingTimeMax: Int? = null,
         calorieMin: Int? = null,
         calorieMax: Int? = null,
-        category: String? = null
+        category: String? = null,
+        searchQuery: String? = null
     ) {
         currentFetchType = RecipeFetchType.FILTERED_RECIPES
-        lastFilterParams = FilterParams(cookingTimeMin, cookingTimeMax, calorieMin, calorieMax, category)
+        lastFilterParams = FilterParams(cookingTimeMin, cookingTimeMax, calorieMin, calorieMax, category, searchQuery)
         viewModelScope.launch (Dispatchers.IO) {
             _isLoading.value = true
             try {
-
                 Log.d(tag, "FILTERED_RECIPES for page:$currentPage and limit:$pageSize")
                 val recipeList = repository.getRecipeList(
-                    pageSize, currentPage, cookingTimeMin, cookingTimeMax, calorieMin, calorieMax, category
+                    pageSize, currentPage, cookingTimeMin, cookingTimeMax, calorieMin, calorieMax, category, searchQuery
                 )
+                if(currentPage == 0 && recipeList.isEmpty()){
+                    setShowNoRecipeDialog(true)
+                }
                 if (recipeList.isEmpty()) {
                     isLastPage = true
                 } else {
                     _recipe.value = _recipe.value + recipeList
                     currentPage++
+                    if(recipeList.size < 10) isLastPage = true
                 }
                 Log.d(tag, "${recipeList.lastOrNull()?.Name}")
             } catch (e: Exception) {
@@ -222,14 +233,17 @@ class RecipeListViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.value = true
             try {
-
                 Log.d(tag, "PERSONALIZED_RECIPES for page:$currentPage and limit:$pageSize")
                 val recipeList = repository.getPersonalizedRecipeList(pageSize, currentPage)
+                if(currentPage == 0 && recipeList.isEmpty()){
+                    setShowNoRecipeDialog(true)
+                }
                 if (recipeList.isEmpty()) {
                     isLastPage = true
                 } else {
                     _recipe.value = _recipe.value + recipeList
                     currentPage++
+                    if(recipeList.size < 10) isLastPage = true
                 }
                 Log.d(tag, "${recipeList.lastOrNull()?.Name}")
             } catch (e: Exception) {
@@ -245,22 +259,27 @@ class RecipeListViewModel(
         cookingTimeMax: Int? = null,
         calorieMin: Int? = null,
         calorieMax: Int? = null,
-        category: String? = null
+        category: String? = null,
+        searchQuery: String? = null
     ) {
         currentFetchType = RecipeFetchType.FILTERED_PERSONALIZED_RECIPES
-        lastFilterParams = FilterParams(cookingTimeMin, cookingTimeMax, calorieMin, calorieMax, category)
+        lastFilterParams = FilterParams(cookingTimeMin, cookingTimeMax, calorieMin, calorieMax, category, searchQuery)
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.value = true
             try {
                 Log.d(tag, "FILTERED_PERSONALIZED_RECIPES for page:$currentPage and limit:$pageSize")
                 val recipeList = repository.getPersonalizedRecipeList(
-                    pageSize, currentPage, cookingTimeMin, cookingTimeMax, calorieMin, calorieMax, category
+                    pageSize, currentPage, cookingTimeMin, cookingTimeMax, calorieMin, calorieMax, category, searchQuery
                 )
+                if(currentPage == 0 && recipeList.isEmpty()){
+                    setShowNoRecipeDialog(true)
+                }
                 if (recipeList.isEmpty()) {
                     isLastPage = true
                 } else {
                     _recipe.value = _recipe.value + recipeList
                     currentPage++
+                    if(recipeList.size < 10) isLastPage = true
                 }
                 Log.d(tag, "${recipeList.lastOrNull()?.Name}")
             } catch (e: Exception) {
@@ -269,6 +288,10 @@ class RecipeListViewModel(
                 _isLoading.value = false
             }
         }
+    }
+
+    fun setShowNoRecipeDialog(newValue: Boolean){
+        _showNoRecipeDialog.value = newValue
     }
 
     fun getUserLikedRecipesList() {

@@ -9,7 +9,6 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
-import com.develoburs.fridgify.model.RecipeLikeResponse
 import retrofit2.http.DELETE
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -31,7 +30,8 @@ interface RecipeApi {
         @Query("maxCookingTime") cookingTimeMax: Int?,
         @Query("minCalories") calorieMin: Int?,
         @Query("maxCalories") calorieMax: Int?,
-        @Query("category") category: String?
+        @Query("category") category: String?,
+        @Query("search") search: String?
     ): List<Recipe>
 
     @GET("recipe-api/personalized/{userId}")
@@ -52,7 +52,8 @@ interface RecipeApi {
         @Query("maxCookingTime") cookingTimeMax: Int?,
         @Query("minCalories") calorieMin: Int?,
         @Query("maxCalories") calorieMax: Int?,
-        @Query("category") category: String?
+        @Query("category") category: String?,
+        @Query("search") search: String?
     ): List<Recipe>
 
     @GET("recipe-api/like/userLikedRecipes")
