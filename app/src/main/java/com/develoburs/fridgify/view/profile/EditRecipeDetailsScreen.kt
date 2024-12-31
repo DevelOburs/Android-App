@@ -280,7 +280,7 @@ fun EditRecipeScreen(
                                     likeCount = recipe.Likes,
                                     commentCount = recipe.Comments,
                                     saveCount = recipe.saveCount,
-                                    ingredients = recipe.ingredients?.plus(selectedItems.map { it.Name }),
+                                    ingredients = (selectedItems.map { it.Name }),
                                     imageUrl = imageUrl ?: "deneme",
                                     category = category,
                                     calories = calories,

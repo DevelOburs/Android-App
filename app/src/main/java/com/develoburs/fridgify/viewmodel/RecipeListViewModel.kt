@@ -57,6 +57,9 @@ class RecipeListViewModel(
     private val _isSaving = MutableStateFlow(false)
     val isSaving: StateFlow<Boolean> = _isSaving
 
+    private val _isCommentLoading = MutableStateFlow(false)
+    val isCommentLoading: StateFlow<Boolean> = _isCommentLoading
+
     fun setIsLikingLoading(isLoading: Boolean) {
         _isLiking.value = isLoading
     }
@@ -495,6 +498,7 @@ class RecipeListViewModel(
     fun fetchUserSavedRecipes(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                setIsSavingLoading(true) // Set loading state
                 val savedRecipes = repository.getUserSavedRecipes(userId)
                 _userSavedRecipes.emit(savedRecipes)
             } catch (e: Exception) {
@@ -502,6 +506,8 @@ class RecipeListViewModel(
                     // Log error or display an error message
                     println("Failed to fetch user saved recipes: $e")
                 }
+            } finally {
+                setIsSavingLoading(false) // Turn off loading state
             }
         }
     }
@@ -575,7 +581,7 @@ class RecipeListViewModel(
     }
 
 
-    fun deleteComment(recipeId: String, commentId: String, userId: String) {
+    fun deleteComment(commentId: String, recipeId: String, userId: String) {
         viewModelScope.launch {
             try {
                 repository.deleteComment(recipeId, commentId, userId)

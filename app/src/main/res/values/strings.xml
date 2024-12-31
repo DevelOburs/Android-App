@@ -35,5 +35,7 @@
     <string name="cancel">Cancel</string>
     <string name="delete_comment">Delete Comment</string>
     <string name="unknown_user">Unknown User</string>
-
+    <string name="calories">Calories</string>
+    <string name="cooking_time">Cooking Time</string>
+    <string name="not_available">Not Available</string>
 </resources>

@@ -447,10 +447,10 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         }
     }
 
-    override suspend fun deleteComment(recipeId: String, commentId: String, userId: String) {
+    override suspend fun deleteComment(commentId: String, recipeId: String, userId: String) {
         try {
             val token = "Bearer ${getToken()}" // Ensure the token is not null or empty
-            api.deleteComment(recipeId, commentId, userId, token)
+            api.deleteComment(commentId, recipeId, userId, token)
             Log.d("Repository", "Comment deleted successfully: recipeId=$recipeId, commentId=$commentId")
         } catch (e: Exception) {
             Log.e("Repository", "Unexpected error while deleting comment", e)

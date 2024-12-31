@@ -30,14 +30,18 @@ data class Recipe(
     @SerializedName("description")
     val instructions: String?,
 
-    val ingredients: List<String>?,
+    @SerializedName("ingredients")
+    val ingredients: List<Food>?,
 
     val comments: List<String>?,
 
+    @SerializedName("calories")
     val calories: Int?,
 
+    @SerializedName("cookingTime")
     val cookingTime: Int?,
 
+    @SerializedName("saveCount")
     val saveCount: Int?
 )
 
