@@ -33,9 +33,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.develoburs.fridgify.viewmodel.RecipeListViewModel
 import com.develoburs.fridgify.viewmodel.RecipeListViewModelFactory
 import androidx.navigation.NavController
-import com.develoburs.fridgify.model.Comment
 import com.develoburs.fridgify.model.repository.FridgifyRepositoryImpl
-import com.develoburs.fridgify.ui.theme.Cream
+import com.develoburs.fridgify.ui.theme.CreamColor
 import com.develoburs.fridgify.ui.theme.CreamColor2
 import com.develoburs.fridgify.ui.theme.MintColor
 
@@ -69,7 +68,6 @@ fun RecipeDetailsScreen(
     }
 
 
-
     // Collect the recipe details state
     val recipe by viewModel.recipeDetail.collectAsState()
     val userLikedRecipes by viewModel.userLikedRecipes.collectAsState()
@@ -79,6 +77,10 @@ fun RecipeDetailsScreen(
     var newComment by remember { mutableStateOf("") } // For new comment input
     val isLiking by viewModel.isLiking.collectAsState()
     val isSaving by viewModel.isSaving.collectAsState()
+    val isCommentsLoading by viewModel.isCommentsLoading.collectAsState()
+    val isAddingComment by viewModel.isAddingComment.collectAsState()
+    val isDeletingComment by viewModel.isDeletingComment.collectAsState()
+
 
     // State for like, save, and new comment
     val isLiked = userLikedRecipes.contains(recipeId)
@@ -99,67 +101,78 @@ fun RecipeDetailsScreen(
                 Text(
                     text = stringResource(id = R.string.confirm_delete),
                     color = Color.Red,
-                    style = MaterialTheme.typography.titleSmall, // Smaller font size
-                    modifier = Modifier.padding(bottom = 8.dp) // Add some spacing
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
             },
             text = {
                 Text(
                     text = stringResource(id = R.string.delete_confirmation_message),
                     color = Color.Black,
-                    style = MaterialTheme.typography.bodySmall, // Smaller font size
-                    modifier = Modifier.padding(bottom = 16.dp) // Add some spacing
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(bottom = 16.dp)
                 )
             },
             confirmButton = {
                 Button(
                     onClick = {
-                        if (selectedCommentId.isNotEmpty()) {
-                            // Call deleteComment from ViewModel
+                        if (selectedCommentId.isNotEmpty() && !isDeletingComment) {
                             viewModel.deleteComment(
-                                recipeId = recipeId,
                                 commentId = selectedCommentId,
                                 userId = repository.getUserID().toString()
                             )
                         }
-                        showDialog = false // Close the dialog
+                        if (!isDeletingComment) {
+                            showDialog = false // Close the dialog only when not deleting
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Red,
+                        containerColor = if (isDeletingComment) Color.Gray else Color.Red,
                         contentColor = Color.White
                     ),
-                    modifier = Modifier
-                        .width(90.dp) // Increased width for text to fit
-                        .height(40.dp) // Slightly taller button
+                    enabled = !isDeletingComment // Disable button during loading
                 ) {
-                    Text(
-                        text = stringResource(id = R.string.delete),
-                        style = MaterialTheme.typography.bodySmall // Smaller text
-                    )
+                    if (isDeletingComment) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(id = R.string.delete),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
             },
             dismissButton = {
                 Button(
-                    onClick = { showDialog = false },
+                    onClick = {
+                        if (!isDeletingComment) {
+                            showDialog = false
+                        }
+                    },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Gray,
                         contentColor = Color.Black
                     ),
                     modifier = Modifier
-                        .width(90.dp) // Increased width for text to fit
-                        .height(40.dp) // Slightly taller button
+                        .width(90.dp)
+                        .height(40.dp),
+                    enabled = !isDeletingComment // Disable cancel button during deletion
                 ) {
                     Text(
                         text = stringResource(id = R.string.cancel),
-                        style = MaterialTheme.typography.bodySmall // Smaller text
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             },
             modifier = Modifier
-                .width(250.dp) // Dialog width
-                .padding(6.dp), // Add padding to the dialog
-            shape = RoundedCornerShape(12.dp), // Optional: Rounded corners
-            containerColor = CreamColor2 // Optional: Adjust background color
+                .width(250.dp)
+                .padding(6.dp),
+            shape = RoundedCornerShape(12.dp),
+            containerColor = CreamColor2
         )
     }
 
@@ -320,10 +333,10 @@ fun RecipeDetailsScreen(
                                 }
                             }
                                 ?: Text(
-                                text = stringResource(id = R.string.no_ingredients_available),
-                                color = Color.Black,
-                                style = MaterialTheme.typography.bodySmall
-                            )
+                                    text = stringResource(id = R.string.no_ingredients_available),
+                                    color = Color.Black,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
 
                             Spacer(modifier = Modifier.height(16.dp))
 // Recipe Calories
@@ -388,19 +401,25 @@ fun RecipeDetailsScreen(
                         )
                     }
 
-// Comment Box
+                    // Comment Box
                     item {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(200.dp) // Fixed height for the comment section
                                 .background(
-                                    color = CreamColor2,
+                                    color = CreamColor,
                                     shape = MaterialTheme.shapes.medium
                                 )
                                 .padding(8.dp)
                         ) {
-                            if (comments.isEmpty()) {
+                            if (isCommentsLoading) {
+                                // Show loading spinner while comments are being fetched
+                                CircularProgressIndicator(
+                                    modifier = Modifier.align(Alignment.Center),
+                                    color = MintColor
+                                )
+                            } else if (comments.isEmpty()) {
                                 // Show "No comments yet" placeholder
                                 Text(
                                     text = stringResource(id = R.string.no_comments_available),
@@ -409,6 +428,7 @@ fun RecipeDetailsScreen(
                                     style = MaterialTheme.typography.titleMedium
                                 )
                             } else {
+                                // Show comments
                                 LazyColumn(
                                     modifier = Modifier.fillMaxSize(),
                                     reverseLayout = true // Most recent comments at the top
@@ -426,23 +446,23 @@ fun RecipeDetailsScreen(
                                             horizontalArrangement = Arrangement.SpaceBetween,
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Column {                Text(
-                                                text = "ID: ${comment.id ?: "Unknown"}", // Show comment ID
-                                                color = Color.Gray,
-                                                style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp)
-                                            )
-
-                                                Spacer(modifier = Modifier.height(4.dp))
+                                            // Column for displaying comment details
+                                            Column {
+                                                // Display commenter's username
                                                 Text(
-                                                    text = comment.username ?: stringResource(id = R.string.unknown_user), // Use username or fallback
+                                                    text = comment.username
+                                                        ?: stringResource(id = R.string.unknown_user),
                                                     color = Color.Black,
                                                     style = MaterialTheme.typography.bodySmall.copy(
                                                         fontWeight = FontWeight.Bold
                                                     )
                                                 )
+
                                                 Spacer(modifier = Modifier.height(4.dp))
+
+                                                // Display the actual comment text
                                                 Text(
-                                                    text = comment.comment, // Access the `comment` field
+                                                    text = comment.comment,
                                                     color = Color.DarkGray,
                                                     style = MaterialTheme.typography.bodySmall.copy(
                                                         fontSize = 16.sp
@@ -451,15 +471,28 @@ fun RecipeDetailsScreen(
                                             }
 
                                             if (comment.userId == repository.getUserID().toString()) {
-                                                IconButton(onClick = {
-                                                    selectedCommentId = comment.id.toString() // Set selected comment ID
-                                                    showDialog = true // Show the dialog
-                                                }) {
-                                                    Icon(
-                                                        imageVector = Icons.Default.Delete,
-                                                        contentDescription = stringResource(id = R.string.delete_comment),
-                                                        tint = Color.Red
-                                                    )
+                                                IconButton(
+                                                    onClick = {
+                                                        if (!isDeletingComment) {
+                                                            selectedCommentId = comment.id?.toString() ?: "" // Set the selected comment ID
+                                                            showDialog = true // Show delete confirmation dialog
+                                                        }
+                                                    },
+                                                    enabled = !isDeletingComment || selectedCommentId != comment.id?.toString() // Disable only for active delete
+                                                ) {
+                                                    if (isDeletingComment && selectedCommentId == comment.id.toString()) {
+                                                        CircularProgressIndicator(
+                                                            modifier = Modifier.size(20.dp),
+                                                            color = Color.Red,
+                                                            strokeWidth = 2.dp
+                                                        )
+                                                    } else {
+                                                        Icon(
+                                                            imageVector = Icons.Default.Delete,
+                                                            contentDescription = stringResource(id = R.string.delete_comment),
+                                                            tint = Color.Red
+                                                        )
+                                                    }
                                                 }
                                             }
                                         }
@@ -470,6 +503,7 @@ fun RecipeDetailsScreen(
 
                         Spacer(modifier = Modifier.height(8.dp))
                     }
+
 
                     // Add New Comment Section
                     item {
@@ -489,25 +523,39 @@ fun RecipeDetailsScreen(
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 },
-                                singleLine = true
+                                singleLine = true,
+                                enabled = !isAddingComment // Disable input while adding a comment
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Button(
                                 onClick = {
                                     if (newComment.isNotBlank()) {
-                                        viewModel.addComment(recipeId, repository.getUserID().toString(), newComment)
+                                        viewModel.addComment(
+                                            recipeId,
+                                            repository.getUserID().toString(),
+                                            newComment
+                                        )
                                         newComment = "" // Clear the input
                                     }
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = MintColor,
                                     contentColor = Color.Black
-                                )
+                                ),
+                                enabled = !isAddingComment // Disable button while loading
                             ) {
-                                Text(
-                                    text = stringResource(id = R.string.send),
-                                    style = MaterialTheme.typography.titleMedium
-                                )
+                                if (isAddingComment) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(20.dp),
+                                        color = Color.Black,
+                                        strokeWidth = 2.dp
+                                    )
+                                } else {
+                                    Text(
+                                        text = stringResource(id = R.string.send),
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                }
                             }
                         }
                     }
