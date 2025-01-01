@@ -1,6 +1,5 @@
 package com.develoburs.fridgify.view.profile
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -8,7 +7,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -18,7 +16,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.develoburs.fridgify.view.home.RecipeCard
 import com.develoburs.fridgify.viewmodel.RecipeListViewModel
-import com.develoburs.fridgify.viewmodel.RecipeListViewModelFactory
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -33,19 +30,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.model.repository.FridgifyRepositoryImpl
-import com.develoburs.fridgify.ui.theme.BlackColor
 import com.develoburs.fridgify.ui.theme.CharcoalColor
 import com.develoburs.fridgify.ui.theme.CreamColor2
 import com.develoburs.fridgify.ui.theme.DarkOrangeColor
 import com.develoburs.fridgify.ui.theme.LightOrangeColor
-import com.develoburs.fridgify.ui.theme.MintColor
-import com.develoburs.fridgify.ui.theme.OrangeColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,7 +66,7 @@ fun ProfileScreen(navController: NavController, viewModel: RecipeListViewModel =
                 title = {
                     Text(
                         text = stringResource(id = R.string.profile),
-                        color = Color.White,
+                        color = CharcoalColor,
                         style = MaterialTheme.typography.labelMedium
                     )
                 },

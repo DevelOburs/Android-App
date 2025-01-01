@@ -15,7 +15,8 @@ interface FridgifyRepository {
         cookingTimeMax: Int?,
         calorieMin: Int?,
         calorieMax: Int?,
-        category: String?
+        category: String?,
+        searchQuery: String?
     ): List<Recipe>
 
     suspend fun getPersonalizedRecipeList(limit: Int, pageNumber: Int): List<Recipe>
@@ -27,7 +28,8 @@ interface FridgifyRepository {
         cookingTimeMax: Int?,
         calorieMin: Int?,
         calorieMax: Int?,
-        category: String?
+        category: String?,
+        searchQuery: String?
     ): List<Recipe>
 
     suspend fun getUserRecipeList(limit: Int, pageNumber: Int): List<Recipe>

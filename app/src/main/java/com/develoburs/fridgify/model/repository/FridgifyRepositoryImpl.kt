@@ -126,9 +126,12 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         cookingTimeMax: Int?,
         calorieMin: Int?,
         calorieMax: Int?,
-        category: String?
+        category: String?,
+        searchQuery: String?
     ): List<Recipe> {
         try {
+            Log.d("repository", "Request:\n\tcookingTimeMin: $cookingTimeMin\n\tcookingTimeMax: $cookingTimeMax\n\t" +
+                    "calorieMin: $calorieMin\n\tcalorieMax: $calorieMax\n\tcategory: $category\n\tsearchQuery: $searchQuery")
             // Use getToken function to retrieve the token
             val recipes = api.getRecipes(
                 token = "Bearer ${getToken()}",
@@ -138,7 +141,8 @@ class FridgifyRepositoryImpl : FridgifyRepository {
                 cookingTimeMax = cookingTimeMax,
                 calorieMin = calorieMin,
                 calorieMax = calorieMax,
-                category = category
+                category = category,
+                search = searchQuery
             )
             return recipes
         } catch (e: Exception) {
@@ -167,9 +171,12 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         cookingTimeMax: Int?,
         calorieMin: Int?,
         calorieMax: Int?,
-        category: String?
+        category: String?,
+        searchQuery: String?
     ): List<Recipe> {
         try {
+            Log.d("repository", "Request:\n\tcookingTimeMin: $cookingTimeMin\n\tcookingTimeMax: $cookingTimeMax\n\t" +
+                    "calorieMin: $calorieMin\n\tcalorieMax: $calorieMax\n\tcategory: $category\n\tsearchQuery: $searchQuery")
             // Use getToken function to retrieve the token
             val recipes = api.getPersonalizedRecipes(
                 token = "Bearer ${getToken()}",
@@ -180,7 +187,8 @@ class FridgifyRepositoryImpl : FridgifyRepository {
                 cookingTimeMax = cookingTimeMax,
                 calorieMin = calorieMin,
                 calorieMax = calorieMax,
-                category = category
+                category = category,
+                search = searchQuery
             )
             return recipes
         } catch (e: Exception) {

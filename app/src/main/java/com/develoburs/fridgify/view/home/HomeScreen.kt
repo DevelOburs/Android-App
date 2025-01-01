@@ -1,6 +1,5 @@
 package com.develoburs.fridgify.view.home
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -30,6 +30,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -57,9 +59,11 @@ import com.develoburs.fridgify.viewmodel.RecipeListViewModel
 import androidx.navigation.NavController
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.CharcoalColor
+import com.develoburs.fridgify.ui.theme.CoffeeColor
 import com.develoburs.fridgify.ui.theme.CreamColor
 import com.develoburs.fridgify.ui.theme.CreamColor2
-import com.develoburs.fridgify.ui.theme.LightCoffee
+import com.develoburs.fridgify.ui.theme.LightCoffeeColor
+import com.develoburs.fridgify.ui.theme.LightOrangeColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -70,6 +74,8 @@ fun HomeScreen(navController: NavController, viewModel: RecipeListViewModel = vi
     val isLoading = viewModel.isLoading.collectAsState()
 
     var showFilterSheet by remember { mutableStateOf(false) }
+
+    val showNoRecipeDialog = viewModel.showNoRecipeDialog.collectAsState().value
 
     val hasLoaded = viewModel.hasLoaded.collectAsState()
 
@@ -162,12 +168,44 @@ fun HomeScreen(navController: NavController, viewModel: RecipeListViewModel = vi
 
                 }
 
+                if (showNoRecipeDialog) {
+                    AlertDialog(
+                        onDismissRequest = { viewModel.setShowNoRecipeDialog(false) },
+                        title = {
+                            Text(
+                                text = "No Recipes Found",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = Color.White
+                            )
+                        },
+                        text = {
+                            Text(
+                                text = "Sorry, there are no recipes that match your selected filters. Please try adjusting your filters.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.White
+                            )
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = { viewModel.setShowNoRecipeDialog(false) },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = OrangeColor,
+                                    contentColor = Color.White
+                                )
+                            ) {
+                                Text("OK", style = MaterialTheme.typography.bodyMedium)
+                            }
+                        },
+                        containerColor = LightOrangeColor,
+                        tonalElevation = 4.dp
+                    )
+                }
+
                 if (showFilterSheet) {
                     ModalBottomSheet(
                         onDismissRequest = { showFilterSheet = false },
                         containerColor = CharcoalColor,
-
-                        ) {
+                    ) {
                         FilterSheetContent(
                             onDismiss = { showFilterSheet = false },
                             viewModel = viewModel
@@ -205,6 +243,7 @@ fun FilterSheetContent(
     var selectedCategory by remember { mutableStateOf<String?>(null) }
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var isPersonalized by remember { mutableStateOf(true) }
+    var searchQuery by remember { mutableStateOf("") }
 
     val scrollState = rememberScrollState()
 
@@ -215,6 +254,50 @@ fun FilterSheetContent(
             .verticalScroll(scrollState)
     ) {
         Text(text = "Filter", style = MaterialTheme.typography.labelMedium, color = CreamColor)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Search recipes by keyword",
+            style = MaterialTheme.typography.bodyLarge.copy(
+                lineHeight = 20.sp,
+                fontStyle = FontStyle.Italic
+            ),
+            color = CreamColor,
+            modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
+        )
+
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            placeholder = {
+                Text(
+                    text = "Search...",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = CreamColor
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.search_icon),
+                    contentDescription = "Search Icon",
+                    tint = OrangeColor
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = CreamColor,
+                focusedContainerColor = CoffeeColor,
+                unfocusedContainerColor = CoffeeColor,
+                disabledContainerColor = CoffeeColor,
+                errorContainerColor = CoffeeColor,
+                cursorColor = Color.Red,
+                focusedBorderColor = CreamColor,
+                unfocusedBorderColor = OrangeColor,
+            )
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -338,7 +421,7 @@ fun FilterSheetContent(
             DropdownMenu(
                 expanded = isDropdownExpanded,
                 onDismissRequest = { isDropdownExpanded = false },
-                modifier = Modifier.background(color = LightCoffee)
+                modifier = Modifier.background(color = LightCoffeeColor)
             ) {
                 categories.forEach { category ->
                     DropdownMenuItem(
@@ -394,7 +477,8 @@ fun FilterSheetContent(
                                 null
                             } else {
                                 categoryMap.entries.find { it.value == selectedCategory }?.key
-                            }
+                            },
+                            searchQuery = searchQuery
                         )
                     } else {
                         viewModel.getRecipesList(
@@ -406,21 +490,10 @@ fun FilterSheetContent(
                                 null
                             } else {
                                 categoryMap.entries.find { it.value == selectedCategory }?.key
-                            }
+                            },
+                            searchQuery = searchQuery
                         )
                     }
-                    Log.d(
-                        "test", "Selected Filters:"
-                    )
-                    Log.d(
-                        "test",
-                        "Cooking Time: Min = ${cookingTimeMin.toInt()}, Max = ${cookingTimeMax.toInt()}"
-                    )
-                    Log.d(
-                        "test",
-                        "Calorie: Min = ${calorieMin.toInt()}, Max = ${calorieMax.toInt()}"
-                    )
-                    Log.d("test", "Category: ${selectedCategory ?: "None"}")
                     onDismiss()
                 },
                 colors = ButtonDefaults.buttonColors(

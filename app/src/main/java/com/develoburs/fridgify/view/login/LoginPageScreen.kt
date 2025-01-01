@@ -11,11 +11,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.develoburs.fridgify.view.bottombar.BottomBarScreen
@@ -24,7 +23,6 @@ import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.DarkBlueColor
 import com.develoburs.fridgify.ui.theme.LightOrangeColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
-import com.develoburs.fridgify.ui.theme.PaleWhiteColor
 import com.develoburs.fridgify.viewmodel.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,12 +44,11 @@ fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = v
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // App Title
-        Text(
-            text = stringResource(id = R.string.app_name),
-            color = OrangeColor, // Customize the color
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 24.dp),
-            style = MaterialTheme.typography.labelLarge
+        Icon(
+            painter = painterResource(id = R.drawable.app_logo),
+            contentDescription = "logo",
+            tint = OrangeColor,
+            modifier = Modifier.height(120.dp).padding(0.dp)
         )
 
         // Username Input
@@ -65,7 +62,8 @@ fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = v
             focusedBorderColor = OrangeColor, // Color for focused state
             unfocusedBorderColor = LightOrangeColor, // Color for unfocused state
             focusedLabelColor = OrangeColor, // Label color when focused
-            unfocusedLabelColor = DarkBlueColor // Label color when not focused
+            unfocusedLabelColor = DarkBlueColor, // Label color when not focused
+            cursorColor = OrangeColor,
         ),
 
         )
@@ -93,7 +91,8 @@ fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = v
             focusedBorderColor = OrangeColor, // Color for focused state
             unfocusedBorderColor = LightOrangeColor, // Color for unfocused state
             focusedLabelColor = OrangeColor, // Label color when focused
-            unfocusedLabelColor = DarkBlueColor // Label color when not focused
+            unfocusedLabelColor = DarkBlueColor, // Label color when not focused
+            cursorColor = OrangeColor,
         ),
         )
 
