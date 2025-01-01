@@ -53,7 +53,7 @@ interface RecipeApi {
         @Query("minCalories") calorieMin: Int?,
         @Query("maxCalories") calorieMax: Int?,
         @Query("category") category: String?,
-        @Query("search") search: String?
+        @Query("name") search: String?
     ): List<Recipe>
 
     @GET("recipe-api/like/userLikedRecipes")
