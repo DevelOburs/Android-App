@@ -108,7 +108,6 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
                 ),
                 modifier = Modifier
                     .height(50.dp)
-                    .background(color = CreamColor2)
 
             )
         },
@@ -117,14 +116,12 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(color = CreamColor2)
             ) {
                 if (isLoading) {
 
                     Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(color = CreamColor2),
+                            .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
@@ -143,7 +140,6 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
                     modifier = Modifier
                         .padding(paddingValues)
                         .padding(top = 21.dp)
-                        .background(color = CreamColor2)
                 ) {
                     TextField(
                         value = searchQuery,

@@ -72,6 +72,7 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
 
 
     Scaffold(
+
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -87,21 +88,18 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
                 ),
                 modifier = Modifier
                     .height(50.dp)
-                    .background(color = CreamColor2)
             )
         },
         content = { paddingValues ->
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(color = CreamColor2)
             ) {
                 if (isLoading) {
 
                     Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(color = CreamColor2),
+                            .fillMaxSize(),
                         contentAlignment = Alignment.Center
 
                     ) {
@@ -118,7 +116,6 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
                     Column(
                         modifier = Modifier
                             .padding(paddingValues)
-                            .background(color = CreamColor2)
                             .padding(top = 21.dp)
                     ) {
                         TextField(

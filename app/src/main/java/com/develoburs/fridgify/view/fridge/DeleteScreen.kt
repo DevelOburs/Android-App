@@ -103,22 +103,18 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                     containerColor = Color.Transparent
                 ),
                 modifier = Modifier
-                    .background(color = CreamColor2)
                     .height(50.dp)
             )
         },
-        containerColor = CreamColor2,
         content = { paddingValues ->
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(color = CreamColor2)
             ) {
                 if (isLoading) {
 
                     Box(
                         modifier = Modifier
-                            .background(color = CreamColor2)
                             .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
@@ -137,7 +133,6 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                     modifier = Modifier
                         .padding(paddingValues)
                         .padding(top = 21.dp)
-                        .background(color = CreamColor2)
 
                 ) {
                     TextField(
