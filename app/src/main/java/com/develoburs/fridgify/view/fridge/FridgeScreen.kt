@@ -25,8 +25,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -41,18 +39,15 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.BlackColor
+import com.develoburs.fridgify.ui.theme.CharcoalColor
 import com.develoburs.fridgify.ui.theme.CreamColor2
 import com.develoburs.fridgify.ui.theme.DarkOrangeColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
 import com.develoburs.fridgify.viewmodel.FridgeViewModel
-import com.develoburs.fridgify.viewmodel.LoginViewModel
-import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,30 +72,45 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
 
 
     Scaffold(
+
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
                         text = stringResource(id = R.string.fridge),
-                        color = BlackColor,
+                        color = CharcoalColor,
                         style = MaterialTheme.typography.labelMedium
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent
+
                 ),
-                modifier = Modifier.height(50.dp)
+                modifier = Modifier
+                    .height(50.dp)
             )
         },
         content = { paddingValues ->
-            Surface(modifier = Modifier.fillMaxSize()) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
                 if (isLoading) {
 
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize(),
                         contentAlignment = Alignment.Center
+
                     ) {
-                        CircularProgressIndicator(color = OrangeColor)
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .height(36.dp)
+                                .fillMaxWidth(0.1f),
+                            strokeWidth = 5.dp,
+                            color = CharcoalColor
+                        )
                     }
                 } else {
                     Column(
