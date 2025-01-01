@@ -1,6 +1,4 @@
 package com.develoburs.fridgify.view.fridge
-import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -32,12 +30,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
-import com.develoburs.fridgify.R
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.ui.theme.BlackColor
+import com.develoburs.fridgify.ui.theme.CharcoalColor
+import com.develoburs.fridgify.ui.theme.CreamColor2
 import com.develoburs.fridgify.ui.theme.DarkOrangeColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
 
@@ -89,7 +86,7 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                 title = {
                     Text(
                         text = "Delete screen",
-                        color = BlackColor,
+                        color = CharcoalColor,
                         style = MaterialTheme.typography.labelMedium
                     )
                 },
@@ -98,39 +95,45 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = BlackColor
+                            tint = CharcoalColor
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent
                 ),
-                modifier = Modifier.height(50.dp)
+                modifier = Modifier
+                    .height(50.dp)
             )
         },
-
         content = { paddingValues ->
-            Surface(modifier = Modifier.fillMaxSize()) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
                 if (isLoading) {
 
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(color = OrangeColor)
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .height(36.dp)
+                                .fillMaxWidth(0.1f),
+                            strokeWidth = 5.dp,
+                            color = CharcoalColor
+                        )
                     }
                 }else {
-                Image(
-                    painter = painterResource(id = R.drawable.background_image),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
 
                 Column(
                     modifier = Modifier
                         .padding(paddingValues)
                         .padding(top = 21.dp)
+
                 ) {
                     TextField(
                         value = searchQuery,
@@ -139,6 +142,7 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                         modifier = Modifier.fillMaxWidth(),
                         colors = TextFieldDefaults.textFieldColors(
                             containerColor = Color(0xFFFFE4B5)
+
                         )
                     )
                     Row(
@@ -146,7 +150,9 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                             .fillMaxWidth()
                             .padding(vertical = 8.dp)
                             .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+
                     ) {
                         val categories = listOf(
                             "All",
@@ -254,8 +260,12 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                         ) {
                             if (isLoading && addTriggered) {
                                 CircularProgressIndicator(
-                                    color = Color.White,
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .height(36.dp)
+                                        .fillMaxWidth(0.1f),
+                                    strokeWidth = 5.dp,
+                                    color = CharcoalColor
                                 )
                             } else {
                                 Text(text = "Delete", style = MaterialTheme.typography.labelMedium)

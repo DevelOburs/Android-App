@@ -19,10 +19,10 @@ import com.develoburs.fridgify.viewmodel.FridgeViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,12 +34,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
-import com.develoburs.fridgify.R
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.ui.theme.BlackColor
+import com.develoburs.fridgify.ui.theme.CharcoalColor
+import com.develoburs.fridgify.ui.theme.CreamColor2
 import com.develoburs.fridgify.ui.theme.DarkOrangeColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
 
@@ -91,7 +90,7 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
                 title = {
                     Text(
                         text = "Adding screen",
-                        color = BlackColor,
+                        color = CharcoalColor,
                         style = MaterialTheme.typography.labelMedium
                     )
                 },
@@ -100,33 +99,42 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = BlackColor
+                            tint =  CharcoalColor,
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent
                 ),
-                modifier = Modifier.height(50.dp)
+                modifier = Modifier
+                    .height(50.dp)
+
             )
         },
+        containerColor = CreamColor2,
         content = { paddingValues ->
-            Surface(modifier = Modifier.fillMaxSize()) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
                 if (isLoading) {
 
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(color = OrangeColor)
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .height(36.dp)
+                                .fillMaxWidth(0.1f),
+                            strokeWidth = 5.dp,
+                            color = CharcoalColor
+                        )
                     }
                 }else {
-                Image(
-                    painter = painterResource(id = R.drawable.background_image),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
+
 
                 Column(
                     modifier = Modifier
@@ -172,7 +180,7 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
                                     .clickable {
                                         selectedCategory = category
                                         val formattedCategory = if (category == "All") null else formatCategoryForApi(category)
-                                        viewModel.getFoodList(formattedCategory)
+                                        viewModel.getNotInFridgeFood(formattedCategory)
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -235,7 +243,10 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
                             .padding(16.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Button(onClick = { navController.popBackStack() },modifier = Modifier.height(40.dp)) {
+                        Button(onClick = { navController.popBackStack() },modifier = Modifier.height(40.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF8B4513)
+                                )) {
                             Text(text = "Exit", style = MaterialTheme.typography.labelMedium)
                         }
                         Button(
@@ -251,18 +262,26 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
 
                             },
                             modifier = Modifier.height(40.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF8B4513)
+                            ),
                             enabled = !isLoading
 
                         ) {
                             if (isLoading && addTriggered) {
                                 CircularProgressIndicator(
-                                    color = Color.White,
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .height(36.dp)
+                                        .fillMaxWidth(0.1f),
+                                    strokeWidth = 5.dp,
+                                    color = CharcoalColor
                                 )
                             } else {
                                 Text(text = "Add", style = MaterialTheme.typography.labelMedium)
                             }
                         }
+
 
 
                     }
