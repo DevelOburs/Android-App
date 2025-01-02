@@ -7,7 +7,6 @@ import retrofit2.http.PUT
 
 data class LoginRequest(
     val username: String,
-    val email: String,
     val password: String
 )
 

@@ -110,7 +110,7 @@ fun LoginPageScreen( navController: NavController, viewModel: LoginViewModel = v
                 ),
                 onClick = {
                     isLoading = true // Show loading indicator
-                    viewModel.login(username, email, password) { response ->
+                    viewModel.login(username, password) { response ->
                         isLoading = false // Hide loading indicator
                         if (response.error.isNullOrEmpty()) {
                             navController.navigate(BottomBarScreen.Home.route) {

@@ -1,6 +1,7 @@
 package com.develoburs.fridgify.view.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,19 +48,19 @@ import com.develoburs.fridgify.ui.theme.DarkOrangeColor
 import com.develoburs.fridgify.ui.theme.LightOrangeColor
 import com.develoburs.fridgify.view.home.RecipeCard
 import com.develoburs.fridgify.viewmodel.RecipeListViewModel
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavController, viewModel: RecipeListViewModel = viewModel(), repository: FridgifyRepositoryImpl) {
+fun ProfileScreen(
+    navController: NavController,
+    viewModel: RecipeListViewModel = viewModel(),
+    repository: FridgifyRepositoryImpl
+) {
     val allRecipes = viewModel.userrecipe.collectAsState(initial = emptyList())
-    // Check if recipes are empty and trigger fetching them
     val isLoading by viewModel.isLoading.collectAsState()
-    if (allRecipes.value.isEmpty()) {
-        with(viewModel) { getUserRecipesList() }
-    }
     val userRecipeCount by viewModel.userRecipeCount.collectAsState(initial = null)
     val userLikeCount by viewModel.userLikeCount.collectAsState(initial = null)
 
+    // Trigger fetch if counts are null
     if (userRecipeCount == null) {
         viewModel.getUserRecipeCount()
     }
@@ -87,26 +88,21 @@ fun ProfileScreen(navController: NavController, viewModel: RecipeListViewModel =
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate("addRecipe") }, // Navigate to Add Recipe Screen
+                onClick = { navController.navigate("addRecipe") },
                 shape = CircleShape,
                 containerColor = DarkOrangeColor,
                 contentColor = Color.White,
                 modifier = Modifier.padding(16.dp)
             ) {
-                Icon(
-                    Icons.Filled.Add, // Replace with your "add" icon resource
-                    contentDescription = "Add Recipe"
-                )
+                Icon(Icons.Filled.Add, contentDescription = "Add Recipe")
             }
         },
         content = { paddingValues ->
-            Surface(
-                modifier = Modifier.fillMaxSize()
-            ) {
+            Surface(modifier = Modifier.fillMaxSize()) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(color = CreamColor2) // Replace Color.Blue with your desired color
+                        .background(CreamColor2)
                 )
 
                 Column(
@@ -114,8 +110,7 @@ fun ProfileScreen(navController: NavController, viewModel: RecipeListViewModel =
                         .padding(paddingValues)
                         .padding(top = 21.dp)
                 ) {
-                    // Upper Box with Name, Two Numbers, and Profile Picture
-                    // Updated Upper Box
+                    // Profile Header Box
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -123,10 +118,7 @@ fun ProfileScreen(navController: NavController, viewModel: RecipeListViewModel =
                             .padding(horizontal = 10.dp)
                             .background(
                                 brush = androidx.compose.ui.graphics.Brush.horizontalGradient(
-                                    colors = listOf(
-                                        LightOrangeColor, // Deep
-                                        LightOrangeColor  // Light
-                                    )
+                                    colors = listOf(LightOrangeColor, LightOrangeColor)
                                 ),
                                 shape = RoundedCornerShape(16.dp)
                             )
@@ -144,16 +136,16 @@ fun ProfileScreen(navController: NavController, viewModel: RecipeListViewModel =
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                // Name
+                                // User's Name
                                 Text(
-                                    text = repository.getUserFirstName() +" " + repository.getUserLastName(),
+                                    text = "${repository.getUserFirstName()} ${repository.getUserLastName()}",
                                     style = MaterialTheme.typography.bodyLarge,
                                     color = Color.White
                                 )
 
                                 Spacer(modifier = Modifier.width(16.dp))
 
-                                // Icons and Numbers in Columns
+                                // Counts (Recipes and Likes)
                                 Row(
                                     modifier = Modifier.weight(1f),
                                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -168,7 +160,7 @@ fun ProfileScreen(navController: NavController, viewModel: RecipeListViewModel =
                                             tint = Color.White
                                         )
                                         Text(
-                                            text = userRecipeCount.toString(),
+                                            text = userRecipeCount?.toString() ?: "-",
                                             style = MaterialTheme.typography.labelSmall,
                                             color = Color.White
                                         )
@@ -184,7 +176,7 @@ fun ProfileScreen(navController: NavController, viewModel: RecipeListViewModel =
                                             tint = Color.White
                                         )
                                         Text(
-                                            text = userLikeCount.toString() ,
+                                            text = userLikeCount?.toString() ?: "-",
                                             style = MaterialTheme.typography.labelSmall,
                                             color = Color.White
                                         )
@@ -194,9 +186,7 @@ fun ProfileScreen(navController: NavController, viewModel: RecipeListViewModel =
 
                             // Settings Button
                             IconButton(
-                                onClick = {
-                                    navController.navigate("SettingsScreen")
-                                },
+                                onClick = { navController.navigate("SettingsScreen") },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(top = 8.dp)
@@ -210,47 +200,75 @@ fun ProfileScreen(navController: NavController, viewModel: RecipeListViewModel =
                         }
                     }
 
-
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Vertical Sliding Recipe Cards
-                    LazyColumn(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        itemsIndexed(recipes) { index, recipe ->  // Use the list of recipes
-                            RecipeCard(
-                                recipe = recipe,
-                                onClick = {
-                                    navController.navigate("recipeDetails/${recipe.id}")
-                                },
-                                onEditClick = {
-                                    navController.navigate("editRecipe/${recipe.id}")
-                                },
-                                isProfileScreen = true
-                            )
-                            if (index == viewModel.userrecipe.collectAsState().value.lastIndex) {
-                                viewModel.getUserRecipesList()
+                    // Recipe List or Empty Message
+                    if (recipes.isEmpty() && !isLoading) {
+                        // No Recipes Message
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "No recipes found.",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = CharcoalColor
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "Do you want to add a recipe?",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = DarkOrangeColor,
+                                    modifier = Modifier.clickable {
+                                        navController.navigate("addRecipe") // Navigate to Add Recipe Screen
+                                    }
+                                )
                             }
                         }
-                        if (isLoading) {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier
-                                            .padding(16.dp)
-                                            .height(36.dp)
-                                            .fillMaxWidth(0.1f),
-                                        strokeWidth = 5.dp,
-                                        color = CharcoalColor
-                                    )
+                    } else {
+                        // LazyColumn for Recipes
+                        LazyColumn(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            itemsIndexed(recipes) { index, recipe ->
+                                RecipeCard(
+                                    recipe = recipe,
+                                    onClick = {
+                                        navController.navigate("recipeDetails/${recipe.id}")
+                                    },
+                                    onEditClick = {
+                                        navController.navigate("editRecipe/${recipe.id}")
+                                    },
+                                    isProfileScreen = true
+                                )
+                                if (index == viewModel.userrecipe.collectAsState().value.lastIndex) {
+                                    viewModel.getUserRecipesList()
                                 }
-
+                            }
+                            if (isLoading) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier
+                                                .padding(16.dp)
+                                                .height(36.dp)
+                                                .fillMaxWidth(0.1f),
+                                            strokeWidth = 5.dp,
+                                            color = CharcoalColor
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
