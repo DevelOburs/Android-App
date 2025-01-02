@@ -143,7 +143,6 @@ fun NavGraph(
 
             // Observe the recipe state from the ViewModel
             val recipe by recipeListViewModel.recipeDetail.collectAsState()
-
             // Trigger the recipe fetch when entering the composable
             LaunchedEffect(recipeId) {
                 recipeListViewModel.getRecipeById(recipeId)

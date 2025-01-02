@@ -77,9 +77,11 @@ class RecipeListViewModel(
 
     private var currentPage = 0
     private val pageSize = 10
+
     private var usr_currentPage = 0
     private val usr_pageSize = 10
     private var usr_isLastPage = false
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
     private var isLastPage = false
@@ -371,12 +373,15 @@ class RecipeListViewModel(
             try {
                 Log.d(tag, "Getting recipes for page:$usr_currentPage and limit:$usr_pageSize")
                 val recipeList = repository.getUserRecipeList(usr_pageSize, usr_currentPage)
-
+                if(currentPage == 0 && recipeList.isEmpty()){
+                    setShowNoRecipeDialog(true)
+                }
                 if (recipeList.isEmpty()) {
                     usr_isLastPage = true
                 } else {
                     _userrecipe.value = _userrecipe.value + recipeList
                     usr_currentPage++
+                    if(recipeList.size < 10) isLastPage = true
                 }
             } catch (e: Exception) {
                 Log.e(tag, "Failed to fetch recipe list", e)
