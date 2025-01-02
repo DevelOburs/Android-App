@@ -4,6 +4,7 @@ import com.develoburs.fridgify.model.Comment
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.model.Recipe
 import com.develoburs.fridgify.model.createRecipe
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -167,9 +168,9 @@ interface RecipeApi {
     @DELETE("recipe-api/comment/{commentId}")
     suspend fun deleteComment(
         @Path("commentId") commentId: String,
-        @Query("recipeId") recipeId: String,
         @Query("userId") userId: String,
         @Header("Authorization") token: String
-    )
+    ): Response<Unit>
+
 
 }

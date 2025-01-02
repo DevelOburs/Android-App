@@ -60,6 +60,6 @@ interface FridgifyRepository {
 
     suspend fun addComment(recipeId: String, userId: String, commentText: String)
 
-    suspend fun deleteComment(recipeId: String, commentId: String, userId: String)
+    suspend fun deleteComment(commentId: String, userId: String)
 
 }

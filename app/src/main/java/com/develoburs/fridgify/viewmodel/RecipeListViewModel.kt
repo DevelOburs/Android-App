@@ -57,8 +57,15 @@ class RecipeListViewModel(
     private val _isSaving = MutableStateFlow(false)
     val isSaving: StateFlow<Boolean> = _isSaving
 
-    private val _isCommentLoading = MutableStateFlow(false)
-    val isCommentLoading: StateFlow<Boolean> = _isCommentLoading
+    // Fetch comments for a specific recipe
+    private val _isCommentsLoading = MutableStateFlow(false)
+    val isCommentsLoading: StateFlow<Boolean> = _isCommentsLoading
+
+    private val _isAddingComment = MutableStateFlow(false)
+    val isAddingComment: StateFlow<Boolean> = _isAddingComment
+
+    private val _isDeletingComment = MutableStateFlow(false)
+    val isDeletingComment: StateFlow<Boolean> = _isDeletingComment
 
     fun setIsLikingLoading(isLoading: Boolean) {
         _isLiking.value = isLoading
@@ -571,27 +578,27 @@ class RecipeListViewModel(
         }
     }
 
-    // Fetch comments for a specific recipe
+
     fun fetchComments(recipeId: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            _isCommentsLoading.value = true // Set loading to true
             try {
                 val fetchedComments = repository.fetchComments(recipeId)
-
-                // Emit updated comments
                 _comments.emit(fetchedComments)
             } catch (e: Exception) {
                 Log.e("ViewModel", "Failed to fetch comments for recipe: $recipeId", e)
+            } finally {
+                _isCommentsLoading.value = false // Set loading to false
             }
         }
     }
 
-
-
     fun addComment(recipeId: String, userId: String, comment: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            _isAddingComment.value = true // Set loading state to true
             try {
                 repository.addComment(recipeId, userId, comment)
-                fetchComments(recipeId) // Refresh comments after adding
+                fetchComments(recipeId) // Refresh comments after successfully adding
 
                 // Increment the comment count in the Recipe object
                 _recipeDetail.value = _recipeDetail.value?.copy(
@@ -599,26 +606,26 @@ class RecipeListViewModel(
                 )
             } catch (e: Exception) {
                 Log.e("RecipeListViewModel", "Failed to add comment", e)
+            } finally {
+                _isAddingComment.value = false // Reset loading state
             }
         }
     }
 
-
-    fun deleteComment(commentId: String, recipeId: String, userId: String) {
-        viewModelScope.launch {
+    fun deleteComment(commentId: String, userId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            Log.d("ViewModel", "Starting deletion...")
+            _isDeletingComment.value = true
             try {
-                repository.deleteComment(recipeId, commentId, userId)
-                fetchComments(recipeId) // Refresh comments after deletion
-
-                // Decrement the comment count in the Recipe object
-                _recipeDetail.value = _recipeDetail.value?.copy(
-                    Comments = (_recipeDetail.value?.Comments ?: 1) - 1
-                )
+                repository.deleteComment(commentId, userId)
+                _comments.value = _comments.value.filterNot { it.id == commentId }
             } catch (e: Exception) {
-                Log.e("ViewModel", "Failed to delete comment: ${e.message}")
+                Log.e("RecipeListViewModel", "Failed to delete comment", e)
+            } finally {
+                _isDeletingComment.value = false
+                Log.d("ViewModel", "Deletion complete.")
             }
         }
     }
-
 
 }
