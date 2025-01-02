@@ -305,6 +305,20 @@ class FridgifyRepositoryImpl : FridgifyRepository {
         }
     }
 
+    suspend fun getAllFoodList(): List<Food> {
+        try {
+
+            val foods = fridgeapi.getAllFood(
+                token = "Bearer ${getToken()}"
+            )
+
+            return foods
+        } catch (e: Exception) {
+
+            throw Exception("Failed to fetch food list", e)
+        }
+    }
+
     override suspend fun getNotInFridge(category: String?): List<Food> {
         try {
             val foods = fridgeapi.getNotInFridge(

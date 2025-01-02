@@ -69,7 +69,8 @@ fun EditRecipeScreen(
     var calories by remember { mutableStateOf(recipe.calories) }
     var cookingTime by remember { mutableStateOf(recipe.cookingTime) }
     var imageUrl by remember { mutableStateOf(recipe.Image ?: "") }
-    var category by remember { mutableStateOf("APPETIZERS_AND_SNACKS") }
+    var category by remember { mutableStateOf(recipe.Category) }
+
 
     val ingredients: List<Food>? = recipe.ingredients
     val selectedItems = fviewModel.selectedFoods

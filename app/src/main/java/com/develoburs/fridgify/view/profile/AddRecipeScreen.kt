@@ -62,14 +62,13 @@ fun AddRecipeScreen(
     onSave: (createRecipe) -> Unit,
     onBack: () -> Unit
 ) {
+    var name by viewModel.name
+    var description by viewModel.description
+    var calories by viewModel.calories
+    var cookingTime by viewModel.cookingTime
+    var category by viewModel.category
 
-    var name by rememberSaveable { mutableStateOf("") }
-    var description by rememberSaveable { mutableStateOf("") }
     var ingredients by rememberSaveable { mutableStateOf(listOf<String>()) }
-
-    var calories by remember { mutableStateOf(0) }
-    var cookingTime by remember { mutableStateOf(0) }
-    var category by remember { mutableStateOf("APPETIZERS_AND_SNACKS") }
     // Get the context for image upload
     val context = LocalContext.current
 
@@ -89,6 +88,14 @@ fun AddRecipeScreen(
 
     val selectedItems = fviewModel.selectedFoods
 
+    fun resetState() {
+        name = ""
+        description = ""
+        ingredients = listOf()
+        calories = 0
+        cookingTime = 0
+        category = "APPETIZERS_AND_SNACKS"
+    }
     // Clear selectedItems when the composable is removed
     DisposableEffect(Unit) {
         onDispose {
@@ -156,7 +163,8 @@ fun AddRecipeScreen(
                     item {
                         OutlinedTextField(
                             value = cookingTime.toString(),
-                            onValueChange = { cookingTime = it.toIntOrNull() ?: 0 },
+                            onValueChange = { input ->
+                                cookingTime = input.toIntOrNull() ?: 0 },
                             label = { Text(text = "Cooking Time (mins)", style = MaterialTheme.typography.titleMedium) },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -166,7 +174,8 @@ fun AddRecipeScreen(
                     item {
                         OutlinedTextField(
                             value = calories.toString(),
-                            onValueChange = { calories = it.toIntOrNull() ?: 0 },
+                            onValueChange = { input ->
+                                calories = input.toIntOrNull() ?: 0 },
                             label = { Text(text = "Calories", style = MaterialTheme.typography.titleMedium) },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -260,6 +269,7 @@ fun AddRecipeScreen(
                         // Debug log
                         Log.d("RecipeCreation", "New recipe created: $newRecipe")
                         onSave(newRecipe)
+                        resetState()
                         selectedItems.clear()
                     },
                     modifier = Modifier
@@ -272,3 +282,4 @@ fun AddRecipeScreen(
         }
     )
 }
+

@@ -1,7 +1,9 @@
 package com.develoburs.fridgify.view.profile
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,10 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,12 +35,18 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -48,6 +59,9 @@ import com.develoburs.fridgify.ui.theme.DarkOrangeColor
 import com.develoburs.fridgify.ui.theme.LightOrangeColor
 import com.develoburs.fridgify.view.home.RecipeCard
 import com.develoburs.fridgify.viewmodel.RecipeListViewModel
+
+import androidx.compose.ui.res.painterResource
+@SuppressLint("RememberReturnType")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
@@ -60,15 +74,18 @@ fun ProfileScreen(
     val userRecipeCount by viewModel.userRecipeCount.collectAsState(initial = null)
     val userLikeCount by viewModel.userLikeCount.collectAsState(initial = null)
 
-    // Trigger fetch if counts are null
-    if (userRecipeCount == null) {
-        viewModel.getUserRecipeCount()
+    // Initial data loading
+    LaunchedEffect(Unit) {
+        if (userRecipeCount == null) {
+            viewModel.getUserRecipeCount()
+        }
+        if (userLikeCount == null) {
+            viewModel.getUserLikeCount()
+        }
+        if (allRecipes.value.isEmpty()) {
+            viewModel.getUserRecipesList()
+        }
     }
-    if (userLikeCount == null) {
-        viewModel.getUserLikeCount()
-    }
-
-    val recipes = allRecipes.value
 
     Scaffold(
         topBar = {
@@ -96,184 +113,209 @@ fun ProfileScreen(
             ) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Recipe")
             }
-        },
-        content = { paddingValues ->
-            Surface(modifier = Modifier.fillMaxSize()) {
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(CreamColor2)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .padding(top = 21.dp)
+            ) {
+                // Profile Header Box
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .background(CreamColor2)
-                )
-
-                Column(
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .padding(top = 21.dp)
+                        .fillMaxWidth()
+                        .height(150.dp)
+                        .padding(horizontal = 10.dp)
+                        .background(
+                            brush = androidx.compose.ui.graphics.Brush.horizontalGradient(
+                                colors = listOf(LightOrangeColor, LightOrangeColor)
+                            ),
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    // Profile Header Box
-                    Box(
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(150.dp)
-                            .padding(horizontal = 10.dp)
-                            .background(
-                                brush = androidx.compose.ui.graphics.Brush.horizontalGradient(
-                                    colors = listOf(LightOrangeColor, LightOrangeColor)
-                                ),
-                                shape = RoundedCornerShape(16.dp)
-                            )
-                            .padding(8.dp),
-                        contentAlignment = Alignment.Center
+                            .padding(horizontal = 16.dp)
                     ) {
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
                         ) {
+                            Text(
+                                text = "${repository.getUserFirstName()} ${repository.getUserLastName()}",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color.White
+                            )
+
+                            Spacer(modifier = Modifier.width(16.dp))
+
                             Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.weight(1f),
+                                horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
-                                // User's Name
-                                Text(
-                                    text = "${repository.getUserFirstName()} ${repository.getUserLastName()}",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = Color.White
-                                )
-
-                                Spacer(modifier = Modifier.width(16.dp))
-
-                                // Counts (Recipes and Likes)
-                                Row(
-                                    modifier = Modifier.weight(1f),
-                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                Column(
+                                    verticalArrangement = Arrangement.SpaceEvenly,
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Column(
-                                        verticalArrangement = Arrangement.SpaceEvenly,
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.menu_book),
-                                            contentDescription = null,
-                                            tint = Color.White
-                                        )
-                                        Text(
-                                            text = userRecipeCount?.toString() ?: "-",
-                                            style = MaterialTheme.typography.labelSmall,
-                                            color = Color.White
-                                        )
-                                    }
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.menu_book),
+                                        contentDescription = null,
+                                        tint = Color.White
+                                    )
+                                    Text(
+                                        text = userRecipeCount?.toString() ?: "-",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = Color.White
+                                    )
+                                }
 
-                                    Column(
-                                        verticalArrangement = Arrangement.SpaceEvenly,
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.favorite_icon),
-                                            contentDescription = null,
-                                            tint = Color.White
-                                        )
-                                        Text(
-                                            text = userLikeCount?.toString() ?: "-",
-                                            style = MaterialTheme.typography.labelSmall,
-                                            color = Color.White
-                                        )
-                                    }
+                                Column(
+                                    verticalArrangement = Arrangement.SpaceEvenly,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.favorite_icon),
+                                        contentDescription = null,
+                                        tint = Color.White
+                                    )
+                                    Text(
+                                        text = userLikeCount?.toString() ?: "-",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = Color.White
+                                    )
                                 }
                             }
+                        }
 
-                            // Settings Button
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
                             IconButton(
-                                onClick = { navController.navigate("SettingsScreen") },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 8.dp)
+                                onClick = {
+                                    viewModel.clearAllRecipes()
+                                    viewModel.usr_currentPage = 0
+                                    viewModel.getUserRecipesList()
+                                    viewModel.getUserRecipeCount()
+                                    viewModel.getUserLikeCount()
+                                }
                             ) {
-                                Text(
-                                    text = "Settings",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = Color.White
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = "Refresh",
+                                    tint = Color.White
+                                )
+                            }
+
+                            IconButton(
+                                onClick = { navController.navigate("SettingsScreen") }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Settings,
+                                    contentDescription = "Settings",
+                                    tint = Color.White
                                 )
                             }
                         }
                     }
+                }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    // Recipe List or Empty Message
-                    if (recipes.isEmpty() && !isLoading) {
-                        // No Recipes Message
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(16.dp),
-                            contentAlignment = Alignment.Center
+                if (allRecipes.value.isEmpty() && !isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = "No recipes found.",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = CharcoalColor
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = "Do you want to add a recipe?",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = DarkOrangeColor,
-                                    modifier = Modifier.clickable {
-                                        navController.navigate("addRecipe") // Navigate to Add Recipe Screen
-                                    }
-                                )
+                            Text(
+                                text = "No recipes found.",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = CharcoalColor
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Do you want to add a recipe?",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = DarkOrangeColor,
+                                modifier = Modifier.clickable {
+                                    navController.navigate("addRecipe")
+                                }
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Refresh The Page",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = DarkOrangeColor,
+                                modifier = Modifier.clickable {
+                                    viewModel.clearAllRecipes()
+                                    viewModel.usr_currentPage = 0
+                                    viewModel.getUserRecipesList()
+                                    viewModel.getUserRecipeCount()
+                                    viewModel.getUserLikeCount()
+                                }
+                            )
+                        }
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        itemsIndexed(allRecipes.value) { index, recipe ->
+                            RecipeCard(
+                                recipe = recipe,
+                                onClick = {
+                                    navController.navigate("recipeDetails/${recipe.id}")
+                                },
+                                onEditClick = {
+                                    navController.navigate("editRecipe/${recipe.id}")
+                                },
+                                isProfileScreen = true
+                            )
+                            if (index == allRecipes.value.lastIndex) {
+                                viewModel.getUserRecipesList()
                             }
                         }
-                    } else {
-                        // LazyColumn for Recipes
-                        LazyColumn(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            itemsIndexed(recipes) { index, recipe ->
-                                RecipeCard(
-                                    recipe = recipe,
-                                    onClick = {
-                                        navController.navigate("recipeDetails/${recipe.id}")
-                                    },
-                                    onEditClick = {
-                                        navController.navigate("editRecipe/${recipe.id}")
-                                    },
-                                    isProfileScreen = true
-                                )
-                                if (index == viewModel.userrecipe.collectAsState().value.lastIndex) {
-                                    viewModel.getUserRecipesList()
-                                }
-                            }
-                            if (isLoading) {
-                                item {
-                                    Box(
+                        if (isLoading) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
                                         modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier
-                                                .padding(16.dp)
-                                                .height(36.dp)
-                                                .fillMaxWidth(0.1f),
-                                            strokeWidth = 5.dp,
-                                            color = CharcoalColor
-                                        )
-                                    }
+                                            .padding(16.dp)
+                                            .height(36.dp)
+                                            .fillMaxWidth(0.1f),
+                                        strokeWidth = 5.dp,
+                                        color = CharcoalColor
+                                    )
                                 }
                             }
                         }
                     }
                 }
             }
-        },
-    )
+        }
+    }
 }

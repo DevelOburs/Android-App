@@ -201,7 +201,7 @@ fun AddEditFoodScreen(navController: NavController, viewModel: FridgeViewModel =
                                 Column {
                                     Text("How many ${selectedFood?.Name} would you like?")
                                     TextField(
-                                        value = "", //
+                                        value = quantity, //
                                         onValueChange = { quantity = it },
                                         label = { Text("Quantity") },
                                     )

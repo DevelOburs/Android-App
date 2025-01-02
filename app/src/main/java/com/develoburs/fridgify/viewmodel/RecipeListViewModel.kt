@@ -2,6 +2,7 @@ package com.develoburs.fridgify.viewmodel
 
 import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.develoburs.fridgify.model.Recipe
@@ -67,6 +68,12 @@ class RecipeListViewModel(
     private val _isDeletingComment = MutableStateFlow(false)
     val isDeletingComment: StateFlow<Boolean> = _isDeletingComment
 
+    var name = mutableStateOf("")
+    var description = mutableStateOf("")
+    var calories = mutableStateOf(0)
+    var cookingTime = mutableStateOf(0)
+    var category = mutableStateOf("APPETIZERS_AND_SNACKS")
+
     fun setIsLikingLoading(isLoading: Boolean) {
         _isLiking.value = isLoading
     }
@@ -78,7 +85,7 @@ class RecipeListViewModel(
     private var currentPage = 0
     private val pageSize = 10
 
-    private var usr_currentPage = 0
+    var usr_currentPage = 0
     private val usr_pageSize = 10
     private var usr_isLastPage = false
 
@@ -131,6 +138,10 @@ class RecipeListViewModel(
         currentPage = 0
         isLastPage = false
         _recipe.value = emptyList()
+    }
+
+    fun clearAllRecipes() {
+        _userrecipe.value = emptyList() // Set the value to an empty list
     }
 
     fun fetchNextPage() {
@@ -371,7 +382,7 @@ class RecipeListViewModel(
         _isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                Log.d(tag, "Getting recipes for page:$usr_currentPage and limit:$usr_pageSize")
+                Log.d(tag, "Getting recipes for user page:$usr_currentPage and limit:$usr_pageSize")
                 val recipeList = repository.getUserRecipeList(usr_pageSize, usr_currentPage)
                 if(currentPage == 0 && recipeList.isEmpty()){
                     setShowNoRecipeDialog(true)
