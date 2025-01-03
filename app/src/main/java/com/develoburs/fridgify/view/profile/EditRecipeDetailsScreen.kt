@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -71,7 +72,8 @@ fun EditRecipeScreen(
     var imageUrl by remember { mutableStateOf(recipe.Image ?: "") }
     var category by remember { mutableStateOf(recipe.Category) }
 
-
+    var showDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
     val ingredients: List<Food>? = recipe.ingredients
     val selectedItems = fviewModel.selectedFoods
 
@@ -273,6 +275,13 @@ fun EditRecipeScreen(
                                 disabledContentColor = Color.White
                             ),
                             onClick = {
+                                if (name?.isBlank() == true) {
+                                    errorMessage = "Recipe name cannot be empty."
+                                    showDialog = true
+                                } else if (selectedItems.isEmpty()) {
+                                    errorMessage = "Ingredients cannot be empty."
+                                    showDialog = true
+                                } else {
                                 val updatedRecipe = createRecipe(
                                     name = name,
                                     description = description,
@@ -292,6 +301,7 @@ fun EditRecipeScreen(
                                 Log.d("RecipeUpdate", "Updated recipe: $updatedRecipe")
                                 selectedItems.clear()
                                 onSave(recipe.id.toInt(), updatedRecipe)
+                                }
                             },
                             modifier = Modifier.weight(1f)
                         ) {
@@ -302,5 +312,39 @@ fun EditRecipeScreen(
             }
         }
     )
+    // Error Dialog
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = {
+                Text(
+                    text = "Error",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = com.develoburs.fridgify.ui.theme.BurgundyColor
+                )
+            },
+            text = {
+                Text(
+                    text = errorMessage,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = com.develoburs.fridgify.ui.theme.OrangeColor
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = { showDialog = false },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = com.develoburs.fridgify.ui.theme.BurgundyColor,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "OK",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            }
+        )
+    }
 }
 

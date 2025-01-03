@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -67,12 +68,9 @@ fun AddRecipeScreen(
     var calories by viewModel.calories
     var cookingTime by viewModel.cookingTime
     var category by viewModel.category
-
     var ingredients by rememberSaveable { mutableStateOf(listOf<String>()) }
-    // Get the context for image upload
-    val context = LocalContext.current
 
-    // Collect image URL from ViewModel
+    val context = LocalContext.current
     val imageUrl by viewModel.imageUrl.collectAsState()
 
     val categoryMap = mapOf(
@@ -87,6 +85,8 @@ fun AddRecipeScreen(
     )
 
     val selectedItems = fviewModel.selectedFoods
+    var showDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
 
     fun resetState() {
         name = ""
@@ -96,12 +96,13 @@ fun AddRecipeScreen(
         cookingTime = 0
         category = "APPETIZERS_AND_SNACKS"
     }
-    // Clear selectedItems when the composable is removed
+
     DisposableEffect(Unit) {
         onDispose {
             selectedItems.clear()
         }
     }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -132,7 +133,6 @@ fun AddRecipeScreen(
                         RecipeImagePicker(
                             imageUrl = imageUrl,
                             onImageSelected = { uri ->
-                                // Pass the URI to ViewModel for upload
                                 uri?.let { viewModel.uploadImage(it) }
                             },
                             modifier = Modifier.fillMaxWidth()
@@ -163,8 +163,7 @@ fun AddRecipeScreen(
                     item {
                         OutlinedTextField(
                             value = cookingTime.toString(),
-                            onValueChange = { input ->
-                                cookingTime = input.toIntOrNull() ?: 0 },
+                            onValueChange = { input -> cookingTime = input.toIntOrNull() ?: 0 },
                             label = { Text(text = "Cooking Time (mins)", style = MaterialTheme.typography.titleMedium) },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -174,8 +173,7 @@ fun AddRecipeScreen(
                     item {
                         OutlinedTextField(
                             value = calories.toString(),
-                            onValueChange = { input ->
-                                calories = input.toIntOrNull() ?: 0 },
+                            onValueChange = { input -> calories = input.toIntOrNull() ?: 0 },
                             label = { Text(text = "Calories", style = MaterialTheme.typography.titleMedium) },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -228,10 +226,7 @@ fun AddRecipeScreen(
                             modifier = Modifier.height(200.dp)
                         ) {
                             items(selectedItems) { food ->
-                                FoodCard(
-                                    food = food,
-                                    onClick = {}
-                                )
+                                FoodCard(food = food, onClick = {})
                             }
                             // Add Food Card
                             item {
@@ -242,44 +237,84 @@ fun AddRecipeScreen(
                 }
 
                 // Save Button positioned at the bottom
-                Button(colors = ButtonDefaults.buttonColors(
-                    containerColor = com.develoburs.fridgify.ui.theme.BurgundyColor,
-                    contentColor = Color.White,
-                    disabledContainerColor = Color.White,
-                    disabledContentColor = Color.White
-                ),
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = com.develoburs.fridgify.ui.theme.BurgundyColor,
+                        contentColor = Color.White
+                    ),
                     onClick = {
-
-                        val newRecipe = createRecipe(
-                            name = name,
-                            description = description,
-                            userId = repository.getUserID().toString(), // Replace with actual user ID
-                            userUsername = repository.getUserName(),
-                            userFirstName = repository.getUserName(),
-                            userLastName = repository.getUserName(),
-                            likeCount = 0,
-                            commentCount = 0,
-                            saveCount = 0,
-                            ingredients = selectedItems,
-                            imageUrl = imageUrl ?: "deneme",
-                            category = category,
-                            calories = calories,
-                            cookingTime = cookingTime
-                        )
-                        // Debug log
-                        Log.d("RecipeCreation", "New recipe created: $newRecipe")
-                        onSave(newRecipe)
-                        resetState()
-                        selectedItems.clear()
+                        if (name.isBlank()) {
+                            errorMessage = "Recipe name cannot be empty."
+                            showDialog = true
+                        } else if (selectedItems.isEmpty()) {
+                            errorMessage = "Ingredients cannot be empty."
+                            showDialog = true
+                        } else {
+                            val newRecipe = createRecipe(
+                                name = name,
+                                description = description,
+                                userId = repository.getUserID().toString(),
+                                userUsername = repository.getUserName(),
+                                userFirstName = repository.getUserName(),
+                                userLastName = repository.getUserName(),
+                                likeCount = 0,
+                                commentCount = 0,
+                                saveCount = 0,
+                                ingredients = selectedItems,
+                                imageUrl = imageUrl ?: "deneme",
+                                category = category,
+                                calories = calories,
+                                cookingTime = cookingTime
+                            )
+                            Log.d("RecipeCreation", "New recipe created: $newRecipe")
+                            onSave(newRecipe)
+                            resetState()
+                            selectedItems.clear()
+                        }
                     },
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(16.dp)
                 ) {
-                    Text(text = "Save Recipe", style = MaterialTheme.typography.bodyLarge)
+                    Text(text = "Save Recipe", style = MaterialTheme.typography.bodyLarge, color = com.develoburs.fridgify.ui.theme.BrightGreenColor)
                 }
+
+
             }
         }
     )
+    // Error Dialog
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = {
+                Text(
+                    text = "Error",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = com.develoburs.fridgify.ui.theme.BurgundyColor
+                )
+            },
+            text = {
+                Text(
+                    text = errorMessage,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = com.develoburs.fridgify.ui.theme.OrangeColor
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = { showDialog = false },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = com.develoburs.fridgify.ui.theme.BurgundyColor,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "OK",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            }
+        )
+    }
 }
-
