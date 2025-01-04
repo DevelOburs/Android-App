@@ -29,6 +29,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 //import androidx.compose.ui.graphics.Color
 import com.develoburs.fridgify.ui.theme.DarkBlueColor
 import coil.compose.rememberAsyncImagePainter
@@ -51,7 +53,7 @@ fun FoodCard(
     Card(
         modifier = Modifier
             .padding(horizontal = 5.dp, vertical = 4.dp)
-            .size(cardSize)
+            .size(cardSize,height = cardSize * 1.1f)
             .clickable { onClick() }
             .border(
                 width = 2.dp,
@@ -68,7 +70,8 @@ fun FoodCard(
         ) {
             Box(
                 modifier = Modifier
-                    .size(cardSize * 0.75f),
+                    .size(cardSize * 0.65f)
+                    .padding(top = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -83,19 +86,15 @@ fun FoodCard(
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
                 contentAlignment = Alignment.Center
-            ) {Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
-                    .padding(horizontal = 8.dp)
-            ){
+            ) {
                 Text(
                     text = food.Name ?: "Unknown",
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(start = 2.dp,end = 8.dp)
-                )}
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }
@@ -104,7 +103,7 @@ fun FoodCard(
 @Composable
 fun AddFoodCard(onClick: () -> Unit) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val cardSize = screenWidth / 4
+    val cardSize = screenWidth / 3
 
     Card(
         modifier = Modifier
@@ -135,7 +134,7 @@ fun AddFoodCard(onClick: () -> Unit) {
 @Composable
 fun DeleteFoodCard(onClick: () -> Unit) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val cardSize = screenWidth / 4
+    val cardSize = screenWidth / 3
 
     Card(
         modifier = Modifier

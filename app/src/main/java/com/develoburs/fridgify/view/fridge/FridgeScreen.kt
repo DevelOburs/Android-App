@@ -87,7 +87,8 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
 
                 ),
                 modifier = Modifier
-                    .height(50.dp)
+                    .height(55.dp)
+                    .padding(bottom = 5.dp)
             )
         },
         content = { paddingValues ->
