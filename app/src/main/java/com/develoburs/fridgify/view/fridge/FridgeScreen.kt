@@ -1,9 +1,6 @@
 package com.develoburs.fridgify.view.fridge
 
-import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 
 import androidx.compose.foundation.clickable
@@ -44,7 +41,6 @@ import androidx.navigation.NavController
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.BlackColor
 import com.develoburs.fridgify.ui.theme.CharcoalColor
-import com.develoburs.fridgify.ui.theme.CreamColor2
 import com.develoburs.fridgify.ui.theme.DarkOrangeColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
 import com.develoburs.fridgify.viewmodel.FridgeViewModel

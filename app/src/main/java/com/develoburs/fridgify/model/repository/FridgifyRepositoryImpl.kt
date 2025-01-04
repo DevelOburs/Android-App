@@ -287,7 +287,6 @@ class FridgifyRepositoryImpl : FridgifyRepository {
 
     override suspend fun getFoodList(category: String?): List<Food> {
         try {
-            Log.d("API_CALL", "getFoodList - Formatted Category: $category")
 
             val foods = fridgeapi.getFood(
                 token = "Bearer ${getToken()}",
@@ -295,7 +294,7 @@ class FridgifyRepositoryImpl : FridgifyRepository {
                 category = if (category == null) null else listOf(category)
 
             )
-            Log.d("API_CALL", "getFoodList - Formatted Category: $category")
+            Log.d("API_CALL", "getFoodList - Category: $category")
 
 
             return foods

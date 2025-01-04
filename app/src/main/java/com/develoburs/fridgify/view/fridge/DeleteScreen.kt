@@ -17,6 +17,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -34,7 +35,6 @@ import androidx.navigation.NavController
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.ui.theme.BlackColor
 import com.develoburs.fridgify.ui.theme.CharcoalColor
-import com.develoburs.fridgify.ui.theme.CreamColor2
 import com.develoburs.fridgify.ui.theme.DarkOrangeColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
 
@@ -85,7 +85,7 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Delete screen",
+                        text = "Delete Screen",
                         color = CharcoalColor,
                         style = MaterialTheme.typography.labelMedium
                     )
@@ -206,10 +206,9 @@ fun DeleteScreen(navController: NavController, viewModel: FridgeViewModel = view
                             items(filteredFoods) { food ->
                                 Box(
                                     modifier = Modifier
-                                        .padding(4.dp)
                                         .background(
                                             color = if (selectedItems.contains(food)) Color.Green else Color.Transparent,
-                                            shape = RectangleShape
+                                            shape = RoundedCornerShape(8.dp)
                                         )
                                         .clickable {
                                             if (selectedItems.contains(food)) {
