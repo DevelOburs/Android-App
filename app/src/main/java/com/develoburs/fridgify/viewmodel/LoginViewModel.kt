@@ -18,11 +18,11 @@ class LoginViewModel(
     private val repository: FridgifyRepositoryImpl
 ) : ViewModel() {
 
-    fun login(username: String, email: String, password: String, onResult: (LoginResponse) -> Unit) {
+    fun login(username: String, password: String, onResult: (LoginResponse) -> Unit) {
         viewModelScope.launch {
             try {
                 val response = authApi.login(
-                    loginRequest = LoginRequest(username, email, password)
+                    loginRequest = LoginRequest(username, password)
                 )
                 if (response.error.isNullOrEmpty()) {
                     // Save the token in the repository

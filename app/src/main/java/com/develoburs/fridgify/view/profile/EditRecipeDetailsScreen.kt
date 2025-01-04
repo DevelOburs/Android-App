@@ -1,7 +1,7 @@
 package com.develoburs.fridgify.view.profile
 
 import android.util.Log
-import androidx.compose.foundation.Image
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -33,7 +34,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,11 +41,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
+import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.model.Recipe
 import com.develoburs.fridgify.model.createRecipe
 import com.develoburs.fridgify.model.repository.FridgifyRepositoryImpl
@@ -71,15 +70,24 @@ fun EditRecipeScreen(
     var calories by remember { mutableStateOf(recipe.calories) }
     var cookingTime by remember { mutableStateOf(recipe.cookingTime) }
     var imageUrl by remember { mutableStateOf(recipe.Image ?: "") }
-    var category by remember { mutableStateOf("APPETIZERS_AND_SNACKS") }
+    var category by remember { mutableStateOf(recipe.Category) }
+
+    var showDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    val ingredients: List<Food>? = recipe.ingredients
+    val selectedItems = fviewModel.selectedFoods
 
     LaunchedEffect(recipe.id) {
-        viewModel.getRecipeIngredients(recipe.id)
+        ingredients?.forEach { ingredient ->
+            // Check if the ingredient is not already in selectedItems before adding
+            if (!selectedItems.any { it.id == ingredient.id }) {
+                selectedItems.add(ingredient)
+            }
+        }
     }
-    val foods by viewModel.food.collectAsState()
+
 
     val categoryMap = mapOf(
-        "ALL" to "All",
         "APPETIZERS_AND_SNACKS" to "Appetizers and Snacks",
         "MAIN_DISHES" to "Main Dishes",
         "SIDE_DISHES" to "Side Dishes",
@@ -90,14 +98,16 @@ fun EditRecipeScreen(
         "SPECIAL_DIETS" to "Special Diets"
     )
 
-    val selectedItems = fviewModel.selectedFoods
-    //selectedItems += foods
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(text = "Edit Recipe", style = MaterialTheme.typography.labelMedium) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = {
+                        selectedItems.clear() // Clear selected items when navigating back
+                        onBack()
+                    }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
@@ -119,18 +129,13 @@ fun EditRecipeScreen(
                 ) {
                     // Recipe Image Section
                     item {
-                        Image(
-                            painter = rememberAsyncImagePainter(imageUrl),
-                            contentDescription = "Recipe Image",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .size(200.dp)
-                                .padding(8.dp)
-                                .clickable {
-                                    // Simulate image selection
-                                    imageUrl = "newImageUri" // Simulating image change
-                                },
-                            contentScale = ContentScale.Crop
+                        RecipeImagePicker(
+                            imageUrl = imageUrl,
+                            onImageSelected = { uri ->
+                                // Pass the URI to ViewModel for upload
+                                uri?.let { viewModel.uploadImage(it) }
+                            },
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
 
@@ -224,7 +229,7 @@ fun EditRecipeScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier.height(200.dp)
                         ) {
-                            items(selectedItems+ foods ) { food ->
+                            items(selectedItems) { food ->
                                 FoodCard(
                                     food = food,
                                     onClick = {}
@@ -270,6 +275,13 @@ fun EditRecipeScreen(
                                 disabledContentColor = Color.White
                             ),
                             onClick = {
+                                if (name?.isBlank() == true) {
+                                    errorMessage = "Recipe name cannot be empty."
+                                    showDialog = true
+                                } else if (selectedItems.isEmpty()) {
+                                    errorMessage = "Ingredients cannot be empty."
+                                    showDialog = true
+                                } else {
                                 val updatedRecipe = createRecipe(
                                     name = name,
                                     description = description,
@@ -280,8 +292,8 @@ fun EditRecipeScreen(
                                     likeCount = recipe.Likes,
                                     commentCount = recipe.Comments,
                                     saveCount = recipe.saveCount,
-                                    ingredients = (selectedItems.map { it.Name }),
-                                    imageUrl = imageUrl ?: "deneme",
+                                    ingredients = selectedItems.toList(),
+                                    imageUrl = imageUrl,
                                     category = category,
                                     calories = calories,
                                     cookingTime = cookingTime
@@ -289,6 +301,7 @@ fun EditRecipeScreen(
                                 Log.d("RecipeUpdate", "Updated recipe: $updatedRecipe")
                                 selectedItems.clear()
                                 onSave(recipe.id.toInt(), updatedRecipe)
+                                }
                             },
                             modifier = Modifier.weight(1f)
                         ) {
@@ -299,4 +312,39 @@ fun EditRecipeScreen(
             }
         }
     )
+    // Error Dialog
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = {
+                Text(
+                    text = "Error",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = com.develoburs.fridgify.ui.theme.BurgundyColor
+                )
+            },
+            text = {
+                Text(
+                    text = errorMessage,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = com.develoburs.fridgify.ui.theme.OrangeColor
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = { showDialog = false },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = com.develoburs.fridgify.ui.theme.BurgundyColor,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "OK",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            }
+        )
+    }
 }
+

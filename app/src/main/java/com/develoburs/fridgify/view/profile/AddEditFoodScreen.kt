@@ -1,46 +1,56 @@
 package com.develoburs.fridgify.view.profile
 
-import com.develoburs.fridgify.view.fridge.FoodCard
-
-import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.develoburs.fridgify.viewmodel.FridgeViewModel
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.ui.theme.BlackColor
+import com.develoburs.fridgify.view.fridge.FoodCard
+import com.develoburs.fridgify.viewmodel.FridgeViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,14 +65,17 @@ fun AddEditFoodScreen(navController: NavController, viewModel: FridgeViewModel =
     if (allFoods.isEmpty()) {
         viewModel.getAllFoodList() // Call the method to fetch recipes
     }
-
-    val filteredFoods = remember("", allFoods) { // TEST FILTER
-        allFoods.filter { it.Name.contains("", ignoreCase = true) }
+    LaunchedEffect(Unit) {
+        viewModel.getAllFoodList()
+    }
+    val filteredFoods = remember(searchQuery, allFoods) {
+        allFoods.filter { it.Name.contains(searchQuery, ignoreCase = true) }
     }
 
+    var showDialog by remember { mutableStateOf(false) }
+    var selectedFood by remember { mutableStateOf<Food?>(null) }
+    var quantity by remember { mutableStateOf("") }
     val selectedItems = viewModel.selectedFoods
-
-    var showSnackbar by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -125,52 +138,116 @@ fun AddEditFoodScreen(navController: NavController, viewModel: FridgeViewModel =
                                     modifier = Modifier
                                         .padding(4.dp)
                                         .background(
-                                            color = if (selectedItems.contains(food)) Color.Green else Color.Transparent,
+                                            color = if (selectedItems.map { it.id }.contains(food.id)) Color.Green else Color.Transparent,
                                             shape = RectangleShape
                                         )
                                         .clickable {
-                                            if (selectedItems.contains(food)) {
-                                                selectedItems.remove(food)
+                                            if (selectedItems.map { it.id }.contains(food.id)) {
+                                                selectedItems.removeIf { it.id == food.id }
                                             } else {
-                                                selectedItems.add(food)
+                                                selectedFood = food
+                                                showDialog = true
                                             }
                                         }
                                 ) {
                                     FoodCard(
                                         food = food,
                                         onClick = {
-                                            if (selectedItems.contains(food)) {
-                                                selectedItems.remove(food)
+                                            if (selectedItems.map { it.id }.contains(food.id)) {
+                                                selectedItems.removeIf { it.id == food.id }
                                             } else {
-                                                selectedItems.add(food)
+                                                selectedFood = food
+                                                showDialog = true
                                             }
                                         }
                                     )
-
-
                                 }
                             }
+
                         }
                     }
-
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Button(onClick = { navController.popBackStack() }) {
-                            Text(text = "Exit", style = MaterialTheme.typography.labelLarge)
+                        Button(colors = ButtonDefaults.buttonColors(
+                            containerColor = com.develoburs.fridgify.ui.theme.BurgundyColor,
+                            contentColor = Color.White,
+                            disabledContainerColor = Color.White,
+                            disabledContentColor = Color.White
+                        ),modifier = Modifier.weight(1f),onClick = { navController.popBackStack() }) {
+                            Text(text = "Exit", style = MaterialTheme.typography.labelMedium)
                         }
-                        Button(onClick = {
+                        Button(colors = ButtonDefaults.buttonColors(
+                            containerColor = com.develoburs.fridgify.ui.theme.BrightGreenColor,
+                            contentColor = Color.White,
+                            disabledContainerColor = Color.White,
+                            disabledContentColor = Color.White
+                        ),modifier = Modifier.weight(1f),onClick = {
                             navController.popBackStack()
                         }) {
-                            Text(text = "Add", style = MaterialTheme.typography.labelLarge)
+                            Text(text = "Add", style = MaterialTheme.typography.labelMedium)
                         }
 
 
                     }
+                    if (showDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showDialog = false },
+                            title = { Text("Enter Quantity") },
+                            text = {
+                                Column {
+                                    Text("How many ${selectedFood?.Name} would you like?")
+                                    TextField(
+                                        value = quantity, //
+                                        onValueChange = { quantity = it },
+                                        label = { Text("Quantity") },
+                                    )
+                                }
+                            },
+                            confirmButton = {
+                                Button(
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = com.develoburs.fridgify.ui.theme.BrightGreenColor,
+                                        contentColor = Color.White,
+                                        disabledContainerColor = Color.White,
+                                        disabledContentColor = Color.White
+                                    ),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(8.dp), // Adjust padding to make it smaller
+                                    onClick = {
+                                        selectedFood?.let {
+                                            it.Quantity = quantity
+                                            selectedItems.add(it)
+                                        }
+                                        showDialog = false
+                                    }
+                                ) {
+                                    Text("OK", style = MaterialTheme.typography.labelSmall)
+                                }
+                            },
+                            dismissButton = {
+                                Button(
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = com.develoburs.fridgify.ui.theme.BurgundyColor,
+                                        contentColor = Color.White,
+                                        disabledContainerColor = Color.White,
+                                        disabledContentColor = Color.White
+                                    ),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(8.dp), // Adjust padding to make it smaller
+                                    onClick = { showDialog = false }
+                                ) {
+                                    Text("Cancel", style = MaterialTheme.typography.labelSmall)
+                                }
+                            }
 
+                        )
+                    }
 
                 }
             }

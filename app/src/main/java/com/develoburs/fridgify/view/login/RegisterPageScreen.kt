@@ -1,6 +1,5 @@
 package com.develoburs.fridgify.view.login
 
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -19,17 +18,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.develoburs.fridgify.view.bottombar.BottomBarScreen
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.DarkBlueColor
 import com.develoburs.fridgify.ui.theme.LightOrangeColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
-import com.develoburs.fridgify.ui.theme.PaleWhiteColor
 import com.develoburs.fridgify.viewmodel.LoginViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,6 +39,11 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
     var registerResult by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
+    // State for error dialog
+    var showDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+
+    // Column Layout
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -160,14 +161,21 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
         // Register Button
         Button(
             onClick = {
-                viewModel.register(username, email, password, firstName, lastName) { response ->
-                    registerResult = if (response.userId != -1) {
-                        navController.navigate("login") {
-                            popUpTo("register") { inclusive = true }
+                // Validation: Check for empty fields
+                if (username.isEmpty() || email.isEmpty() || password.isEmpty() || firstName.isEmpty() || lastName.isEmpty() || phoneNumber.isEmpty()) {
+                    errorMessage = "All fields are required."
+                    showDialog = true
+                } else {
+                    // Perform registration
+                    viewModel.register(username, email, password, firstName, lastName) { response ->
+                        if (response.userId != -1) {
+                            navController.navigate("login") {
+                                popUpTo("register") { inclusive = true }
+                            }
+                        } else {
+                            errorMessage = "Error: Registration failed. Please try again."
+                            showDialog = true
                         }
-                        "Welcome, ${response.username} (ID: ${response.userId})"
-                    } else {
-                        "Error: Registration failed. Please try again."
                     }
                 }
             },
@@ -186,5 +194,42 @@ fun RegisterPageScreen(navController: NavController, viewModel: LoginViewModel =
         ) {
             Text(text = "Already have an account? Login", style = MaterialTheme.typography.bodyMedium, color = OrangeColor)
         }
+    }
+
+    // Error Dialog
+    // Error Dialog
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = {
+                Text(
+                    text = "Error",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = OrangeColor // Adjust the color as needed
+                )
+            },
+            text = {
+                Text(
+                    text = errorMessage,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = OrangeColor // Adjust the color as needed
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = { showDialog = false },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = OrangeColor, // Same color as register button
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "OK",
+                        style = MaterialTheme.typography.titleMedium // Same style as register button
+                    )
+                }
+            },
+            dismissButton = null // Optional: Add a dismiss button if needed
+        )
     }
 }

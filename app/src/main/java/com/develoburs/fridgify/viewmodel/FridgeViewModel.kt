@@ -35,12 +35,12 @@ class FridgeViewModel(private val repository: FridgifyRepositoryImpl) : ViewMode
         getAllFoodList()
     }
 
-    fun getAllFoodList(category: String? = null) {
+    fun getAllFoodList() {
         if (_isLoading.value ) return
         _isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val foodList = repository.getFoodList(category)
+                val foodList = repository.getAllFoodList()
                 _allfood.value = foodList
             } catch (e: Exception) {
                 Log.e("FridgeViewModel", "Failed to fetch food list", e)

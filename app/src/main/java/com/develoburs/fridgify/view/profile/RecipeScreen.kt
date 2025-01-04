@@ -1,30 +1,37 @@
 package com.develoburs.fridgify.view.profile
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import androidx.navigation.NavController
-import com.develoburs.fridgify.viewmodel.RecipeListViewModel
-import com.develoburs.fridgify.view.home.RecipeCard
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.develoburs.fridgify.ui.theme.CharcoalColor
-
+import com.develoburs.fridgify.view.home.RecipeCard
+import com.develoburs.fridgify.viewmodel.RecipeListViewModel
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeScreen(
     navController: NavController,
@@ -47,6 +54,19 @@ fun RecipeScreen(
     }
 
     Column {
+        TopAppBar(
+            title = {
+                Text(
+                    text = if (recipeType == "liked") "Liked Recipes" else "Saved Recipes",
+                    color = CharcoalColor,
+                    style = MaterialTheme.typography.labelMedium
+                )
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.Transparent
+            ),
+            modifier = Modifier.height(50.dp)
+        )
         // Back button at the top of the screen
         IconButton(onClick = { navController.popBackStack() }) {
             Icon(
@@ -56,7 +76,7 @@ fun RecipeScreen(
         }
 
         // Show a message if the list is empty
-        if (recipes.isEmpty()) {
+        if (recipes.isEmpty() && !isLoading) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()

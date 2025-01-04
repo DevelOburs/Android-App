@@ -15,4 +15,6 @@ data class Food(
     @SerializedName("imageUrl")
     val ImageUrl: String,
 
+    @SerializedName("quantity")
+    var Quantity: String?,
     )

@@ -50,7 +50,10 @@ interface FridgeApi {
         @Query("category") category: List<String>? = null
         ): List<Food>
 
-
+    @GET("recipe-api/ingredient")
+    suspend fun getAllFood(
+        @Header("Authorization") token: String
+    ): List<Food>
 
 }
 

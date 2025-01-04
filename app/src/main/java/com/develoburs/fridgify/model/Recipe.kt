@@ -27,6 +27,9 @@ data class Recipe(
     @SerializedName("imageUrl")
     val Image: String?,
 
+    @SerializedName("category")
+    val Category: String?,
+
     @SerializedName("description")
     val instructions: String?,
 
@@ -77,7 +80,7 @@ data class createRecipe(
     val saveCount: Int? = 0, // Added to match schema
 
     @SerializedName("ingredients")
-    val ingredients: List<String>?, // List of ingredients
+    val ingredients: List<Food>?, // List of ingredients
 
     @SerializedName("imageUrl")
     val imageUrl: String?, // Updated to lowercase for consistency

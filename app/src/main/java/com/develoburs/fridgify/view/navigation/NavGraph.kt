@@ -1,5 +1,6 @@
 package com.develoburs.fridgify.view.navigation
 
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -131,7 +132,8 @@ fun NavGraph(
                     recipeListViewModel.addRecipe(repository.getUserID().toString(), newRecipe) // Add the new recipe to your ViewModel
                     navController.popBackStack() // Navigate back after saving
                 },
-                onBack = { navController.popBackStack() } // Handle back navigation
+                onBack = {
+                    navController.popBackStack() } // Handle back navigation
             )
         }
 
@@ -143,7 +145,6 @@ fun NavGraph(
 
             // Observe the recipe state from the ViewModel
             val recipe by recipeListViewModel.recipeDetail.collectAsState()
-
             // Trigger the recipe fetch when entering the composable
             LaunchedEffect(recipeId) {
                 recipeListViewModel.getRecipeById(recipeId)
