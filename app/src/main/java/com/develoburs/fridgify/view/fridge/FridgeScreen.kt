@@ -75,7 +75,8 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
                     Text(
                         text = stringResource(id = R.string.fridge),
                         color = CharcoalColor,
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.padding(bottom = 12.dp)
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -83,8 +84,7 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
 
                 ),
                 modifier = Modifier
-                    .height(55.dp)
-                    .padding(bottom = 5.dp)
+                    .height(65.dp)
             )
         },
         content = { paddingValues ->

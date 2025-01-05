@@ -33,7 +33,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.navigation.NavController
 import com.develoburs.fridgify.model.Food
 import com.develoburs.fridgify.ui.theme.BlackColor
@@ -91,7 +90,8 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
                     Text(
                         text = "Adding Screen",
                         color = CharcoalColor,
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.padding(bottom = 12.dp)
                     )
                 },
                 navigationIcon = {
@@ -107,8 +107,7 @@ fun AddingScreen(navController: NavController, viewModel: FridgeViewModel = view
                     containerColor = Color.Transparent
                 ),
                 modifier = Modifier
-                    .height(55.dp)
-                    .padding(bottom = 5.dp)
+                    .height(65.dp)
 
             )
         },
