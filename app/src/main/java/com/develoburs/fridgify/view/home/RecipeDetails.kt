@@ -34,6 +34,7 @@ import com.develoburs.fridgify.viewmodel.RecipeListViewModel
 import com.develoburs.fridgify.viewmodel.RecipeListViewModelFactory
 import androidx.navigation.NavController
 import com.develoburs.fridgify.model.repository.FridgifyRepositoryImpl
+import com.develoburs.fridgify.ui.theme.CharcoalColor
 import com.develoburs.fridgify.ui.theme.CreamColor
 import com.develoburs.fridgify.ui.theme.CreamColor2
 import com.develoburs.fridgify.ui.theme.MintColor
@@ -182,7 +183,7 @@ fun RecipeDetailsScreen(
                 title = {
                     Text(
                         text = recipe?.Name ?: stringResource(id = R.string.unknown_recipe),
-                        color = BlackColor,
+                        color = CharcoalColor,
                         style = MaterialTheme.typography.labelMedium
                     )
                 },
@@ -191,7 +192,7 @@ fun RecipeDetailsScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(id = R.string.back),
-                            tint = BlackColor
+                            tint = CharcoalColor
                         )
                     }
                 },
