@@ -4,7 +4,6 @@ package com.develoburs.fridgify.view.fridge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,23 +17,18 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.develoburs.fridgify.model.Food
 
-import com.develoburs.fridgify.ui.theme.BlueColor
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-//import androidx.compose.ui.graphics.Color
-import com.develoburs.fridgify.ui.theme.DarkBlueColor
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.rememberAsyncImagePainter
 import com.develoburs.fridgify.ui.theme.LightOrangeColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
-import com.develoburs.fridgify.ui.theme.YellowColor
 
 
 
@@ -51,7 +45,7 @@ fun FoodCard(
     Card(
         modifier = Modifier
             .padding(horizontal = 5.dp, vertical = 4.dp)
-            .size(cardSize)
+            .size(cardSize,height = cardSize * 1.1f)
             .clickable { onClick() }
             .border(
                 width = 2.dp,
@@ -68,7 +62,8 @@ fun FoodCard(
         ) {
             Box(
                 modifier = Modifier
-                    .size(cardSize * 0.75f),
+                    .size(cardSize * 0.65f)
+                    .padding(top = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -83,19 +78,15 @@ fun FoodCard(
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
                 contentAlignment = Alignment.Center
-            ) {Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
-                    .padding(horizontal = 8.dp)
-            ){
+            ) {
                 Text(
                     text = food.Name ?: "Unknown",
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(start = 2.dp,end = 8.dp)
-                )}
+                    modifier = Modifier.padding(horizontal = 6.dp),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }
@@ -108,9 +99,8 @@ fun AddFoodCard(onClick: () -> Unit) {
 
     Card(
         modifier = Modifier
-            .padding(horizontal = 4.dp)
-            .padding(bottom = 8.dp)
-            .size(cardSize)
+            .padding(horizontal = 5.dp, vertical = 4.dp)
+            .size(cardSize,height = cardSize * 1.1f)
             .border(
                 width = 2.dp,
                 color = OrangeColor,
@@ -139,9 +129,8 @@ fun DeleteFoodCard(onClick: () -> Unit) {
 
     Card(
         modifier = Modifier
-            .padding(horizontal = 4.dp)
-            .padding(bottom = 8.dp)
-            .size(cardSize)
+            .padding(horizontal = 5.dp, vertical = 4.dp)
+            .size(cardSize,height = cardSize * 1.1f)
             .border(
                 width = 2.dp,
                 color = OrangeColor,

@@ -1,9 +1,6 @@
 package com.develoburs.fridgify.view.fridge
 
-import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 
 import androidx.compose.foundation.clickable
@@ -44,7 +41,6 @@ import androidx.navigation.NavController
 import com.develoburs.fridgify.R
 import com.develoburs.fridgify.ui.theme.BlackColor
 import com.develoburs.fridgify.ui.theme.CharcoalColor
-import com.develoburs.fridgify.ui.theme.CreamColor2
 import com.develoburs.fridgify.ui.theme.DarkOrangeColor
 import com.develoburs.fridgify.ui.theme.OrangeColor
 import com.develoburs.fridgify.viewmodel.FridgeViewModel
@@ -79,7 +75,8 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
                     Text(
                         text = stringResource(id = R.string.fridge),
                         color = CharcoalColor,
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.padding(bottom = 12.dp)
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -87,7 +84,7 @@ fun FridgeScreen(navController: NavController, viewModel: FridgeViewModel = view
 
                 ),
                 modifier = Modifier
-                    .height(50.dp)
+                    .height(65.dp)
             )
         },
         content = { paddingValues ->

@@ -2,7 +2,6 @@ package com.develoburs.fridgify.viewmodel
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.develoburs.fridgify.model.Food
@@ -127,7 +126,7 @@ class FridgeViewModel(private val repository: FridgifyRepositoryImpl) : ViewMode
                 repository.removeFood(ingredientIds)
                 getFoodList()
             } catch (e: Exception) {
-                Log.e("FridgeViewModel", "Remove food", e)
+                Log.e("FridgeViewModel", "Delete food", e)
             }finally {
                 _isLoading.value = false
                 getFoodList()
